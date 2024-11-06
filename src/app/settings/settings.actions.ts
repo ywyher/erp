@@ -30,11 +30,9 @@ export async function updateSettings(data: { userId: string } & Partial<TSetting
         })
         .where(eq(user.id, data.userId))
 
-    console.log(result)
-
     if (!result) throw new Error('Profile not updated');
 
     return {
-        success: result
+        success: true
     };
 } 

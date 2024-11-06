@@ -65,7 +65,7 @@ export default function UploadPfp(
             oldFileName: session.user.image,
         })
 
-        if (pfpResult) {
+        if (pfpResult.success) {
             setFile(null)
             setPreviewUrl('')
             setTrigger(false)

@@ -86,7 +86,7 @@ export default function OnboardingForm({ setTrigger }: { setTrigger: React.Dispa
             };
         }
 
-        if (result && result.updated) {
+        if (result && result.success) {
             setIsLoading(false)
             setTrigger(true)
             await queryClient.invalidateQueries({ queryKey: ['session'] })

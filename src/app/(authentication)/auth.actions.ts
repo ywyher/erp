@@ -40,7 +40,7 @@ export async function onBoarding(data: { userId: string } & TOnBoardingSchema) {
     if (!result) throw new Error('profile not updated');
 
     return {
-        updated: result
+        success: true
     };
 }
 

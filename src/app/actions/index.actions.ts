@@ -65,7 +65,9 @@ export async function uploadPfp({
         })
         .where(eq(user.id, userId));
 
-    return result;
+    return {
+        success: true
+    };
 }
 
 
