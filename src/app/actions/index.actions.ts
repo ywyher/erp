@@ -59,7 +59,7 @@ export async function uploadPfp({
         await deleteFile(oldFileName);
     }
 
-    const result = await db.update(user)
+    await db.update(user)
         .set({
             image: fileName
         })
