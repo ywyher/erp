@@ -3,7 +3,7 @@ import { emailOTPClient, inferAdditionalFields, usernameClient } from "better-au
 import { auth } from "@/lib/auth"
 
 export const client = createAuthClient({
-    baseURL: process.env.BETTER_AUTH_URL! || 'http://localhost:3000',
+    baseURL: process.env.BETTER_AUTH_URL!,
     plugins: [
         usernameClient(),
         emailOTPClient(),
