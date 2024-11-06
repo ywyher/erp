@@ -1,12 +1,9 @@
 'use client'
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback } from "react"
 import { getSession } from "@/lib/auth-client"
 import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
 import { useQuery, useQueryClient } from "@tanstack/react-query"
-import Image from "next/image"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { uploadPfp, uploadToS3 } from "@/app/actions/index.actions"
 import { useToast } from "@/hooks/use-toast"
 import Pfp from "@/components/pfp"
@@ -55,7 +52,7 @@ export default function UploadPfp(
         }
     }
 
-    const handleUploadPfp = async () => {
+    const handleUploadPfp = useCallback(async () => {
         if (!session || !file) return
 
         const result = await uploadToS3({ file })
@@ -69,7 +66,6 @@ export default function UploadPfp(
         })
 
         if (pfpResult) {
-            console.log('pfpresult')
             setFile(null)
             setPreviewUrl('')
             setTrigger(false)
@@ -80,13 +76,13 @@ export default function UploadPfp(
                 description: 'Your profile picture was successfully updated.',
             })
         }
-    }
+    }, [session, file, queryClient, setIsUploadPfp, setTrigger, toast])
 
     useEffect(() => {
         if (trigger) {
             handleUploadPfp()
         }
-    }, [trigger])
+    }, [trigger, handleUploadPfp])
 
     if (!session) throw new Error('Not authenticated')
 

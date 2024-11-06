@@ -1,5 +1,4 @@
 import { ForgetPassowrdEmailTemplate } from '@/components/templates/email/forget-password';
-import { SendOtpEmailTemplate } from '@/components/templates/email/send-otp';
 import { NextResponse } from 'next/server';
 import { Resend } from 'resend';
 

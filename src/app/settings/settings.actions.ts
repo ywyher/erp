@@ -1,17 +1,11 @@
 'use server'
 
 import { TSettingsSchema } from "@/app/settings/settings.types";
-import { updateUser } from "@/lib/auth-client";
 import db from "@/lib/db";
 import { user } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
-import { headers } from 'next/headers';
 
 export async function updateSettings(data: { userId: string } & Partial<TSettingsSchema>) {
-    const requestHeaders = await headers();
-
-    // Check if the username is changed and exists in the database
-
     if (data.username) {
         const isUsernameExists = await db.query.user.findFirst({
             where: (user, { eq }) => eq(user.username, data.username ?? '')

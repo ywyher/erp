@@ -6,7 +6,6 @@ import {
     FormControl,
     FormField,
     FormItem,
-    FormLabel,
     FormMessage,
 } from "@/components/ui/form"
 import { InputOTP, InputOTPGroup, InputOTPSeparator, InputOTPSlot } from "@/components/ui/input-otp";
@@ -15,7 +14,6 @@ import { useForm } from "react-hook-form";
 import { redirect } from "next/navigation";
 import { verifyOtpSchema, TVerifyOtpSchema } from "@/app/(authentication)/auth.types";
 import { verifyOtp } from "@/app/(authentication)/auth.actions";
-import Image from "next/image";
 import AuthLayout from "@/app/(authentication)/auth/_components/auth-layout";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { emailOtp, getSession } from "@/lib/auth-client";
@@ -37,12 +35,12 @@ export default function Verify() {
     })
 
     useEffect(() => {
+        if (isPending) return;
         if (!session || !session.user) redirect("/")
-        if (session) {
-            if (session.user.emailVerified && session.user.onBoarding) redirect("/onboarding")
-            if (session.user.emailVerified) redirect("/")
-        }
-    }, [session])
+        else if (session.user.emailVerified && session.user.onBoarding) redirect("/onboarding")
+        else if (session.user.emailVerified) redirect("/")
+    }, [session, isPending])
+
 
     const form = useForm<TVerifyOtpSchema>({
         resolver: zodResolver(verifyOtpSchema),
@@ -126,7 +124,7 @@ export default function Verify() {
                         <LoadingBtn isLoading={isLoading} label="Verify" />
                     </form>
                 </Form>
-                <Button variant="link" onClick={(() => onSendOtp())}>Didn't receive an email? Click here to resend</Button>
+                <Button variant="link" onClick={(() => onSendOtp())}>Didnt receive an email? Click here to resend</Button>
                 <p className="text-sm text-gray-400">Emails may take up to 5 minutes to arrive. If you did not receive an email or your code did not work, please try again. If you encounter any issues, please visit our <span className="text-blue-500 hover:cursor-pointer hover:text-blue-400">support</span> page.</p>
             </div>
         </AuthLayout >

@@ -5,7 +5,6 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import {
     Form,
     FormControl,
-    FormDescription,
     FormField,
     FormItem,
     FormLabel,
@@ -13,10 +12,7 @@ import {
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
-import { onBoarding } from "@/app/(authentication)/auth.actions"
 import { useQuery, useQueryClient } from "@tanstack/react-query"
-import { changePassword } from "@/lib/auth-client"
-import { redirect } from "next/navigation"
 import { getSession } from "@/lib/auth-client"
 import { useState } from "react"
 import { useToast } from "@/hooks/use-toast"

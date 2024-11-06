@@ -9,13 +9,10 @@ import {
     FormLabel,
     FormMessage,
 } from "@/components/ui/form"
-import { InputOTP, InputOTPGroup, InputOTPSeparator, InputOTPSlot } from "@/components/ui/input-otp";
 import { Button } from "@/components/ui/button";
 import { useForm } from "react-hook-form";
 import { redirect } from "next/navigation";
-import Image from "next/image";
 import AuthLayout from "@/app/(authentication)/auth/_components/auth-layout";
-import { useQuery } from "@tanstack/react-query";
 import { Input } from "@/components/ui/input";
 import { useState } from "react";
 import { resetPassword } from "@/lib/auth-client";
@@ -34,7 +31,7 @@ export default function ResetPassword() {
 
     const onResetPassword = async (formData: TPasswordSchema) => {
         setIsLoading(true)
-        const { data, error } = await resetPassword({
+        const { error } = await resetPassword({
             newPassword: formData.password,
         });
 

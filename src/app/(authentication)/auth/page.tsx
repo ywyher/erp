@@ -20,12 +20,12 @@ export default function Auth() {
         }
     });
 
-    const { data: provider } = useQuery({
+    const { data: provider } = useQuery<'oauth' | 'credential'>({
         queryKey: ['provider', session?.user?.id],
         queryFn: async () => {
-            if (!session) return;
-            const { provider }: any = await getUserProvider(session.user.id);
-            return provider;
+            if (!session) return 'credential'; // or 'oauth' as a fallback
+            const { provider } = await getUserProvider(session.user.id);
+            return provider as 'oauth' | 'credential';
         },
         enabled: !!session
     });
@@ -36,7 +36,7 @@ export default function Auth() {
                 <h1 className="text-2xl font-semibold tracking-tight text-white">Authenicate</h1>
                 <p className="text-sm text-zinc-400">Welcome!</p>
             </div>
-            {port === 'check' && <Check provider={provider} setEmail={setEmail} setPort={setPort} />}
+            {port === 'check' && <Check provider={provider ?? 'credential'} setEmail={setEmail} setPort={setPort} />}
             {port === 'login' && <Login email={email ?? ''} />}
         </AuthLayout>
     )

@@ -1,9 +1,8 @@
 'use server'
 
-import { emailOtp } from "@/lib/auth-client"
 import db from "@/lib/db"
 import { user } from "@/lib/db/schema"
-import { deleteFile, getPreSignedUrl } from "@/lib/r2"
+import { deleteFile, getPreSignedUrl } from "@/lib/s3"
 import { eq } from "drizzle-orm"
 
 export const computeSHA256 = async (file: File) => {
@@ -70,25 +69,17 @@ export async function uploadPfp({
 }
 
 
-export async function getUserProvider(userId: string) {
+export async function getUserProvider(userId: string): Promise<{ provider: 'oauth' | 'credential' }> {
     const result = await db.query.account.findFirst({
         where: (account, { eq }) => eq(account.userId, userId),
         columns: {
             providerId: true
         }
-    })
+    });
 
-    if (result?.providerId != 'credential') {
-        return {
-            provider: 'oauth'
-        }
-    } else if (result?.providerId == 'credential') {
-        return {
-            provider: 'credential'
-        }
+    if (result?.providerId !== 'credential') {
+        return { provider: 'oauth' };
     } else {
-        return {
-            provider: 'unknown'
-        }
+        return { provider: 'credential' };
     }
 }

@@ -48,11 +48,11 @@ function Dropdown({ session }: { session: TSession }) {
                 <DropdownMenuLabel>My Account</DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuGroup>
-                    <DropdownMenuItem>
+                    {/* <DropdownMenuItem>
                         <User />
                         <span>Profile</span>
                         <DropdownMenuShortcut>⇧⌘P</DropdownMenuShortcut>
-                    </DropdownMenuItem>
+                    </DropdownMenuItem> */}
                     <DropdownMenuItem className="cursor-pointer" onClick={() => handleRedirect('settings')}>
                         <Settings />
                         <span>Settings</span>

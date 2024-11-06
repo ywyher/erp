@@ -1,7 +1,7 @@
 'use server'
 
 import { TAuthSchema, TOnBoardingSchema } from "@/app/(authentication)/auth.types"
-import { changePassword, emailOtp, getSession, updateUser } from "@/lib/auth-client"
+import { emailOtp } from "@/lib/auth-client"
 import db from "@/lib/db"
 import { user } from "@/lib/db/schema"
 import { eq } from "drizzle-orm"

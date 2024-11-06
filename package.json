@@ -15,6 +15,7 @@
   "dependencies": {
     "@aws-sdk/client-s3": "^3.682.0",
     "@aws-sdk/s3-request-presigner": "^3.682.0",
+    "@faker-js/faker": "^9.2.0",
     "@hookform/resolvers": "^3.9.1",
     "@oslojs/crypto": "^1.0.1",
     "@oslojs/encoding": "^1.1.0",

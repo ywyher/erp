@@ -7,7 +7,7 @@ import { redirect } from "next/navigation"
 import { useEffect } from "react"
 
 export default function Home() {
-  const { data: session } = useQuery({
+  const { data: session, isLoading: isPending } = useQuery({
     queryKey: ['session'],
     queryFn: async () => {
       const { data } = await getSession()
@@ -16,11 +16,10 @@ export default function Home() {
   })
 
   useEffect(() => {
-    if (session) {
-      if (session.user.onBoarding) redirect("/onboarding")
-      if (!session.user.emailVerified) redirect("/verify")
-    }
-  }, [session])
+    if (!session || isPending) return;
+    if (!session.user.emailVerified) redirect("/verify")
+    else if (session.user.onBoarding) redirect("/onboarding")
+  }, [session, isPending])
 
   return (
     <div>

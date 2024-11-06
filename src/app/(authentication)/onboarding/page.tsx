@@ -12,7 +12,7 @@ import Header from "@/components/header"
 export default function Onboarding() {
     const [trigger, setTrigger] = useState<boolean>(false)
 
-    const { data: session, isLoading } = useQuery({
+    const { data: session, isLoading: isPending } = useQuery({
         queryKey: ['session'],
         queryFn: async () => {
             const { data } = await getSession()
@@ -21,15 +21,12 @@ export default function Onboarding() {
     })
 
     useEffect(() => {
-        if (session) {
-            console.log(session)
-            if (!session.user.emailVerified) redirect("/verify")
-            if (session.user.onBoarding == false) redirect("/")
-        }
-    }, [session])
+        if (!session || isPending) return;
+        if (!session.user.emailVerified) redirect("/verify")
+        else if (!session.user.onBoarding) redirect("/")
+    }, [session, isPending])
 
-
-    if (isLoading) return;
+    if (isPending) return;
 
     return (
         <div>

@@ -1,7 +1,6 @@
 "use client"
 
 import { forgetPassword, signIn } from "@/lib/auth-client"; //import the auth client
-import { Button } from "@/components/ui/button"
 import { zodResolver } from "@hookform/resolvers/zod"
 import {
     Form,
@@ -26,19 +25,20 @@ export default function Login({ email }: { email: string }) {
 
     const login = async (data: TLoginSchema) => {
         setIsLoading(true)
-        const login = await signIn.email({
+        await signIn.email({
             email: data.email,
             password: data.password,
         }, {
-            onRequest: (ctx) => {
-                //show loading
-            },
-            onSuccess: (ctx) => {
+            onSuccess: () => {
                 //redirect to the dashboard
                 redirect("/")
             },
             onError: (ctx) => {
-                alert(ctx.error.message);
+                toast({
+                    title: ctx.error.message,
+                    description: "Please try again",
+                    variant: "destructive",
+                })
             },
         });
         setIsLoading(false)
@@ -54,7 +54,7 @@ export default function Login({ email }: { email: string }) {
     });
 
     const resetPassword = async () => {
-        const { data, error } = await forgetPassword({
+        const { error } = await forgetPassword({
             email: email,
             redirectTo: "/reset-password",
         });

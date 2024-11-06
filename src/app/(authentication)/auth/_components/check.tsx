@@ -2,13 +2,11 @@
 
 import { Button } from "@/components/ui/button"
 import { useForm } from "react-hook-form"
-import { z } from "zod"
 import {
     Form,
     FormControl,
     FormField,
     FormItem,
-    FormLabel,
     FormMessage,
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
@@ -21,6 +19,7 @@ import { useState } from "react"
 import { useToast } from "@/hooks/use-toast"
 import { useQueryClient } from "@tanstack/react-query"
 import LoadingBtn from "@/components/loading-btn"
+import { faker } from '@faker-js/faker'
 
 export default function Check(
     {
@@ -47,14 +46,16 @@ export default function Check(
         setIsLoading(true)
         const result = await checkEmailAvailability(data)
         if (result.available == true) {
+            const randomName = faker.person.firstName()
+            const randomUsername = faker.person.lastName()
+
             await signUp.email({
                 email: data.email,
-                name: 'name',
-                username: 'username',
+                name: randomName,
+                username: randomUsername,
                 password: 'password'
             }, {
-                onRequest: (ctx) => { },
-                onSuccess: async (ctx) => {
+                onSuccess: async () => {
                     await queryClient.invalidateQueries({ queryKey: ['session'] })
                     redirect("/verify")
                 },

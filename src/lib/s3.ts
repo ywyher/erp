@@ -1,6 +1,6 @@
 'use server'
 
-import { DeleteObjectCommand, GetObjectCommand, PutObjectCommand, S3Client } from '@aws-sdk/client-s3';
+import { DeleteObjectCommand, PutObjectCommand, S3Client } from '@aws-sdk/client-s3';
 import { headers } from 'next/headers';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { getSession } from '@/lib/auth-client';
@@ -8,10 +8,10 @@ import crypto from 'crypto'
 
 const s3 = new S3Client({
     region: 'auto',
-    endpoint: `https://${process.env.R2_ACCOUNT_ID}.r2.cloudflarestorage.com`,
+    endpoint: `https://${process.env.S3_ACCOUNT_ID}.r2.cloudflarestorage.com`,
     credentials: {
-        accessKeyId: process.env.R2_ACCESS_KEY_ID!,
-        secretAccessKey: process.env.R2_SECRET_ACCESS_KEY!,
+        accessKeyId: process.env.S3_ACCESS_KEY_ID!,
+        secretAccessKey: process.env.S3_SECRET_ACCESS_KEY!,
     },
 });
 
@@ -51,7 +51,7 @@ export async function getPreSignedUrl({
     const fileName = generateFileName();
 
     const putObjectCommand = new PutObjectCommand({
-        Bucket: process.env.R2_BUCKET_NAME!,
+        Bucket: process.env.S3_BUCKET_NAME!,
         Key: fileName,
         ContentType: 'image/jpg', // Add a content type if necessary
         ContentLength: size,
@@ -86,7 +86,7 @@ export async function deleteFile(fileName: string) {
         };
     }
     const deleteObjectCommand = new DeleteObjectCommand({
-        Bucket: process.env.R2_BUCKET_NAME!,
+        Bucket: process.env.S3_BUCKET_NAME!,
         Key: fileName,
     });
 

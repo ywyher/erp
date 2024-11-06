@@ -5,23 +5,22 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import {
     Form,
     FormControl,
-    FormDescription,
     FormField,
     FormItem,
     FormLabel,
     FormMessage,
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
-import { Button } from "@/components/ui/button"
 import { TOnBoardingSchema, onBoardingSchema } from "@/app/(authentication)/auth.types"
 import { onBoarding } from "@/app/(authentication)/auth.actions"
 import { useQuery, useQueryClient } from "@tanstack/react-query"
 import { changePassword } from "@/lib/auth-client"
 import { redirect } from "next/navigation"
 import { getSession } from "@/lib/auth-client"
-import { useEffect, useState } from "react"
+import { useState } from "react"
 import { useToast } from "@/hooks/use-toast"
 import { getUserProvider } from "@/app/actions/index.actions"
+import LoadingBtn from "@/components/loading-btn"
 
 export default function OnboardingForm({ setTrigger }: { setTrigger: React.Dispatch<React.SetStateAction<boolean>> }) {
     const [isLoading, setIsLoading] = useState<boolean>(false)
@@ -179,7 +178,7 @@ export default function OnboardingForm({ setTrigger }: { setTrigger: React.Dispa
                         defaultValue={provider != 'credential' ? 'password' : ''}
                         render={({ field }) => (
                             <FormItem className="w-full">
-                                <FormLabel>Confirm Password"</FormLabel>
+                                <FormLabel>Confirm Password</FormLabel>
                                 <FormControl>
                                     <Input {...field} className="w-full" />
                                 </FormControl>
@@ -188,31 +187,7 @@ export default function OnboardingForm({ setTrigger }: { setTrigger: React.Dispa
                         )}
                     />
                 </div>
-                <Button
-                    type="submit"
-                    className="w-full bg-[#E4E4E7] text-black hover:bg-white"
-                    disabled={isLoading}
-                >
-                    {isLoading ? (
-                        <svg className="mr-2 h-4 w-4 animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                            <circle
-                                className="opacity-25"
-                                cx="12"
-                                cy="12"
-                                r="10"
-                                stroke="currentColor"
-                                strokeWidth="4"
-                            ></circle>
-                            <path
-                                className="opacity-75"
-                                fill="currentColor"
-                                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
-                            ></path>
-                        </svg>
-                    ) : (
-                        "Save"
-                    )}
-                </Button>
+                <LoadingBtn isLoading={isLoading} label="Save" />
             </form>
         </Form>
     )
