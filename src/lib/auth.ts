@@ -5,7 +5,7 @@ import { emailOTP, username } from "better-auth/plugins"
 
 export const auth = betterAuth({
     database: drizzleAdapter(db, {
-        provider: 'pg'
+        provider: 'mysql'
     }),
     emailAndPassword: {
         enabled: true,
