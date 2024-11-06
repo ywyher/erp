@@ -32,12 +32,13 @@ export default function Onboarding() {
         <div>
             <Header />
             {session && session.user && (
-                <div className="flex flex-col gap-5 w-[40%] p-10 m-auto border-x border-b border-zinc-800">
-                    <p className="text-2xl font-medium text-white">Set Profile Settings</p>
+                <div className="flex flex-col gap-5 w-full p-6 mx-auto border-x border-b border-zinc-800 sm:p-8 md:w-[70%] lg:w-[60%] xl:w-[50%] 2xl:w-[40%]">
+                    <p className="text-lg font-medium text-white sm:text-2xl">Set Profile Settings</p>
                     <UploadPfp setTrigger={setTrigger} trigger={trigger} />
                     <OnboardingForm setTrigger={setTrigger} />
                 </div>
             )}
         </div>
+
     )
 }

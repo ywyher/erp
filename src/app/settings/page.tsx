@@ -35,11 +35,11 @@ export default function Settings() {
     });
 
     useEffect(() => {
-        if (session) {
-            if (!session.user) redirect("/")
-            if (!session.user.emailVerified) redirect("/verify")
-        }
-    }, [session])
+        if (!session || isLoading) return;
+        if (session.user.onBoarding) redirect("/onboarding")
+        if (!session.user) redirect("/")
+        if (!session.user.emailVerified) redirect("/verify")
+    }, [session, isLoading])
 
 
     if (isLoading) return;
@@ -48,7 +48,7 @@ export default function Settings() {
         <div>
             <Header />
             {session && session.user && (
-                <div className="w-[40%] p-10 m-auto border-x border-b border-zinc-800">
+                <div className="flex flex-col gap-5 w-full p-6 mx-auto border-x border-b border-zinc-800 sm:p-8 md:w-[70%] lg:w-[60%] xl:w-[50%] 2xl:w-[40%]">
                     {provider == 'credential' ? (
                         <Tabs defaultValue="settings" className="w-full flex flex-col gap-3">
                             <TabsList className="w-full">

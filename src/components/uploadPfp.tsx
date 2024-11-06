@@ -87,21 +87,15 @@ export default function UploadPfp(
     if (!session) throw new Error('Not authenticated')
 
     return (
-        <div>
-            <div className="flex flex-row items-center gap-5 w-full space-y-4">
-                <div>
-                    <Pfp image={previewUrl ? previewUrl : session.user.image} />
-                </div>
-                <div>
-                    <Input
-                        id="pfp-upload"
-                        type="file"
-                        accept="image/*"
-                        onChange={handleFileChange}
-                        className="cursor-pointer"
-                    />
-                </div>
-            </div>
+        <div className="flex flex-col items-center gap-4 sm:flex-row sm:items-center sm:gap-5 w-full">
+            <Pfp image={previewUrl ? previewUrl : session.user.image} className="w-20 h-20 sm:w-24 sm:h-24" />
+            <Input
+                id="pfp-upload"
+                type="file"
+                accept="image/*"
+                onChange={handleFileChange}
+                className="w-full cursor-pointer text-sm sm:text-base"
+            />
         </div>
     )
 }

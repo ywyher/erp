@@ -96,10 +96,12 @@ export default function OnboardingForm({ setTrigger }: { setTrigger: React.Dispa
 
     if (isPending || isProviderLoading) return;
 
+    // Adjusted form elements to be more responsive with flexible widths and spacing
+
     return (
         <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-2">
-                <div className="flex flex-col gap-2">
+            <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-4 sm:gap-2">
+                <div className="flex flex-col gap-4 sm:gap-2">
                     <FormField
                         control={form.control}
                         name="name"
@@ -129,7 +131,7 @@ export default function OnboardingForm({ setTrigger }: { setTrigger: React.Dispa
                         )}
                     />
                 </div>
-                <div className="flex flex-col gap-2">
+                <div className="flex flex-col gap-4 sm:gap-2">
                     <FormField
                         control={form.control}
                         name="username"
@@ -157,7 +159,7 @@ export default function OnboardingForm({ setTrigger }: { setTrigger: React.Dispa
                         )}
                     />
                 </div>
-                <div className={`${provider == 'oauth' && 'hidden'} flex flex-row gap-2`}>
+                <div className={`${provider == 'oauth' ? 'hidden' : 'flex flex-col sm:flex-row'} gap-4 sm:gap-2`}>
                     <FormField
                         control={form.control}
                         name="password"
@@ -191,4 +193,5 @@ export default function OnboardingForm({ setTrigger }: { setTrigger: React.Dispa
             </form>
         </Form>
     )
+
 }
