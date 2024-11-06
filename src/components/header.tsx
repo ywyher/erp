@@ -7,7 +7,6 @@ import { getSession, signOut, TSession } from "@/lib/auth-client";
 import {
     LogOut,
     Settings,
-    User,
 } from "lucide-react"
 
 import {
