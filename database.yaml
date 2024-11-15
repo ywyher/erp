@@ -2,15 +2,15 @@ services:
   postgres:
     restart: always
     image: postgres:latest
-    container_name: postgres
+    container_name: postgres_erp
     ports:
       - 5432:5432
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: ayat-snippet
+      POSTGRES_DB: erp
     volumes:
-      - postgres:/data/postgres
+      - postgres:/data/postgres/erp
   adminer:
     image: adminer
     restart: always

@@ -1,7 +1,7 @@
 import db from "@/lib/db";
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
-import { emailOTP, username } from "better-auth/plugins"
+import { emailOTP, phoneNumber, username } from "better-auth/plugins"
 
 export const auth = betterAuth({
     database: drizzleAdapter(db, {
@@ -11,16 +11,17 @@ export const auth = betterAuth({
         enabled: true,
         maxPasswordLength: 10,
         minPasswordLength: 1,
-        sendResetPassword: async (user, url) => {
+        autoSignIn: true,
+        sendResetPassword: async ({ url, user }) => {
             try {
                 const response = await fetch(
-                    `${process.env.APP_URL}/api/email/password/forget?user=${user}&url=${url}`,
+                    `${process.env.APP_URL}/api/auth/password/reset/email?name=${user.name}&email=${user.email}&url=${url}`,
                     {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json'
                         },
-                        body: JSON.stringify({ user, url })
+                        body: JSON.stringify({ name: user.name, email: user.email, url: url })
                     });
 
                 if (!response.ok) {
@@ -31,8 +32,8 @@ export const auth = betterAuth({
 
                 return data;
             } catch (error) {
-                console.error("Failed to send OTP:", error);
-                throw error;
+                console.error("Failed to send reset password url:", error);
+                // throw error;
             }
         },
     },
@@ -61,6 +62,10 @@ export const auth = betterAuth({
                 required: false,
                 defaultValue: "",
                 input: true
+            },
+            registeredWith: {
+                type: 'string',
+                required: true,
             }
         }
     },
@@ -71,7 +76,7 @@ export const auth = betterAuth({
                 if (type === "email-verification") {
                     try {
                         const response = await fetch(
-                            `${process.env.APP_URL}/api/email/otp/send?email=${email}&otp=${otp}`,
+                            `${process.env.APP_URL}/api/auth/verify/email?email=${email}&otp=${otp}`,
                             {
                                 method: 'POST',
                                 headers: {
@@ -93,7 +98,58 @@ export const auth = betterAuth({
                     }
                 }
             },
-            sendVerificationOnSignUp: true,
         }),
+        phoneNumber({
+            sendOTP: async ({ phoneNumber, code }) => {
+                const email = 'yassienwyh0@gmail.com'
+                console.log(`code`, code)
+                // console.log(`${process.env.APP_URL}/api/auth/verify/email?email=${email}&otp=${code}`)
+
+                const response = await fetch(
+                    `${process.env.APP_URL}/api/auth/verify/email?email=${email}&otp=${code}`,
+                    {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ email, otp: code })
+                    });
+
+                if (!response.ok) {
+                    throw new Error(`Error: ${response.statusText}`);
+                }
+
+                const data = await response.json();
+
+                return data;
+
+                // const response = await fetch(
+                //     `${process.env.APP_URL}/api/auth/verify/phone?phoneNumber=${phoneNumber}&code=${code}`,
+                //     {
+                //         method: 'POST',
+                //         headers: {
+                //             'Content-Type': 'application/json'
+                //         },
+                //         body: JSON.stringify({ phoneNumber, code })
+                //     });
+
+                // if (!response.ok) {
+                //     throw new Error(`Error: ${response.statusText}`);
+                // }
+
+                // const data = await response.json();
+
+                // return data;
+            },
+            // signUpOnVerification: {
+            //     getTempEmail: (phoneNumber) => {
+            //         return `${phoneNumber}@${process.env.APP_NAME}.com`
+            //     },
+            //     //optionally you can alos pass `getTempName` function to generate a temporary name for the user
+            //     getTempName: (phoneNumber) => {
+            //         return phoneNumber //by default it will use the phone number as the name
+            //     },
+            // }
+        })
     ]
 })

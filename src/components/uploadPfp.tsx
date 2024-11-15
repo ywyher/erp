@@ -7,22 +7,15 @@ import { useQuery, useQueryClient } from "@tanstack/react-query"
 import { uploadPfp, uploadToS3 } from "@/app/actions/index.actions"
 import { useToast } from "@/hooks/use-toast"
 import Pfp from "@/components/pfp"
+import { useImageStore } from "@/app/store"
 
-export default function UploadPfp(
-    {
-        setIsUploadPfp,
-        setTrigger,
-        trigger = false
-    }:
-        {
-            setIsUploadPfp?: React.Dispatch<React.SetStateAction<boolean>>
-            setTrigger: React.Dispatch<React.SetStateAction<boolean>>
-            trigger: boolean
-        }) {
+export default function UploadPfp() {
     const [file, setFile] = useState<File | null>(null)
     const [previewUrl, setPreviewUrl] = useState<string>()
     const { toast } = useToast()
     const queryClient = useQueryClient()
+    const trigger = useImageStore((state) => state.trigger)
+    const setTrigger = useImageStore((state) => state.setTrigger)
 
     const { data: session } = useQuery({
         queryKey: ['session'],
@@ -45,7 +38,6 @@ export default function UploadPfp(
         const selectedFile = e.target.files?.[0] ?? null
 
         if (selectedFile) {
-            if (setIsUploadPfp) setIsUploadPfp(true)
             setFile(selectedFile)
             const objectUrl = URL.createObjectURL(selectedFile)
             setPreviewUrl(objectUrl)
@@ -69,14 +61,14 @@ export default function UploadPfp(
             setFile(null)
             setPreviewUrl('')
             setTrigger(false)
-            if (setIsUploadPfp) setIsUploadPfp(false)
             await queryClient.invalidateQueries({ queryKey: ['session'] })
+            console.log('pfp updated !!')
             toast({
                 title: 'Profile Picture Updated',
                 description: 'Your profile picture was successfully updated.',
             })
         }
-    }, [session, file, queryClient, setIsUploadPfp, setTrigger, toast])
+    }, [session, file, queryClient, setTrigger, toast])
 
     useEffect(() => {
         if (trigger) {

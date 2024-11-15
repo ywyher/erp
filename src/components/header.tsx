@@ -27,7 +27,7 @@ function Dropdown({ session }: { session: TSession }) {
 
     const handleLogout = async () => {
         await signOut()
-        queryClient.invalidateQueries({ queryKey: ['session'] })
+        await queryClient.invalidateQueries({ queryKey: ['session'] })
     }
 
     const handleRedirect = (page: 'settings' | 'profile') => {
@@ -41,7 +41,7 @@ function Dropdown({ session }: { session: TSession }) {
     return (
         <DropdownMenu>
             <DropdownMenuTrigger className="cursor-pointer">
-                <Pfp image={session.user.image} />
+                <Pfp image={session.user.image || ''} />
             </DropdownMenuTrigger>
             <DropdownMenuContent className="w-56">
                 <DropdownMenuLabel>My Account</DropdownMenuLabel>

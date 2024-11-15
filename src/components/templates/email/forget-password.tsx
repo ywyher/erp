@@ -12,5 +12,6 @@ export const ForgetPassowrdEmailTemplate: React.FC<Readonly<TForgetPassowrdEmail
     <div>
         <h1>Welcome, {firstname}!</h1>
         <a href={url}>Click Here To Reset</a>
+        <p>{url}</p>
     </div>
 );

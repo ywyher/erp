@@ -71,7 +71,7 @@ export async function uploadPfp({
 }
 
 
-export async function getUserProvider(userId: string): Promise<{ provider: 'oauth' | 'credential' }> {
+export async function getUserProvider(userId: string): Promise<{ provider: 'social' | 'credential' }> {
     const result = await db.query.account.findFirst({
         where: (account, { eq }) => eq(account.userId, userId),
         columns: {
@@ -80,7 +80,7 @@ export async function getUserProvider(userId: string): Promise<{ provider: 'oaut
     });
 
     if (result?.providerId !== 'credential') {
-        return { provider: 'oauth' };
+        return { provider: 'social' };
     } else {
         return { provider: 'credential' };
     }

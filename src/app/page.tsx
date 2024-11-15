@@ -17,7 +17,8 @@ export default function Home() {
 
   useEffect(() => {
     if (!session || isPending) return;
-    if (!session.user.emailVerified) redirect("/verify")
+    if (session.user.registeredWith == 'phoneNumber' && !session.user.phoneNumberVerified) redirect('verify')
+    if (session.user.registeredWith == 'email' && !session.user.emailVerified) redirect('verify')
     else if (session.user.onBoarding) redirect("/onboarding")
   }, [session, isPending])
 
