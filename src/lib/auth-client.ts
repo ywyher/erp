@@ -25,7 +25,9 @@ export const {
     updateUser,
     forgetPassword,
     resetPassword,
-    listAccounts
+    listAccounts,
+    revokeSession,
 } = client
 
-export type TSession = typeof client.$Infer.Session
+export type Session = typeof client.$Infer.Session
+export type User = typeof client.$Infer.Session.user

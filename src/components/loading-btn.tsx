@@ -1,11 +1,24 @@
 import { Button } from "@/components/ui/button";
 
-export default function LoadingBtn({ isLoading, label }: { isLoading: boolean, label: string }) {
+export default function LoadingBtn(
+    {
+        isLoading,
+        label,
+        variant = 'default',
+        onClick,
+    }: {
+        isLoading: boolean,
+        label: string,
+        variant?: 'default' | 'destructive',
+        onClick?: () => void
+    }) {
     return (
         <Button
             type="submit"
             className="w-full bg-[#E4E4E7] text-black hover:bg-white"
             disabled={isLoading}
+            variant={variant}
+            onClick={onClick}
         >
             {isLoading ? (
                 <svg className="mr-2 h-4 w-4 animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">

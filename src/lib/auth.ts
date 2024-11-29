@@ -1,6 +1,7 @@
 import db from "@/lib/db";
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
+import { nextCookies } from "better-auth/next-js";
 import { emailOTP, phoneNumber, username } from "better-auth/plugins"
 
 export const auth = betterAuth({
@@ -33,7 +34,7 @@ export const auth = betterAuth({
                 return data;
             } catch (error) {
                 console.error("Failed to send reset password url:", error);
-                // throw error;
+                throw error;
             }
         },
     },
@@ -57,19 +58,19 @@ export const auth = betterAuth({
                 defaultValue: true,
                 input: false,
             },
-            bio: {
-                type: "string",
-                required: false,
-                defaultValue: "",
-                input: true
-            },
-            registeredWith: {
+            role: {
                 type: 'string',
                 required: true,
+                defaultValue: 'user'
+            },
+            nationalId: {
+                type: 'string',
+                required: false,
             }
         }
     },
     plugins: [
+        nextCookies(),
         username(),
         emailOTP({
             async sendVerificationOTP({ email, otp, type }) {
@@ -141,6 +142,7 @@ export const auth = betterAuth({
 
                 // return data;
             },
+
             // signUpOnVerification: {
             //     getTempEmail: (phoneNumber) => {
             //         return `${phoneNumber}@${process.env.APP_NAME}.com`
@@ -151,5 +153,8 @@ export const auth = betterAuth({
             //     },
             // }
         })
-    ]
+    ],
+    advanced: {
+        cookiePrefix: 'testing'
+    }
 })

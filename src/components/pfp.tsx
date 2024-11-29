@@ -1,6 +1,6 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
-export default function Pfp({ image, className }: { image: string | undefined, className?: string }) {
+export default function Pfp({ image, className }: { image?: string, className?: string }) {
 
     const getImage = () => {
         if (image == 'pfp.jpg') {

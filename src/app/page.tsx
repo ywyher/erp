@@ -2,25 +2,44 @@
 
 import Header from "@/components/header"
 import { getSession } from "@/lib/auth-client"
+import { getUserRegistrationType } from "@/lib/db/queries"
 import { useQuery } from "@tanstack/react-query"
-import { redirect } from "next/navigation"
+import { useRouter } from "next/navigation"
 import { useEffect } from "react"
 
 export default function Home() {
-  const { data: session, isLoading: isPending } = useQuery({
-    queryKey: ['session'],
+  const router = useRouter()
+  const { data: user, isLoading } = useQuery({
+    queryKey: ['session', 'home'],
     queryFn: async () => {
       const { data } = await getSession()
-      return data
+      return data?.user || null
     }
   })
 
   useEffect(() => {
-    if (!session || isPending) return;
-    if (session.user.registeredWith == 'phoneNumber' && !session.user.phoneNumberVerified) redirect('verify')
-    if (session.user.registeredWith == 'email' && !session.user.emailVerified) redirect('verify')
-    else if (session.user.onBoarding) redirect("/onboarding")
-  }, [session, isPending])
+    if (!user) return;
+
+    (async () => {
+      try {
+        const registeredWith = await getUserRegistrationType(user.id)
+        if (registeredWith === 'phoneNumber' && !user.phoneNumberVerified) {
+          router.replace('/')
+          return
+        }
+        if (registeredWith === 'email' && !user.emailVerified) {
+          router.replace('/')
+          return
+        }
+        if (user.onBoarding) {
+          router.replace("/onboarding")
+        }
+      } catch (error) {
+        console.error("Error in handleRules:", error)
+      }
+    })
+
+  }, [user, router]);
 
   return (
     <div>

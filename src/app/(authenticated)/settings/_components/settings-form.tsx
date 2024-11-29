@@ -14,77 +14,84 @@ import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { useQuery, useQueryClient } from "@tanstack/react-query"
 import { getSession } from "@/lib/auth-client"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { useToast } from "@/hooks/use-toast"
-import { settingsSchema, TSettingsSchema } from "@/app/(authenticated)/settings/settings.types"
 import { updateSettings } from "@/app/(authenticated)/settings/settings.actions"
 import { useImageStore } from "@/app/store"
 import LoadingBtn from "@/components/loading-btn"
 import { Textarea } from "@/components/ui/textarea"
+import { isFakeEmail, normalizeData } from "@/lib/funcs"
+import { z } from "zod"
+import { userSchema } from "@/app/types"
+import { updateUser } from "@/app/actions"
+import { date } from "drizzle-orm/mysql-core"
+import { FormFieldWrapper } from "@/components/formFieldWrapper"
+import { getUserRegistrationType } from "@/lib/db/queries"
+
+type UpdateField = {
+    value: string | null;
+    nullable: boolean;
+};
 
 export default function SettingsForm() {
     const [isLoading, setIsLoading] = useState<boolean>(false)
+    const [registeredWith, setRegisteredWith] = useState<'both' | 'email' | 'phoneNumber' | 'none' | null>(null)
 
     const queryClient = useQueryClient()
     const { toast } = useToast()
-
     const setTrigger = useImageStore((store) => store.setTrigger)
 
-    const { data: session, isLoading: isPending } = useQuery({
-        queryKey: ['session'],
+    const { data: user, isLoading: isPending } = useQuery({
+        queryKey: ['session', 'settingsForm'],
         queryFn: async () => {
             const { data } = await getSession()
-            return data
+            return data?.user || null
         }
     })
 
-    const form = useForm<TSettingsSchema>({
-        resolver: zodResolver(settingsSchema),
-        defaultValues: {
-            name: session?.user.name || '',
-            email: session?.user.registeredWith == 'email' && session?.user.email || '',
-            phoneNumber: session?.user.registeredWith == 'phoneNumber' && session?.user.phoneNumber || '',
-            username: session?.user.username || '',
-            bio: session?.user.bio || '',
-            emailFake: session?.user.registeredWith != 'email' && session?.user.email || '',
-            phoneNumberFake: session?.user.registeredWith != 'phoneNumber' && session?.user.phoneNumber || '',
-        }
+    const form = useForm<z.infer<typeof userSchema>>({
+        resolver: zodResolver(userSchema),
     })
 
-    const onCheckChangedFields = async (data: TSettingsSchema) => {
-        if (!session) return;
+    useEffect(() => {
+        (async () => {
+            if (user) {
+                const context = await getUserRegistrationType(user.id)
+                setRegisteredWith(context)
+            }
+        })
+        if (user) {
+            form.setValue('name', user.name || '')
+            form.setValue('username', user.username || '')
+            form.setValue('email', isFakeEmail(user.email) ? '' : user.email || '')
+            form.setValue('phoneNumber', user.phoneNumber || '')
+            form.setValue('nationalId', user.nationalId || '')
+        }
+    }, [user])
 
-        // Extract user data from session
-        const { name, email, username, bio, phoneNumber } = session.user;
+    const onCheckChangedFields = async (data: z.infer<typeof userSchema>) => {
+        if (!user) return;
 
-        console.log(
-            `name:` + name + '\n',
-            `email:` + email + '\n',
-            `username:` + username + '\n',
-            `bio:` + bio + '\n',
-            `phoneNumber:` + phoneNumber + '\n',
-        )
-        console.log(`#####################`)
-        console.log(
-            `name:` + data.name + '\n',
-            `email:` + data.email + '\n',
-            `username:` + data.username + '\n',
-            `bio:` + data.bio + '\n',
-            `phoneNumber:` + data.phoneNumber + '\n',
-        )
+        const normalizedSessionData = {
+            name: normalizeData(user.name),
+            email: isFakeEmail(user.email) ? '' : normalizeData(user.email),
+            username: normalizeData(user.username),
+            phoneNumber: normalizeData(user.phoneNumber),
+            nationalId: normalizeData(user.nationalId)
+        };
 
-        // Check if the submitted data matches the session data
-        const isUnchanged =
-            data.name === name &&
-            data.email === email &&
-            data.username === username &&
-            data.bio === bio &&
-            data.phoneNumber === phoneNumber;
+        const changedFields: Partial<z.infer<typeof userSchema>> = {};
 
-        console.log(isUnchanged)
+        for (const key in normalizedSessionData) {
+            let formValue = normalizeData(data[key as keyof z.infer<typeof userSchema>]);
+            const sessionValue = normalizedSessionData[key as keyof typeof normalizedSessionData];
 
-        // If no changes, show a toast and return early
-        if (isUnchanged) {
+            if (formValue !== sessionValue) {
+                changedFields[key as keyof typeof changedFields] = formValue;
+            }
+        }
+
+        if (Object.keys(changedFields).length === 0) {
             toast({
                 title: "No Changes",
                 description: "No fields were updated.",
@@ -92,119 +99,74 @@ export default function SettingsForm() {
             });
             return;
         }
-    }
+
+        await onSubmit(changedFields as z.infer<typeof userSchema>);
+    };
 
 
-    if (!session || isPending) return;
+    const onSubmit = async (data: z.infer<typeof userSchema>) => {
+        if (!user || !user.id) return;
+        setIsLoading(true)
+        const result = await updateUser({ data, userId: user.id });
+
+        if (result && result.error) {
+            toast({
+                title: "Error",
+                description: result.error,
+                variant: "destructive",
+            });
+            return;
+        }
+
+        toast({
+            title: "Settings Updated",
+            description: "Your settings were successfully updated.",
+        });
+        await queryClient.invalidateQueries({ queryKey: ['session'] });
+        setIsLoading(false)
+    };
+
+    if (!user || isPending) return;
 
     return (
         <Form {...form}>
             <form onSubmit={form.handleSubmit(onCheckChangedFields)} className="flex flex-col gap-2">
-                <div className="flex flex-col gap-2">
-                    <FormField
-                        control={form.control}
-                        name="name"
-                        render={({ field }) => (
-                            <FormItem className="w-full">
-                                <FormLabel>Display Name</FormLabel>
-                                <FormControl>
-                                    <Input {...field} className="w-full" />
-                                </FormControl>
-                                <FormMessage />
-                            </FormItem>
-                        )}
-                    />
-                    <FormField
-                        control={form.control}
-                        name="email"
-                        render={({ field }) => (
-                            <FormItem className="w-full">
-                                <FormLabel>Email {session.user.registeredWith != 'email' && <span className="text-gray-500">(Optional)</span>}</FormLabel>
-                                <FormControl>
-                                    <Input {...field} className="w-full" />
-                                </FormControl>
-                                <FormMessage />
-                            </FormItem>
-                        )}
-                    />
-                </div>
-                <div className="flex flex-col gap-2">
-                    <FormField
-                        control={form.control}
-                        name="username"
-                        render={({ field }) => (
-                            <FormItem className="w-full">
-                                <FormLabel>Username</FormLabel>
-                                <FormControl>
-                                    <Input {...field} className="w-full" />
-                                </FormControl>
-                                <FormMessage />
-                            </FormItem>
-                        )}
-                    />
-                    {session.user.registeredWith != 'email'} {
-                        <FormField
-                            control={form.control}
-                            name="emailFake"
-                            render={({ field }) => (
-                                <FormItem className="w-full">
-                                    <FormLabel>EmailFake</FormLabel>
-                                    <FormControl>
-                                        <Input {...field} className="w-full" />
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
-                    }
-                    {session.user.registeredWith != 'phoneNumber'} {
-                        <FormField
-                            control={form.control}
-                            name="phoneNumberFake"
-                            render={({ field }) => (
-                                <FormItem className="w-full">
-                                    <FormLabel>PhoneNumberFake</FormLabel>
-                                    <FormControl>
-                                        <Input {...field} className="w-full" />
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
-                    }
-                    <FormField
-                        control={form.control}
-                        name="phoneNumber"
-                        render={({ field }) => (
-                            <FormItem className="w-full">
-                                <FormLabel>PhoneNumber {session.user.registeredWith != 'phoneNumber' && <span className="text-gray-500">(Optional)</span>}</FormLabel>
-                                <FormControl>
-                                    <Input {...field} className="w-full" />
-                                </FormControl>
-                                <FormMessage />
-                            </FormItem>
-                        )}
-                    />
-                </div>
-                <FormField
-                    control={form.control}
-                    name="bio"
-                    render={({ field }) => (
-                        <FormItem>
-                            <FormLabel>Bio <span className="text-gray-500">(optional)</span></FormLabel>
-                            <FormControl>
-                                <Textarea
-                                    className="resize-none"
-                                    maxLength={160}
-                                    {...field}
-                                />
-                            </FormControl>
-                            <FormMessage />
-                        </FormItem>
-                    )}
+                <FormFieldWrapper
+                    form={form}
+                    name='name'
+                    label="Display Name"
+                />
+                <FormFieldWrapper
+                    form={form}
+                    name='username'
+                    label="Username"
+                />
+                <FormFieldWrapper
+                    form={form}
+                    name='email'
+                    label={`
+                            Email
+                            ${user.email && user.emailVerified ? '(verified)' : '(Unverified)'}
+                        `}
+                    optional={registeredWith != 'email' && isFakeEmail(user.email) ? true : false}
+                    disabled={user.emailVerified}
+                />
+                <FormFieldWrapper
+                    form={form}
+                    name='phoneNumber'
+                    label={`
+                            PhoneNumber
+                            ${user.phoneNumber && user.phoneNumberVerified ? '(verified)' : '(Unverified)'}
+                        `}
+                    optional={registeredWith != 'phoneNumber' && isFakeEmail(user.phoneNumber) ? true : false}
+                />
+                <FormFieldWrapper
+                    form={form}
+                    name='nationalId'
+                    label="National Id"
                 />
                 <LoadingBtn label="Update" isLoading={isLoading} />
             </form>
-        </Form >
+        </Form>
     )
 }

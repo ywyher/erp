@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useQuery, useQueryClient } from "@tanstack/react-query"
-import { getSession, signOut, TSession } from "@/lib/auth-client";
+import { getSession, User } from "@/lib/auth-client";
 
 import {
     LogOut,
@@ -19,74 +19,64 @@ import {
     DropdownMenuShortcut,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { redirect } from "next/navigation";
+import { redirect, useRouter } from "next/navigation";
 import Pfp from "@/components/pfp";
+import { useEffect } from "react";
 
-function Dropdown({ session }: { session: TSession }) {
+function Dropdown({ user }: { user: User }) {
     const queryClient = useQueryClient()
+    const router = useRouter();
 
-    const handleLogout = async () => {
-        await signOut()
-        await queryClient.invalidateQueries({ queryKey: ['session'] })
-    }
-
-    const handleRedirect = (page: 'settings' | 'profile') => {
-        if (page == 'settings') {
-            redirect('/settings')
-        }
-    }
-
-    if (!session || !session.user) return;
+    if (!user) return;
 
     return (
         <DropdownMenu>
             <DropdownMenuTrigger className="cursor-pointer">
-                <Pfp image={session.user.image || ''} />
+                <Pfp image={user.image || ''} />
             </DropdownMenuTrigger>
             <DropdownMenuContent className="w-56">
                 <DropdownMenuLabel>My Account</DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuGroup>
-                    {/* <DropdownMenuItem>
-                        <User />
-                        <span>Profile</span>
-                        <DropdownMenuShortcut>⇧⌘P</DropdownMenuShortcut>
-                    </DropdownMenuItem> */}
-                    <DropdownMenuItem className="cursor-pointer" onClick={() => handleRedirect('settings')}>
+                    <DropdownMenuItem className="cursor-pointer" onClick={() => router.push('settings')}>
                         <Settings />
                         <span>Settings</span>
-                        <DropdownMenuShortcut>⌘S</DropdownMenuShortcut>
                     </DropdownMenuItem>
                 </DropdownMenuGroup>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={() => handleLogout()}>
+                <DropdownMenuItem onClick={() => router.push('/logout')}>
                     <LogOut />
                     <span>Log out</span>
-                    <DropdownMenuShortcut>⇧⌘Q</DropdownMenuShortcut>
                 </DropdownMenuItem>
             </DropdownMenuContent>
         </DropdownMenu>
     )
 }
 
-
 export default function Header() {
-    const { data: session } = useQuery({
-        queryKey: ['session'],
+    const { data: user } = useQuery({
+        queryKey: ['session', 'header'],
         queryFn: async () => {
             const { data } = await getSession()
-            return data
+            return data?.user || null
         }
     })
 
     return (
         <nav>
             <div className="relative flex w-full items-center justify-between border-b border-b-zinc-800 bg-black py-2 px-4 ">
-                <div>
+                <div className="flex flex-row gap-3 items-center">
                     <Link href="/" className="text-xl font-bold">Header</Link>
+                    <div>
+                        {user && (
+                            <>
+                                <Link href="/dashboard">Dashboard</Link>
+                            </>
+                        )}
+                    </div>
                 </div>
-                {session && session.user ? (
-                    <Dropdown session={session} />
+                {user ? (
+                    <Dropdown user={user} />
                 ) : (
                     <div className="ml-4 flex items-center space-x-4 text-zinc-300 md:ml-8 lg:ml-6 lg:space-x-6">
                         <Link className="text-lg min-w-max rounded-full bg-zinc-200 px-4 py-1 font-medium text-black" href="/auth">Auth</Link>

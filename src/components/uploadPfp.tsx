@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from "react"
 import { getSession } from "@/lib/auth-client"
 import { Input } from "@/components/ui/input"
 import { useQuery, useQueryClient } from "@tanstack/react-query"
-import { uploadPfp, uploadToS3 } from "@/app/actions/index.actions"
+import { uploadPfp, uploadToS3 } from "@/app/actions"
 import { useToast } from "@/hooks/use-toast"
 import Pfp from "@/components/pfp"
 import { useImageStore } from "@/app/store"
@@ -17,11 +17,11 @@ export default function UploadPfp() {
     const trigger = useImageStore((state) => state.trigger)
     const setTrigger = useImageStore((state) => state.setTrigger)
 
-    const { data: session } = useQuery({
-        queryKey: ['session'],
+    const { data: user, isLoading: isPending } = useQuery({
+        queryKey: ['session', 'uploadPfp'],
         queryFn: async () => {
             const { data } = await getSession()
-            return data
+            return data?.user || null
         }
     })
 
@@ -45,7 +45,7 @@ export default function UploadPfp() {
     }
 
     const handleUploadPfp = useCallback(async () => {
-        if (!session || !file) return
+        if (!user || !file) return
 
         const result = await uploadToS3({ file })
 
@@ -53,8 +53,8 @@ export default function UploadPfp() {
 
         const pfpResult = await uploadPfp({
             fileName: result.fileName,
-            userId: session.user.id,
-            oldFileName: session.user.image,
+            userId: user.id,
+            oldFileName: user.image || '',
         })
 
         if (pfpResult.success) {
@@ -68,7 +68,7 @@ export default function UploadPfp() {
                 description: 'Your profile picture was successfully updated.',
             })
         }
-    }, [session, file, queryClient, setTrigger, toast])
+    }, [user, file, queryClient, setTrigger, toast])
 
     useEffect(() => {
         if (trigger) {
@@ -76,11 +76,11 @@ export default function UploadPfp() {
         }
     }, [trigger, handleUploadPfp])
 
-    if (!session) throw new Error('Not authenticated')
+    if (!user || isPending) return
 
     return (
         <div className="flex flex-col items-center gap-4 sm:flex-row sm:items-center sm:gap-5 w-full">
-            <Pfp image={previewUrl ? previewUrl : session.user.image} className="w-20 h-20 sm:w-24 sm:h-24" />
+            <Pfp image={previewUrl ? previewUrl : user.image || ''} className="w-20 h-20 sm:w-24 sm:h-24" />
             <Input
                 id="pfp-upload"
                 type="file"

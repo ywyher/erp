@@ -2,33 +2,32 @@
 
 import { getSession } from "@/lib/auth-client"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { redirect } from "next/navigation"
-import { useEffect, useState } from "react"
 import { useQuery } from "@tanstack/react-query"
 import UploadPfp from "@/components/uploadPfp"
 import Header from "@/components/header"
 import SettingsForm from "@/app/(authenticated)/settings/_components/settings-form"
-import PasswordForm from "@/app/(authenticated)/settings/_components/password-form"
-import { getUserProvider } from "@/app/actions/index.actions"
+import { getUserProvider } from "@/lib/db/queries"
+import VerifyAlert from "@/components/verify-alert"
+import UpdatePassword from "@/components/update-password"
 
 
 export default function Settings() {
-    const { data: session, isLoading } = useQuery({
-        queryKey: ['session'],
+    const { data: user, isLoading } = useQuery({
+        queryKey: ['session', 'settings'],
         queryFn: async () => {
             const { data } = await getSession();
-            return data;
+            return data?.user || null;
         }
     });
 
     const { data: provider } = useQuery({
-        queryKey: ['provider', session?.user?.id],
+        queryKey: ['provider', user?.id],
         queryFn: async () => {
-            if (!session) return;
-            const { provider } = await getUserProvider(session.user.id);
+            if (!user) return;
+            const { provider } = await getUserProvider(user.id);
             return provider;
         },
-        enabled: !!session
+        enabled: !!user
     });
 
     if (isLoading) return;
@@ -36,8 +35,9 @@ export default function Settings() {
     return (
         <div>
             <Header />
-            {session && session.user && (
-                <div className="flex flex-col gap-5 w-full p-6 mx-auto border-x border-b border-zinc-800 sm:p-8 md:w-[70%] lg:w-[60%] xl:w-[50%] 2xl:w-[40%]">
+            <VerifyAlert />
+            {user && (
+                <div className="flex flex-col gap-5 w-full p-6 mx-auto border-x border-t border-b border-zinc-800 sm:p-8 md:w-[70%] lg:w-[60%] xl:w-[50%] 2xl:w-[40%]">
                     {provider == 'credential' ? (
                         <Tabs defaultValue="settings" className="w-full flex flex-col gap-3">
                             <TabsList className="w-full">
@@ -51,7 +51,7 @@ export default function Settings() {
                             </TabsContent>
                             <TabsContent value="password" className="flex flex-col gap-3">
                                 <p className="text-2xl font-medium text-white">Update Profile Settings</p>
-                                <PasswordForm />
+                                <UpdatePassword userId={user.id} />
                             </TabsContent>
                         </Tabs>
                     ) : (
@@ -61,7 +61,6 @@ export default function Settings() {
                             <SettingsForm />
                         </div>
                     )}
-
                 </div>
             )}
         </div>
