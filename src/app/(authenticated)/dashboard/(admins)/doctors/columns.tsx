@@ -20,7 +20,7 @@ import Edit from "@/app/(authenticated)/dashboard/(admins)/users/_components/upd
 import React from "react";
 import UserActions from "@/app/(authenticated)/dashboard/(admins)/users/_components/user-actions";
 import DoctorAction from "@/app/(authenticated)/dashboard/(admins)/doctors/_components/doctor-actions";
-import { ScheduleDisplay } from "@/app/(authenticated)/dashboard/_components/schedule-display";
+import { ScheduleDisplay } from "@/components/schedule-display";
 
 const doctorColumns = [
     { value: "name", header: "Name" },
@@ -77,19 +77,7 @@ export const doctorTableColumns: ColumnDef<any>[] = [
                 const schedules = Array.isArray(cellValue) ? cellValue : [cellValue];
 
                 return (
-                    <Dialog>
-                        <DialogTrigger asChild>
-                            <Button variant="outline" size="sm">
-                                View Schedules
-                            </Button>
-                        </DialogTrigger>
-                        <DialogContent>
-                            <DialogHeader>
-                                <DialogTitle>{header}</DialogTitle>
-                            </DialogHeader>
-                            <ScheduleDisplay schedules={schedules} />
-                        </DialogContent>
-                    </Dialog>
+                    <ScheduleDisplay schedules={schedules} />
                 )
             }
 

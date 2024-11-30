@@ -1,2 +1,3 @@
 redirect url query paramn in the <Verify /> in case one verified in middle of something important !!
 if email isnt verified on login redirect to verify page !!
+allow user to add files when booking an appointment !!

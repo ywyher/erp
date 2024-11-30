@@ -28,7 +28,11 @@ export default function UserActions({ userId }: { userId: string }) {
                 <DropdownMenuSeparator />
                 <div className="flex flex-col gap-2">
                     <UpdateUser setPopOpen={setOpen} userId={userId} />
-                    <Delete setPopOpen={setOpen} userId={userId} />
+                    <Delete
+                        id={userId}
+                        table="user"
+                        setPopOpen={setOpen}
+                    />
                 </div>
             </DropdownMenuContent>
         </DropdownMenu>

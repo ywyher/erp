@@ -18,9 +18,7 @@ export default async function Layout({ children }: { children: React.ReactNode }
   return (
     <SidebarProvider defaultOpen={defaultOpen}>
       <DashboardSidebar userRole={data?.user.role as Roles} />
-      <main>
-        {children}
-      </main>
+      {children}
     </SidebarProvider>
   )
 }

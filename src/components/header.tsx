@@ -67,12 +67,13 @@ export default function Header() {
             <div className="relative flex w-full items-center justify-between border-b border-b-zinc-800 bg-black py-2 px-4 ">
                 <div className="flex flex-row gap-3 items-center">
                     <Link href="/" className="text-xl font-bold">Header</Link>
-                    <div>
+                    <div className="flex flex-row gap-3">
                         {user && (
                             <>
                                 <Link href="/dashboard">Dashboard</Link>
                             </>
                         )}
+                        <Link href="/booking">Booking</Link>
                     </div>
                 </div>
                 {user ? (

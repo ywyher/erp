@@ -9,7 +9,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { isFakeEmail } from "@/lib/funcs";
 import React from "react";
 import ReceptionistAction from "@/app/(authenticated)/dashboard/(admins)/receptionists/_components/receptionist-actions";
-import { ScheduleDisplay } from "@/app/(authenticated)/dashboard/_components/schedule-display";
+import { ScheduleDisplay } from "@/components/schedule-display";
 
 const receptionistColumns = [
     { value: "name", header: "Name" },
@@ -66,19 +66,7 @@ export const receptionistTableColumns: ColumnDef<any>[] = [
                 const schedules = Array.isArray(cellValue) ? cellValue : [cellValue];
 
                 return (
-                    <Dialog>
-                        <DialogTrigger asChild>
-                            <Button variant="outline" size="sm">
-                                View Schedules
-                            </Button>
-                        </DialogTrigger>
-                        <DialogContent>
-                            <DialogHeader>
-                                <DialogTitle>{header}</DialogTitle>
-                            </DialogHeader>
-                            <ScheduleDisplay schedules={schedules} />
-                        </DialogContent>
-                    </Dialog>
+                    <ScheduleDisplay schedules={schedules} />
                 )
             }
 

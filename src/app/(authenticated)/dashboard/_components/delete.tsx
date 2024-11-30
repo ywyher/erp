@@ -15,15 +15,21 @@ import { Dispatch, SetStateAction, useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import LoadingBtn from "@/components/loading-btn";
 import { deleteById } from "@/lib/db/queries";
+import { Tables } from "@/lib/db/schema";
 
-export default function Delete({ userId, setPopOpen }: { userId: string, setPopOpen: Dispatch<SetStateAction<boolean>>; }) {
+export default function Delete({ id, table, setPopOpen, label = 'delete' }: {
+    id: string,
+    table: Tables,
+    label?: string,
+    setPopOpen: Dispatch<SetStateAction<boolean>>;
+}) {
     const [open, setOpen] = useState<boolean>()
     const [isLoading, setIsLoading] = useState<boolean>(false)
     const { toast } = useToast()
 
     const handleDelete = async () => {
         setIsLoading(true)
-        const result = await deleteById(userId, 'user');
+        const result = await deleteById(id, table);
 
         if (result?.message) {
             toast({
@@ -39,8 +45,8 @@ export default function Delete({ userId, setPopOpen }: { userId: string, setPopO
     return (
         <AlertDialog open={open}>
             <AlertDialogTrigger asChild>
-                <Button variant={'destructive'}>
-                    Delete
+                <Button variant={'destructive'} className="capitalize font-bold">
+                    {label}
                 </Button>
             </AlertDialogTrigger>
             <AlertDialogContent>
@@ -55,7 +61,7 @@ export default function Delete({ userId, setPopOpen }: { userId: string, setPopO
                     <AlertDialogCancel className="w-full">Cancel</AlertDialogCancel>
                     <LoadingBtn
                         isLoading={isLoading}
-                        label="delete"
+                        label='Proceed'
                         variant="destructive"
                         onClick={() => handleDelete()}
                     />

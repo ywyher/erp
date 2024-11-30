@@ -103,6 +103,7 @@ const receptionistRelation = relations(receptionist, ({ one, many }) => ({
 // Appointment table
 
 export const appointmentStatusEnum = pgEnum('status', ['pending', 'ongoing', 'completed', 'cancelled'])
+export const createdByEnum = pgEnum('createdBy', ['user', 'receptionist', 'doctor'])
 
 export const appointment = pgTable('appointment', {
 	id: text('id').primaryKey(),
@@ -112,6 +113,7 @@ export const appointment = pgTable('appointment', {
 	startTime: timestamp('startTime').notNull(),
 	endTime: timestamp('endTime').notNull(),
 	status: appointmentStatusEnum('status').notNull().default('pending'),
+	createdBy: createdByEnum('createdBy').notNull(),
 	createdAt: timestamp('createdAt').notNull().defaultNow(),
 	updatedAt: timestamp('updatedAt').notNull().defaultNow(),
 });
@@ -196,5 +198,7 @@ export const verification = pgTable("verification", {
 
 export type Appointment = InferSelectModel<typeof appointment>;
 export type User = InferSelectModel<typeof user>;
+export type Doctor = InferSelectModel<typeof doctor>;
+export type Schedule = InferSelectModel<typeof schedule>;
 export type Receptionist = InferSelectModel<typeof receptionist>;
-export type Tables = 'user' | 'doctor' | 'receptionist' | 'schedule' | 'session' | 'account';
+export type Tables = 'user' | 'doctor' | 'receptionist' | 'schedule' | 'session' | 'account' | 'appointment';

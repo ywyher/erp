@@ -11,6 +11,7 @@ import AdminDashboard from "@/app/(authenticated)/dashboard/_components/sidebar/
 import DoctorDashboard from "@/app/(authenticated)/dashboard/_components/sidebar/doctor/doctor-dashboard";
 import ReceptionistDashboard from "@/app/(authenticated)/dashboard/_components/sidebar/receptionist/receptionist-dashboard";
 import { Roles } from "@/app/types";
+import UserDashboard from "@/app/(authenticated)/dashboard/_components/sidebar/user/user-dashboard";
 
 export default async function DashboardSidebar({ userRole }: { userRole: Roles }) {
   return (
@@ -28,6 +29,9 @@ export default async function DashboardSidebar({ userRole }: { userRole: Roles }
         )}
         {userRole == 'receptionist' && (
           <ReceptionistDashboard />
+        )}
+        {userRole == 'user' && (
+          <UserDashboard />
         )}
       </SidebarContent>
       <DashboardSidebarFooter />

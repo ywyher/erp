@@ -14,11 +14,9 @@ export default function Pfp({ image, className }: { image?: string, className?: 
     }
 
     return (
-        <div>
-            <Avatar className={className}>
-                <AvatarImage src={getImage()} alt="Profile picture" />
-                <AvatarFallback>AS</AvatarFallback>
-            </Avatar>
-        </div>
+        <Avatar className={className}>
+            <AvatarImage src={getImage()} alt="Profile picture" />
+            <AvatarFallback>AS</AvatarFallback>
+        </Avatar>
     );
 }

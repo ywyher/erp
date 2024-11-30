@@ -1,5 +1,6 @@
 import { Schedules } from "@/app/(authenticated)/dashboard/types";
-import { phoneNumberRegex, emailRegex, Schedule } from "@/app/types";
+import { phoneNumberRegex, emailRegex } from "@/app/types";
+import { Schedule } from "@/lib/db/schema";
 import { nanoid } from "nanoid";
 
 export const checkFieldType = (column: string): 'email' | 'phoneNumber' | 'unknown' => {
@@ -97,4 +98,15 @@ export const transformSchedulesToRecords = (schedules: Schedules, userId: string
 export function excludeField<T extends object, K extends keyof T>(obj: T, field: K): Omit<T, K> {
     const { [field]: _, ...rest } = obj;
     return rest;
+}
+
+export function groupSchedulesByDay(schedules: Schedule[]): Record<string, Schedule[]> {
+    return schedules.reduce((acc, schedule) => {
+        const day = schedule.day.toLowerCase();
+        if (!acc[day]) {
+            acc[day] = [];
+        }
+        acc[day].push(schedule);
+        return acc;
+    }, {} as Record<string, Schedule[]>);
 }

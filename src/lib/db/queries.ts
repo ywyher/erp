@@ -4,8 +4,8 @@ import { Doctor, Roles, Schedule } from "@/app/types";
 import { auth } from "@/lib/auth";
 import { signIn, User } from "@/lib/auth-client";
 import db from "@/lib/db";
-import { account, doctor, Receptionist, receptionist, schedule, session, Tables, user } from "@/lib/db/schema";
-import { and, eq, like, or, sql } from "drizzle-orm";
+import { account, appointment, doctor, Receptionist, receptionist, schedule, session, Tables, user } from "@/lib/db/schema";
+import { and, ConsoleLogWriter, eq, like, or, sql } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { headers } from "next/headers";
 
@@ -15,6 +15,7 @@ const tableMap = {
     schedule: schedule,
     session: session,
     account: account,
+    appointment: appointment,
 };
 
 export async function getUserProvider(userId: string): Promise<{ provider: 'social' | 'credential' }> {
@@ -62,6 +63,8 @@ export async function getUserById(userId: string, role: Roles) {
             .leftJoin(schedule, eq(user.id, schedule.userId))
             .where(eq(user.id, userId))
             .groupBy(user.id, doctor.id);
+
+        console.log(result)
 
         return result[0] as { user: User, doctor: Doctor, schedules: Schedule[] };
     }
@@ -190,24 +193,25 @@ export async function deleteById(id: string, tableName: Tables) {
     }
 }
 
-export async function searchUsers(query: string, role: Roles) {
+export async function searchUsers(query: string, role: Roles | 'all') {
     const lowerQuery = `%${query.toLowerCase()}%`;
+
+    // Create the base conditions for the query
+    const baseConditions = or(
+        like(sql`LOWER(${user.name})`, lowerQuery),
+        like(sql`LOWER(${user.username})`, lowerQuery),
+        like(sql`LOWER(${user.email})`, lowerQuery),
+        like(user.nationalId, lowerQuery),
+        like(user.phoneNumber, lowerQuery)
+    );
+
+    // Add the role condition only if role is not 'all'
+    const conditions = role === 'all' ? baseConditions : and(baseConditions, eq(user.role, role));
 
     const results = await db
         .select()
         .from(user)
-        .where(
-            and(
-                or(
-                    like(sql`LOWER(${user.name})`, lowerQuery),
-                    like(sql`LOWER(${user.username})`, lowerQuery),
-                    like(sql`LOWER(${user.email})`, lowerQuery),
-                    like(user.nationalId, lowerQuery),
-                    like(user.phoneNumber, lowerQuery)
-                ),
-                eq(user.role, role)
-            )
-        )
+        .where(conditions)
         .limit(10);
 
     return results;
@@ -257,5 +261,25 @@ export async function getUserRegistrationType(userId: string) {
         return 'phoneNumber'; // Registered with phone number
     } else {
         return 'none'; // User has neither email nor phone number (unlikely)
+    }
+}
+
+export async function getWorkerUserId(workerId: string, table: 'doctor' | 'receptionist') {
+    if (table == 'doctor') {
+        const [doctorData] = await db.select().from(doctor)
+            .where(eq(doctor.id, workerId))
+
+        const [userData] = await db.select().from(user)
+            .where(eq(user.id, doctorData.userId))
+
+        return userData.id;
+    } else if (table == 'receptionist') {
+        const [receptionistData] = await db.select().from(receptionist)
+            .where(eq(receptionist.id, workerId))
+
+        const [userData] = await db.select().from(user)
+            .where(eq(user.id, receptionistData.userId))
+
+        return userData.id;
     }
 }

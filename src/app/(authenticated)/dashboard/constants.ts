@@ -11,15 +11,15 @@
 // ]
 
 export const specialties = [
-    'Cardiology',
-    'Dermatology',
-    'Gastroenterology',
-    'Neurology',
-    'Orthopedics',
-    'Pediatrics',
-    'Psychiatry',
-    'Radiology',
-    'Urology'
+    'cardiology',
+    'dermatology',
+    'gastroenterology',
+    'neurology',
+    'orthopedics',
+    'pediatrics',
+    'psychiatry',
+    'radiology',
+    'urology'
 ] as const
 
 export const days = [
