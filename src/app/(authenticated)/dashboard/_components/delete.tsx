@@ -12,10 +12,10 @@ import {
     AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
 import { Dispatch, SetStateAction, useState } from "react";
-import { useToast } from "@/hooks/use-toast";
 import LoadingBtn from "@/components/loading-btn";
 import { deleteById } from "@/lib/db/queries";
 import { Tables } from "@/lib/db/schema";
+import { toast } from "sonner";
 
 export default function Delete({ id, table, setPopOpen, label = 'delete' }: {
     id: string,
@@ -25,17 +25,13 @@ export default function Delete({ id, table, setPopOpen, label = 'delete' }: {
 }) {
     const [open, setOpen] = useState<boolean>()
     const [isLoading, setIsLoading] = useState<boolean>(false)
-    const { toast } = useToast()
 
     const handleDelete = async () => {
         setIsLoading(true)
         const result = await deleteById(id, table);
 
         if (result?.message) {
-            toast({
-                title: 'Success',
-                description: result?.message
-            });
+            toast(result.message);
             setIsLoading(false)
             setPopOpen(false)
             setOpen(false)

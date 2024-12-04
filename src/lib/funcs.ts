@@ -110,3 +110,14 @@ export function groupSchedulesByDay(schedules: Schedule[]): Record<string, Sched
         return acc;
     }, {} as Record<string, Schedule[]>);
 }
+
+export const getImageUrl = (name: string) => {
+    if (name == 'pfp.jpg') {
+        return `/images/${name}`
+    }
+    if (name?.includes('https') || name?.includes('http')) {
+        return name
+    } else {
+        return `${process.env.NEXT_PUBLIC_S3_DEV_URL}` + name
+    }
+}

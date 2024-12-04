@@ -17,12 +17,13 @@ import { getUserRegistrationType } from "@/lib/db/queries"
 import { updateUser } from "@/app/actions"
 import { excludeField } from "@/lib/funcs"
 import { updateOnboarding } from "@/app/(auth)/actions"
+import { getErrorMessage } from "@/lib/handle-error"
+import { toast } from "sonner"
 
 export default function Onboarding() {
     const router = useRouter();
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [context, setContext] = useState<'email' | 'phoneNumber' | null>(null);
-    const { toast } = useToast();
     const queryClient = useQueryClient();
     const setTrigger = useImageStore((state) => state.setTrigger)
 
@@ -87,10 +88,7 @@ export default function Onboarding() {
 
         if (updatedUser && updatedUser.error) {
             setIsLoading(false)
-            toast({
-                title: updatedUser.error,
-                variant: 'destructive'
-            })
+            getErrorMessage(updatedUser.error)
             return;
         }
 
@@ -100,9 +98,7 @@ export default function Onboarding() {
             setIsLoading(false)
             setTrigger(true)
             await queryClient.invalidateQueries({ queryKey: ['session'] })
-            toast({
-                title: 'Account updated successfully'
-            })
+            toast('Account updated successfully')
             router.replace("/");
         }
     }

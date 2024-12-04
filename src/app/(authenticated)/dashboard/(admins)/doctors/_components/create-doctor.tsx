@@ -8,7 +8,6 @@ import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
-import { useToast } from "@/hooks/use-toast";
 import { createDoctorSchema } from "@/app/(authenticated)/dashboard/(admins)/doctors/types";
 import { days as daysList, specialties } from "@/app/(authenticated)/dashboard/constants";
 import { createDoctor } from "@/app/(authenticated)/dashboard/(admins)/doctors/actions";
@@ -20,6 +19,8 @@ import { Schedules } from "@/app/(authenticated)/dashboard/types";
 import { useRouter } from "next/navigation";
 import { normalizeData } from "@/lib/funcs";
 import { z } from "zod";
+import { getErrorMessage } from "@/lib/handle-error";
+import { toast } from "sonner";
 
 function CreateDialog({ children, open, setOpen }: { children: React.ReactNode, open: boolean, setOpen: Dispatch<SetStateAction<boolean>> }) {
     return (
@@ -49,30 +50,20 @@ export default function CreateDoctor() {
     const [open, setOpen] = useState<boolean>(false)
     const router = useRouter();
 
-    const { toast } = useToast()
-
     const form = useForm<z.infer<typeof createDoctorSchema>>({
         resolver: zodResolver(createDoctorSchema),
     });
 
     const onSubmit = async (data: z.infer<typeof createDoctorSchema>) => {
         if (selectedDays.length == 0) {
-            toast({
-                title: "Validation Error",
-                description: `Work days is required`,
-                variant: "destructive",
-            })
+            getErrorMessage(`Work days is required`)
             return;
         }
 
         const missingSchedules = selectedDays.filter((day) => !schedules[day] || schedules[day].length === 0);
 
         if (missingSchedules.length > 0) {
-            toast({
-                title: "Validation Error",
-                description: `The following days are missing schedules: ${missingSchedules.join(", ")}`,
-                variant: "destructive",
-            });
+            getErrorMessage(`The following days are missing schedules: ${missingSchedules.join(", ")}`)
             return;
         }
 
@@ -89,19 +80,12 @@ export default function CreateDoctor() {
         const result = await createDoctor({ userData: normalizedData, schedulesData: schedules })
 
         if (result?.error) {
-            toast({
-                title: "Error",
-                description: result.error,
-                variant: "destructive",
-            })
+            getErrorMessage(result.error)
             setIsLoading(false)
             return;
         }
 
-        toast({
-            title: 'Success',
-            description: result?.message
-        })
+        toast(result?.message)
         setIsLoading(false)
         form.reset()
         setOpen(false)
@@ -109,11 +93,7 @@ export default function CreateDoctor() {
     };
 
     const onError = () => {
-        toast({
-            title: "Validation Error",
-            description: `Please check all tabs for potential errors`,
-            variant: "destructive",
-        })
+        getErrorMessage('Please check all tabs for potential errors')
     }
 
     return (

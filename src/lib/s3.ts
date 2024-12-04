@@ -17,8 +17,8 @@ const s3 = new S3Client({
 
 const generateFileName = (bytes = 32) => crypto.randomBytes(bytes).toString('hex');
 
-const acceptedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp']
-const maxFileSize = 5 * 1024 * 1024
+const acceptedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'application/pdf']
+const maxFileSize = 11 * 1024 * 1024
 
 export async function getPreSignedUrl({
     type,
@@ -53,7 +53,7 @@ export async function getPreSignedUrl({
     const putObjectCommand = new PutObjectCommand({
         Bucket: process.env.S3_BUCKET_NAME!,
         Key: fileName,
-        ContentType: 'image/jpg', // Add a content type if necessary
+        ContentType: type,
         ContentLength: size,
         ChecksumSHA256: checksum,
         Metadata: {

@@ -7,10 +7,11 @@ import { useRouter } from "next/navigation"
 import ExistingUser from "@/app/(authenticated)/dashboard/appointments/create/_components/existing-user"
 import { User } from "@/lib/db/schema"
 import DoctorsList from "@/components/doctors/doctors-list"
-import { useBookDoctorStore } from "@/components/doctors/store"
+import { useAppointmentReservationStore } from "@/components/doctors/store"
 import { createAppointment } from "@/app/(authenticated)/dashboard/appointments/actions"
-import { useToast } from "@/hooks/use-toast"
 import NewUser from "@/app/(authenticated)/dashboard/appointments/create/_components/new-user"
+import { toast } from "sonner"
+import { getErrorMessage } from "@/lib/handle-error"
 
 export default function CreateAppointment({ userId, role }: { userId: string, role: 'doctor' | 'receptionist' }) {
     const router = useRouter();
@@ -18,38 +19,29 @@ export default function CreateAppointment({ userId, role }: { userId: string, ro
     const [isCreateUser, setIsCreateUser] = useState<boolean>(false)
     const [patientId, setPatientId] = useState<User['id'] | null>(null);
 
-    const { doctor, schedule, setSchedule, setDoctor } = useBookDoctorStore()
-
-    const { toast } = useToast()
+    const { doctorId, schedule, setSchedule, setDoctorId } = useAppointmentReservationStore()
 
     useEffect(() => {
         async function handleCreateAppointment() {
             try {
-                if (!doctor || !schedule || !patientId) return;
+                if (!doctorId || !schedule || !patientId) return;
 
                 const result = await createAppointment({
                     patientId: patientId,
-                    doctorId: doctor.id,
+                    doctorId: doctorId,
                     createdBy: role,
                     schedule: schedule,
                     receptionistId: role == 'receptionist' ? userId : undefined,
                 })
 
                 if (result?.success) {
-                    toast({
-                        title: "Appointment created successfully",
-                        description: result.message,
-                    })
-                    setDoctor(null)
+                    toast(result.message)
+                    setDoctorId(null)
                     setSchedule(null)
                     router.push(`/dashboard/appointments`)
                 } else {
-                    toast({
-                        title: "Failed to create appointment",
-                        description: result?.message || "An error occurred",
-                        variant: "destructive"
-                    })
-                    setDoctor(null)
+                    getErrorMessage(result?.message)
+                    setDoctorId(null)
                     setSchedule(null)
                     return;
                 }
@@ -59,7 +51,7 @@ export default function CreateAppointment({ userId, role }: { userId: string, ro
         }
 
         handleCreateAppointment()
-    }, [doctor, schedule, patientId])
+    }, [doctorId, schedule, patientId])
 
     return (
         <div className="p-2">

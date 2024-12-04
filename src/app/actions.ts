@@ -80,34 +80,41 @@ export const computeSHA256 = async (file: File) => {
     return hashHex
 }
 
-export async function uploadToS3({ file }: { file: File }) {
-    const checksum = await computeSHA256(file)
+export async function uploadToS3({
+    file,
+}: {
+    file: File;
+}) {
+    const checksum = await computeSHA256(file);
 
-    const presinedUrl = await getPreSignedUrl({
+    const presignedUrl = await getPreSignedUrl({
         type: file.type,
         size: file.size,
-        checksum: checksum
-    })
+        checksum: checksum,
+    });
 
-    if (presinedUrl.failure) {
-        console.log('Not authenticated')
-        return;
+    if (presignedUrl.failure) {
+        return { error: "Not authenticated", file: file.name };
     }
 
-    const { url, fileName } = presinedUrl.success
+    const { url, fileName } = presignedUrl.success;
 
-    if (!url || !fileName) throw new Error('Failed to get pre-signed URL')
+    if (!url || !fileName) {
+        return { error: "Failed to get pre-signed URL", file: file.name };
+    }
 
-    await fetch(url, {
-        method: 'PUT',
-        headers: {
-            "Content-Type": file.type,
-        },
-        body: file
-    })
+    try {
+        await fetch(url, {
+            method: "PUT",
+            headers: {
+                "Content-Type": file.type,
+            },
+            body: file,
+        });
 
-    return {
-        fileName: fileName
+        return { name: fileName, size: file.size, type: file.type };
+    } catch (error) {
+        return { error: "Failed to upload", file: file.name };
     }
 }
 

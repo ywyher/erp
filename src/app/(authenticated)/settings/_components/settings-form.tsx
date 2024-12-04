@@ -15,7 +15,6 @@ import { Button } from "@/components/ui/button"
 import { useQuery, useQueryClient } from "@tanstack/react-query"
 import { getSession } from "@/lib/auth-client"
 import { useEffect, useState } from "react"
-import { useToast } from "@/hooks/use-toast"
 import { updateSettings } from "@/app/(authenticated)/settings/settings.actions"
 import { useImageStore } from "@/app/store"
 import LoadingBtn from "@/components/loading-btn"
@@ -27,6 +26,8 @@ import { updateUser } from "@/app/actions"
 import { date } from "drizzle-orm/mysql-core"
 import { FormFieldWrapper } from "@/components/formFieldWrapper"
 import { getUserRegistrationType } from "@/lib/db/queries"
+import { getErrorMessage } from "@/lib/handle-error"
+import { toast } from "sonner"
 
 type UpdateField = {
     value: string | null;
@@ -38,7 +39,6 @@ export default function SettingsForm() {
     const [registeredWith, setRegisteredWith] = useState<'both' | 'email' | 'phoneNumber' | 'none' | null>(null)
 
     const queryClient = useQueryClient()
-    const { toast } = useToast()
     const setTrigger = useImageStore((store) => store.setTrigger)
 
     const { data: user, isLoading: isPending } = useQuery({
@@ -92,11 +92,7 @@ export default function SettingsForm() {
         }
 
         if (Object.keys(changedFields).length === 0) {
-            toast({
-                title: "No Changes",
-                description: "No fields were updated.",
-                variant: "destructive",
-            });
+            getErrorMessage("No Changes thus no fields were updated.");
             return;
         }
 
@@ -110,18 +106,11 @@ export default function SettingsForm() {
         const result = await updateUser({ data, userId: user.id });
 
         if (result && result.error) {
-            toast({
-                title: "Error",
-                description: result.error,
-                variant: "destructive",
-            });
+            getErrorMessage(result.error)
             return;
         }
 
-        toast({
-            title: "Settings Updated",
-            description: "Your settings were successfully updated.",
-        });
+        toast("Settings were successfully updated.");
         await queryClient.invalidateQueries({ queryKey: ['session'] });
         setIsLoading(false)
     };

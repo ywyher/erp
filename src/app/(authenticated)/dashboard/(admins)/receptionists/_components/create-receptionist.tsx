@@ -8,7 +8,6 @@ import { Dispatch, SetStateAction, useState } from "react";
 import { useForm } from "react-hook-form";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
-import { useToast } from "@/hooks/use-toast";
 import { departments } from "@/app/(authenticated)/dashboard/constants";
 import LoadingBtn from "@/components/loading-btn";
 import ScheduleSelector from "@/app/(authenticated)/dashboard/_components/schedule-selector";
@@ -17,6 +16,8 @@ import { useRouter } from "next/navigation";
 import { z } from "zod";
 import { createReceptionistSchema } from "@/app/(authenticated)/dashboard/(admins)/receptionists/types";
 import { createReceptionist } from "@/app/(authenticated)/dashboard/(admins)/receptionists/actions";
+import { getErrorMessage } from "@/lib/handle-error";
+import { toast } from "sonner";
 
 function CreateDialog({ children, open, setOpen }: { children: React.ReactNode, open: boolean, setOpen: Dispatch<SetStateAction<boolean>> }) {
     return (
@@ -46,30 +47,20 @@ export default function CreateReceptionist() {
     const [open, setOpen] = useState<boolean>(false)
     const router = useRouter();
 
-    const { toast } = useToast()
-
     const form = useForm<z.infer<typeof createReceptionistSchema>>({
         resolver: zodResolver(createReceptionistSchema),
     });
 
     const onSubmit = async (data: z.infer<typeof createReceptionistSchema>) => {
         if (selectedDays.length == 0) {
-            toast({
-                title: "Validation Error",
-                description: `Work days is required`,
-                variant: "destructive",
-            })
+            getErrorMessage(`Work days are required`)
             return;
         }
 
         const missingSchedules = selectedDays.filter((day) => !schedules[day] || schedules[day].length === 0);
 
         if (missingSchedules.length > 0) {
-            toast({
-                title: "Validation Error",
-                description: `The following days are missing schedules: ${missingSchedules.join(", ")}`,
-                variant: "destructive",
-            });
+            getErrorMessage(`The following days are missing schedules: ${missingSchedules.join(", ")}`)
             return;
         }
 
@@ -77,19 +68,12 @@ export default function CreateReceptionist() {
         const result = await createReceptionist({ userData: data, schedulesData: schedules })
 
         if (result?.error) {
-            toast({
-                title: "Error",
-                description: result.error,
-                variant: "destructive",
-            })
+            getErrorMessage(result.error)
             setIsLoading(false)
             return;
         }
 
-        toast({
-            title: 'Success',
-            description: result?.message
-        })
+        toast(result.message)
         setIsLoading(false)
         form.reset()
         setOpen(false)
@@ -97,11 +81,7 @@ export default function CreateReceptionist() {
     };
 
     const onError = () => {
-        toast({
-            title: "Validation Error",
-            description: `Please check all tabs for potential errors`,
-            variant: "destructive",
-        })
+        getErrorMessage(`Please check all tabs for potential errors`)
     }
 
     return (

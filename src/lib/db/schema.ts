@@ -29,6 +29,7 @@ const userRelation = relations(user, ({ one, many }) => ({
 	}),
 	schedules: many(schedule),
 	appointments: many(appointment),
+	medicalFiles: many(medicalFile),
 }))
 
 // Doctor
@@ -118,6 +119,22 @@ export const appointment = pgTable('appointment', {
 	updatedAt: timestamp('updatedAt').notNull().defaultNow(),
 });
 
+// Medical files for appointments
+export const medicalFile = pgTable('medical_file', {
+	id: text('id').primaryKey(),
+	name: text('name').notNull(),
+	type: text('type').notNull(),
+	patientId: text('patientId').references(() => user.id, { onDelete: 'cascade' }).notNull(),
+	appointmentId: text('appointmentId').references(() => appointment.id, { onDelete: 'cascade' }).notNull(),
+})
+
+export const medicalFileRelation = relations(medicalFile, ({ one }) => ({
+	appointment: one(appointment, {
+		fields: [medicalFile.appointmentId],
+		references: [appointment.id],
+	})
+}))
+
 // Medical Record table
 export const medicalRecord = pgTable('medical_record', {
 	id: text('id').primaryKey(),
@@ -129,7 +146,7 @@ export const medicalRecord = pgTable('medical_record', {
 });
 
 // Relations
-export const appointmentRelations = relations(appointment, ({ one }) => ({
+export const appointmentRelations = relations(appointment, ({ one, many }) => ({
 	user: one(user, {
 		fields: [appointment.patientId],
 		references: [user.id],
@@ -146,6 +163,7 @@ export const appointmentRelations = relations(appointment, ({ one }) => ({
 		fields: [appointment.id],
 		references: [medicalRecord.appointmentId],
 	}),
+	medicalFiles: many(medicalFile)
 }));
 
 export const medicalRecordRelations = relations(medicalRecord, ({ one }) => ({

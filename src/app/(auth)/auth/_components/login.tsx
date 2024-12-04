@@ -20,10 +20,11 @@ import LoadingBtn from "@/components/loading-btn";
 import { useVerifyStore } from "@/app/(auth)/store";
 import { z } from "zod";
 import { FormFieldWrapper } from "@/components/formFieldWrapper";
+import { getErrorMessage } from "@/lib/handle-error";
+import { toast } from "sonner";
 
 export default function Login() {
     const [isLoading, setIsLoading] = useState(false);
-    const { toast } = useToast()
     const value = useVerifyStore((state) => state.value)
     const context = useVerifyStore((state) => state.context)
 
@@ -41,11 +42,7 @@ export default function Login() {
                     redirect("/")
                 },
                 onError: (ctx) => {
-                    toast({
-                        title: ctx.error.message,
-                        description: "Please try again",
-                        variant: "destructive",
-                    })
+                    getErrorMessage(ctx.error.message);
                     setIsLoading(false)
                 },
             });
@@ -69,9 +66,8 @@ export default function Login() {
     const resetPassword = async () => {
         if (!value) return;
         if (context != 'email') {
-            toast({
-                title: "Password Reset functionality only works for emals at the moment",
-                variant: 'destructive'
+            toast("Password Reset functionality only works for emals at the moment", {
+                description: "May Take 1-5 Minutes",
             })
             return;
         }
@@ -82,8 +78,7 @@ export default function Login() {
         });
 
         if (!error) {
-            toast({
-                title: "Password Reset Link Sent Successfully",
+            toast('Password Reset Link Sent Successfully', {
                 description: "May Take 1-5 Minutes",
             })
         }

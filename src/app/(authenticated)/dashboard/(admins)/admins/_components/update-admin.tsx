@@ -7,7 +7,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
-import { useToast } from "@/hooks/use-toast";
 import { useQuery } from "@tanstack/react-query";
 import { isFakeEmail, normalizeData } from "@/lib/funcs";
 import { getUserById } from "@/lib/db/queries";
@@ -18,6 +17,8 @@ import LoadingBtn from "@/components/loading-btn";
 import { updateAdmin } from "@/app/(authenticated)/dashboard/(admins)/admins/action";
 import { userSchema } from "@/app/types";
 import { z } from "zod";
+import { getErrorMessage } from "@/lib/handle-error";
+import { toast } from "sonner";
 
 function UpdateDialog({ children, open, setOpen }: { children: React.ReactNode, open: boolean, setOpen: Dispatch<SetStateAction<boolean>> }) {
     return (
@@ -47,7 +48,6 @@ export default function UpdateAdmin(
         userId: string
     }
 ) {
-    const { toast } = useToast()
     const [open, setOpen] = useState<boolean>(false)
     const [isLoading, setIsLoading] = useState<boolean>(false)
 
@@ -87,11 +87,7 @@ export default function UpdateAdmin(
         }
 
         if (Object.keys(changedFields).length === 0) {
-            toast({
-                title: "No Changes",
-                description: "No fields were updated.",
-                variant: "destructive",
-            });
+            getErrorMessage("No changes made");
             return;
         }
 
@@ -114,19 +110,12 @@ export default function UpdateAdmin(
         const result = await updateAdmin({ data, userId: userId })
 
         if (result?.error) {
-            toast({
-                title: 'Error',
-                description: result?.error,
-                variant: 'destructive'
-            })
+            getErrorMessage(result.error);
             setIsLoading(false)
             return;
         }
 
-        toast({
-            title: 'Success',
-            description: result?.message,
-        })
+        toast(result.message)
         form.reset()
         setIsLoading(false)
         setOpen(false)

@@ -9,10 +9,11 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { MoreHorizontal, Loader2, UserPlus } from 'lucide-react'
 import { createAppointment } from "@/app/(authenticated)/dashboard/appointments/actions"
-import { useToast } from "@/hooks/use-toast"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { getErrorMessage } from "@/lib/handle-error"
+import { toast } from "sonner"
 
 export default function ExistingUser({ userId, role, setPatientId, setIsCreateUser }: {
     userId: string,
@@ -21,7 +22,6 @@ export default function ExistingUser({ userId, role, setPatientId, setIsCreateUs
     setIsCreateUser: Dispatch<SetStateAction<boolean>>
 }) {
     const router = useRouter()
-    const { toast } = useToast()
 
     const [searchQuery, setSearchQuery] = useState<string>('')
     const [searchResults, setSearchResults] = useState<User[]>([])
@@ -35,12 +35,7 @@ export default function ExistingUser({ userId, role, setPatientId, setIsCreateUs
             const results = await searchUsers(query, 'all')
             setSearchResults(results)
         } catch (error) {
-            console.error('Error searching patients:', error)
-            toast({
-                title: "Error searching patients",
-                description: "Please try again later",
-                variant: "destructive"
-            })
+            getErrorMessage(`Error searching patients, Please try again later.`)
         } finally {
             setIsSearching(false)
         }
@@ -56,10 +51,7 @@ export default function ExistingUser({ userId, role, setPatientId, setIsCreateUs
 
     const handleCreateAppointment = async (patientId: string, doctorId: string) => {
         if (!patientId) {
-            toast({
-                title: "Patient id not found!",
-                variant: 'destructive'
-            })
+            getErrorMessage(`Patient id not found!`)
             return;
         }
 
@@ -70,18 +62,11 @@ export default function ExistingUser({ userId, role, setPatientId, setIsCreateUs
         })
 
         if (result?.success) {
-            toast({
-                title: "Appointment created successfully",
-                description: result.message,
-            })
+            toast(result.message)
             setSearchQuery('')
             router.push(`/dashboard/appointments/${result.appointmentId}`)
         } else {
-            toast({
-                title: "Failed to create appointment",
-                description: result?.message || "An error occurred",
-                variant: "destructive"
-            })
+            toast(result?.message)
         }
     }
 

@@ -5,18 +5,18 @@ import { updateSchedule } from "@/app/(authenticated)/dashboard/actions";
 import { Schedules } from "@/app/(authenticated)/dashboard/types";
 import { Schedule } from "@/app/types";
 import LoadingBtn from "@/components/loading-btn";
-import { useToast } from "@/hooks/use-toast";
 import { User } from "@/lib/auth-client";
 import { getUserById } from "@/lib/db/queries";
 import { groupSchedules, transformSchedulesToRecords } from "@/lib/funcs";
+import { getErrorMessage } from "@/lib/handle-error";
 import { useQuery } from "@tanstack/react-query";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
+import { toast } from "sonner";
 
 export default function UpdateSchedule({ userId, setOpen }: { userId: string, setOpen?: Dispatch<SetStateAction<boolean>> }) {
     const [isLoading, setIsLoading] = useState<boolean>(false)
     const [schedules, setSchedules] = useState<Schedules>({});
     const [selectedDays, setSelectedDays] = useState<string[]>([]);
-    const { toast } = useToast()
 
     const { data: user, isLoading: isPending } = useQuery({
         queryKey: ['userById', userId],
@@ -44,22 +44,14 @@ export default function UpdateSchedule({ userId, setOpen }: { userId: string, se
             }
 
             if (selectedDays.length == 0) {
-                toast({
-                    title: "Validation Error",
-                    description: `Schedule is required`,
-                    variant: "destructive",
-                })
+                getErrorMessage('Schedule is required')
                 return;
             }
 
             const missingSchedules = selectedDays.filter((day) => !schedules[day] || schedules[day].length === 0);
 
             if (missingSchedules.length > 0) {
-                toast({
-                    title: "Validation Error",
-                    description: `The following days are missing schedules: ${missingSchedules.join(", ")}`,
-                    variant: "destructive",
-                });
+                getErrorMessage(`The following days are missing schedules: ${missingSchedules.join(", ")}`)
                 return;
             }
 
@@ -69,31 +61,20 @@ export default function UpdateSchedule({ userId, setOpen }: { userId: string, se
             const areSchedulesEqual = compareSchedules(sessionSchedules, newSchedules);
 
             if (areSchedulesEqual) {
-                toast({
-                    title: "No changes detected",
-                    description: "The schedules are the same as the current ones. No update needed.",
-                    variant: "destructive",
-                });
+                getErrorMessage("The schedules are the same as the current ones. No updates needed.")
                 return;
             }
 
             const result = await updateSchedule({ schedules, userId })
 
             if (result.success) {
-                toast({
-                    title: "Schedule updated",
-                    description: result.message,
-                });
+                toast(result.message);
 
                 if (setOpen) setOpen(false)
             }
         } catch (error) {
             console.error("Error updating schedule:", error);
-            toast({
-                title: "Error",
-                description: "An error occurred while updating the schedule.",
-                variant: "destructive",
-            });
+            getErrorMessage("An error occurred while updating the schedule.")
         } finally {
             setIsLoading(false);
         }

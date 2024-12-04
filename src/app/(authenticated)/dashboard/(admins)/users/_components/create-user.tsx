@@ -9,11 +9,12 @@ import { FieldErrors, useForm } from "react-hook-form";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { createUser } from "@/app/(authenticated)/dashboard/actions";
-import { useToast } from "@/hooks/use-toast";
 import LoadingBtn from "@/components/loading-btn";
-import { normalizeData } from "@/lib/funcs";
 import { z } from "zod";
 import { createUserSchema } from "@/app/(authenticated)/dashboard/types";
+import { getErrorMessage } from "@/lib/handle-error";
+import { toast } from "sonner";
+import { revalidate } from "@/app/actions";
 
 function CreateDialog({ children, open, setOpen }: { children: React.ReactNode, open: boolean, setOpen: Dispatch<SetStateAction<boolean>> }) {
     return (
@@ -39,7 +40,6 @@ export default function CreateUser() {
     const [open, setOpen] = useState<boolean>(false)
     const [tab, setTab] = useState<'account' | 'password'>('account')
     const [isLoading, setIsLoading] = useState<boolean>(false)
-    const { toast } = useToast()
 
     const form = useForm<z.infer<typeof createUserSchema>>({
         resolver: zodResolver(createUserSchema),
@@ -50,19 +50,12 @@ export default function CreateUser() {
         const result = await createUser({ data, role: 'user' })
 
         if (result?.error) {
-            toast({
-                title: 'Error',
-                description: result?.error,
-                variant: 'destructive'
-            })
+            getErrorMessage(result.error)
             setIsLoading(false)
             return;
         }
 
-        toast({
-            title: 'Success',
-            description: result?.message,
-        })
+        toast(result?.message)
 
         await revalidate('/dashboard/users')
         form.reset()
@@ -72,11 +65,7 @@ export default function CreateUser() {
     };
 
     const onError = () => {
-        toast({
-            title: "Validation Error",
-            description: `Please check all tabs for potential errors`,
-            variant: "destructive",
-        })
+        getErrorMessage(`Please check all tabs for potential errors`)
     }
 
     return (

@@ -1,6 +1,5 @@
 'use client'
 
-import { useToast } from "@/hooks/use-toast"
 import { useRouter } from "next/navigation"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { Form } from "@/components/ui/form"
@@ -16,6 +15,8 @@ import { createUser } from "@/app/(authenticated)/dashboard/actions"
 import { createAppointment } from "@/app/(authenticated)/dashboard/appointments/actions"
 import { createUserSchema } from "@/app/(authenticated)/dashboard/types"
 import { User } from "@/lib/db/schema"
+import { getErrorMessage } from "@/lib/handle-error"
+import { toast } from "sonner"
 
 export default function NewUser({ userId, role, setPatientId }: {
     userId: string,
@@ -26,7 +27,6 @@ export default function NewUser({ userId, role, setPatientId }: {
     const [open, setOpen] = useState<boolean>(true)
 
     const router = useRouter()
-    const { toast } = useToast()
 
     const form = useForm<z.infer<typeof userSchema>>({
         resolver: zodResolver(userSchema)
@@ -38,11 +38,7 @@ export default function NewUser({ userId, role, setPatientId }: {
         const createdUser = await createUser({ data: data as z.infer<typeof createUserSchema>, role: 'user' })
 
         if (!createdUser || !createdUser?.success || createdUser?.error) {
-            toast({
-                title: "Error while creating the appointment.",
-                description: createdUser?.error,
-                variant: 'destructive'
-            })
+            getErrorMessage(createdUser?.error)
             setIsLoading(false)
             return;
         }
@@ -64,18 +60,12 @@ export default function NewUser({ userId, role, setPatientId }: {
         })
 
         if (!createdAppointment || !createdAppointment?.success) {
-            toast({
-                title: "Error while creating the appointment.",
-                variant: 'destructive'
-            })
+            getErrorMessage("Error while creating the appointment.")
             return;
         }
 
         if (createdAppointment?.success) {
-            toast({
-                title: "Appointment created successfully redirecting...",
-                description: createdAppointment.message,
-            })
+            toast(createdAppointment.message)
             setOpen(false)
             router.push(`/dashboard/appointments/${createdAppointment.appointmentId}`)
         }

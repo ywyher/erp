@@ -5,10 +5,10 @@ import { passwordSchema, TPasswordSchema } from "@/app/types";
 import { FormFieldWrapper } from "@/components/formFieldWrapper";
 import LoadingBtn from "@/components/loading-btn";
 import { Form } from "@/components/ui/form";
-import { useToast } from "@/hooks/use-toast";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Dispatch, SetStateAction, useState } from "react";
 import { useForm } from "react-hook-form";
+import { toast } from "sonner";
 
 export default function UpdatePassword(
     {
@@ -23,7 +23,6 @@ export default function UpdatePassword(
         }
 ) {
     const [isLoading, setIsLoading] = useState<boolean>(false)
-    const { toast } = useToast()
 
     const form = useForm<TPasswordSchema>({
         resolver: zodResolver(passwordSchema)
@@ -35,10 +34,7 @@ export default function UpdatePassword(
 
         if (result?.success) {
             if (setOpen) setOpen(false);
-            toast({
-                title: 'Success',
-                description: result.message
-            })
+            toast(result.message)
             setIsLoading(false)
         }
     }

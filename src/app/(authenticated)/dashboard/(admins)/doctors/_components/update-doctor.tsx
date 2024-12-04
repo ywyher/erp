@@ -8,7 +8,6 @@ import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
-import { useToast } from "@/hooks/use-toast";
 import { updateDoctorSchema } from "@/app/(authenticated)/dashboard/(admins)/doctors/types";
 import { days as daysList, specialties } from "@/app/(authenticated)/dashboard/constants";
 import LoadingBtn from "@/components/loading-btn";
@@ -24,6 +23,8 @@ import { isFakeEmail, normalizeData } from "@/lib/funcs";
 import { updateDoctor } from "@/app/(authenticated)/dashboard/(admins)/doctors/actions";
 import UpdateSchedule from "@/app/(authenticated)/dashboard/_components/update-schedule";
 import { z } from "zod";
+import { getErrorMessage } from "@/lib/handle-error";
+import { toast } from "sonner";
 
 function UpdateDialog({ children, open, setOpen }: { children: React.ReactNode, open: boolean, setOpen: Dispatch<SetStateAction<boolean>> }) {
     return (
@@ -57,8 +58,6 @@ export default function UpdateDoctor(
     const [isLoading, setIsLoading] = useState<boolean>(false)
     const [open, setOpen] = useState<boolean>(false)
     const router = useRouter();
-
-    const { toast } = useToast()
 
     const { data: user, isLoading: isPending } = useQuery({
         queryKey: ['userById', userId],
@@ -107,11 +106,7 @@ export default function UpdateDoctor(
         }
 
         if (Object.keys(changedFields).length === 0) {
-            toast({
-                title: "No Changes",
-                description: "No fields or schedules were updated.",
-                variant: "destructive",
-            });
+            getErrorMessage('No fields chagned thus no fields or schedules were updated.')
             return;
         }
 
@@ -126,20 +121,12 @@ export default function UpdateDoctor(
         const result = await updateDoctor({ data, userId: user.user.id });
 
         if (result.error) {
-            console.log('testing errro')
-            toast({
-                title: "Error",
-                description: result.error,
-                variant: "destructive",
-            })
+            getErrorMessage(result.error)
             setIsLoading(false)
             return;
         }
 
-        toast({
-            title: 'Success',
-            description: result?.message
-        })
+        toast(result?.message)
         setIsLoading(false)
         form.reset()
         setOpen(false)

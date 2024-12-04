@@ -6,17 +6,17 @@ import { redirect } from "next/navigation";
 import { verifyOtpSchema } from "@/app/(auth)/types";
 import { emailOtp, phoneNumber, signUp } from "@/lib/auth-client";
 import { useEffect, useState } from "react";
-import { useToast } from "@/hooks/use-toast";
 import VerifyForm from "@/app/(auth)/verify/_components/verify-form";
 import { useVerifyStore } from "@/app/(auth)/store";
 import { updatePhoneNumberVerified } from "@/app/(auth)/actions";
 import { useQueryClient } from "@tanstack/react-query";
 import { generateFakeField } from "@/lib/funcs";
 import { z } from "zod";
+import { getErrorMessage } from "@/lib/handle-error";
+import { toast } from "sonner";
 
 export default function Verify() {
     const [isLoading, setIsLoading] = useState(false)
-    const { toast } = useToast()
     const value = useVerifyStore((state) => state.value)
     const context = useVerifyStore((state) => state.context)
     const operation = useVerifyStore((state) => state.operation)
@@ -61,10 +61,7 @@ export default function Verify() {
                     console.log('loading')
                 },
                 onError: (ctx) => {
-                    toast({
-                        title: ctx.error.message,
-                        variant: 'destructive'
-                    })
+                    getErrorMessage(ctx.error.message)
                     setIsLoading(false)
                 },
             });
@@ -112,10 +109,7 @@ export default function Verify() {
                     }
                 },
                 onError: (ctx) => {
-                    toast({
-                        title: ctx.error.message,
-                        variant: 'destructive'
-                    })
+                    getErrorMessage(ctx.error.message)
                     setIsLoading(false)
                 }
             })
@@ -132,17 +126,13 @@ export default function Verify() {
                 type: "email-verification",
             }, {
                 onSuccess: () => {
-                    toast({
-                        title: "OTP Sent",
+                    toast("OTP Sent", {
                         description: "Check your email and verify your account",
                     })
                     setIsLoading(false)
                 },
                 onError: (ctx) => {
-                    toast({
-                        title: ctx.error.message,
-                        variant: 'destructive'
-                    })
+                    getErrorMessage(ctx.error.message)
                     setIsLoading(false)
                     return;
                 }
@@ -152,17 +142,13 @@ export default function Verify() {
                 phoneNumber: value,
             }, {
                 onSuccess: () => {
-                    toast({
-                        title: "OTP Sent",
+                    toast("OTP Sent", {
                         description: "Check your email and verify your account",
                     })
                     setIsLoading(false)
                 },
                 onError: (ctx) => {
-                    toast({
-                        title: ctx.error.message,
-                        variant: 'destructive'
-                    })
+                    getErrorMessage(ctx.error.message)
                     setIsLoading(false)
                     return;
                 }

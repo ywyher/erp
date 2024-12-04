@@ -18,15 +18,15 @@ import { checkFieldType } from "@/lib/funcs"
 import { useVerifyStore } from "@/app/(auth)/store"
 import { signIn } from "@/lib/auth-client"
 import { Dispatch, useState } from "react"
-import { useToast } from "@/hooks/use-toast"
 import { checkFieldAvailability } from "@/lib/db/queries"
 import { z } from "zod"
 import { FormFieldWrapper } from "@/components/formFieldWrapper"
+import { toast } from "sonner"
+import { getErrorMessage } from "@/lib/handle-error"
 
 
 export default function Check({ setPort }: { setPort: Dispatch<React.SetStateAction<'check' | 'register' | 'login'>> }) {
     const [isLoading, setIsLoading] = useState(false)
-    const { toast } = useToast()
 
     const setValue = useVerifyStore((state) => state.setValue)
     const setContext = useVerifyStore((state) => state.setContext)
@@ -48,11 +48,7 @@ export default function Check({ setPort }: { setPort: Dispatch<React.SetStateAct
         const fieldType = checkField(data.field)
 
         if (fieldType == 'unknown') {
-            toast({
-                title: 'Validation error',
-                description: 'Inserted data is not correct',
-                variant: 'destructive'
-            })
+            getErrorMessage('Validation Error')
             setIsLoading(false)
             return;
         }

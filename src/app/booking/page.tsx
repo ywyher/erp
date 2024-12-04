@@ -2,13 +2,14 @@
 
 import { createAppointment } from "@/app/(authenticated)/dashboard/appointments/actions";
 import DoctorsList from "@/components/doctors/doctors-list";
-import { useBookDoctorStore } from "@/components/doctors/store";
+import { useAppointmentReservationStore } from "@/components/doctors/store";
 import Header from "@/components/header";
-import { useToast } from "@/hooks/use-toast";
 import { getSession } from "@/lib/auth-client";
+import { getErrorMessage } from "@/lib/handle-error";
 import { useQuery } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
+import { toast } from "sonner";
 
 export default function Booking() {
     const router = useRouter()
@@ -21,55 +22,46 @@ export default function Booking() {
         }
     })
 
-    const { doctor, schedule, setSchedule, setDoctor } = useBookDoctorStore()
-
-    const { toast } = useToast()
+    const { doctorId, schedule, setSchedule, setDoctorId, setReserved } = useAppointmentReservationStore()
 
     useEffect(() => {
         async function handleCreateAppointment() {
             try {
-                if (!doctor || !schedule) return;
+                if (!doctorId || !schedule) return;
                 if (!user) {
-                    toast({
-                        title: "Unauthorized",
-                        description: "Redirecting to /auth.",
-                        variant: 'destructive'
-                    })
+                    getErrorMessage("Unauthorized, Redirecting to /auth.")
                     router.push('/auth')
                     return;
                 }
-                const result = await createAppointment({
+                const createdAppointment = await createAppointment({
                     patientId: user.id,
-                    doctorId: doctor.id,
+                    doctorId: doctorId,
                     createdBy: 'user',
                     schedule: schedule,
                 })
 
-                if (result?.success) {
-                    toast({
-                        title: "Appointment created successfully",
-                        description: result.message,
-                    })
-                    setDoctor(null)
+                if (createdAppointment?.success) {
+                    toast(createdAppointment.message)
+                    setDoctorId(null)
                     setSchedule(null)
-                    router.push(`/dashboard/appointments`)
-                } else {
-                    toast({
-                        title: "Failed to create appointment",
-                        description: result?.message || "An error occurred",
-                        variant: "destructive"
+                    setReserved({
+                        reserved: true,
+                        appointmentId: createdAppointment?.appointmentId
                     })
-                    setDoctor(null)
+                    router.push(`/booking/reservation`)
+                } else {
+                    getErrorMessage(createdAppointment?.message)
+                    setDoctorId(null)
                     setSchedule(null)
                     return;
                 }
             } catch (err) {
-                console.error("Error in useEffect:", err);
+                getErrorMessage(err)
             }
         }
 
         handleCreateAppointment()
-    }, [doctor, schedule, user])
+    }, [doctorId, schedule, user])
 
     return (
         <>

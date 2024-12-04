@@ -17,12 +17,11 @@ import { Input } from "@/components/ui/input";
 import { useState } from "react";
 import { resetPassword } from "@/lib/auth-client";
 import { passwordSchema, TPasswordSchema } from "@/app/types";
-import { toast, useToast } from "@/hooks/use-toast";
 import { auth } from "@/lib/auth";
+import { toast } from "sonner";
 
 export default function ResetPassword() {
     const [isLoading, setIsLoading] = useState(false)
-    const { toast } = useToast()
 
     const form = useForm<TPasswordSchema>({
         resolver: zodResolver(passwordSchema),
@@ -41,10 +40,7 @@ export default function ResetPassword() {
         if (error) {
             console.error(error.message)
         } else {
-            toast({
-                title: "Success",
-                description: "Password reset successfully",
-            })
+            toast("Password reset successfully")
             setIsLoading(false)
             redirect("/auth")
         }

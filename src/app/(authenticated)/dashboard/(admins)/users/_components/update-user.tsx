@@ -8,7 +8,6 @@ import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
-import { useToast } from "@/hooks/use-toast";
 import { useQuery } from "@tanstack/react-query";
 import { isFakeEmail, normalizeData } from "@/lib/funcs";
 import { getUserById } from "@/lib/db/queries";
@@ -20,6 +19,8 @@ import { revalidate, updateUser } from "@/app/actions";
 import { z } from "zod";
 import { userSchema } from "@/app/types";
 import { revalidatePath } from "next/cache";
+import { getErrorMessage } from "@/lib/handle-error";
+import { toast } from "sonner";
 
 function UpdateDialog({ children, open, setOpen }: { children: React.ReactNode, open: boolean, setOpen: Dispatch<SetStateAction<boolean>> }) {
     return (
@@ -49,7 +50,6 @@ export default function UpdateUser(
         userId: string
     }
 ) {
-    const { toast } = useToast()
     const [open, setOpen] = useState<boolean>(false)
     const [isLoading, setIsLoading] = useState<boolean>(false)
 
@@ -89,11 +89,7 @@ export default function UpdateUser(
         }
 
         if (Object.keys(changedFields).length === 0) {
-            toast({
-                title: "No Changes",
-                description: "No fields were updated.",
-                variant: "destructive",
-            });
+            getErrorMessage("No changes were made thus no fields were updated.")
             return;
         }
 
@@ -116,19 +112,12 @@ export default function UpdateUser(
         const result = await updateUser({ data, userId: userId })
 
         if (result?.error) {
-            toast({
-                title: 'Error',
-                description: result?.error,
-                variant: 'destructive'
-            })
+            getErrorMessage(result.error)
             setIsLoading(false)
             return;
         }
 
-        toast({
-            title: 'Success',
-            description: result?.message,
-        })
+        toast(result?.message)
         await revalidate('/dashboard/users')
         form.reset()
         setIsLoading(false)

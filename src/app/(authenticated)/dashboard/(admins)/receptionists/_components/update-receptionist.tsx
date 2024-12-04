@@ -7,7 +7,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
-import { useToast } from "@/hooks/use-toast";
 import { departments } from "@/app/(authenticated)/dashboard/constants";
 import LoadingBtn from "@/components/loading-btn";
 import { useRouter } from "next/navigation";
@@ -22,6 +21,8 @@ import { z } from "zod";
 import { updateReceptionist } from "@/app/(authenticated)/dashboard/(admins)/receptionists/actions";
 import { updateReceptionistSchema } from "@/app/(authenticated)/dashboard/(admins)/receptionists/types";
 import { Receptionist } from "@/lib/db/schema";
+import { getErrorMessage } from "@/lib/handle-error";
+import { toast } from "sonner";
 
 function UpdateDialog({ children, open, setOpen }: { children: React.ReactNode, open: boolean, setOpen: Dispatch<SetStateAction<boolean>> }) {
     return (
@@ -55,8 +56,6 @@ export default function UpdateReceptionist(
     const [isLoading, setIsLoading] = useState<boolean>(false)
     const [open, setOpen] = useState<boolean>(false)
     const router = useRouter();
-
-    const { toast } = useToast()
 
     const { data: user, isLoading: isPending } = useQuery({
         queryKey: ['userById', userId],
@@ -105,11 +104,7 @@ export default function UpdateReceptionist(
         }
 
         if (Object.keys(changedFields).length === 0) {
-            toast({
-                title: "No Changes",
-                description: "No fields or schedules were updated.",
-                variant: "destructive",
-            });
+            getErrorMessage('No changes were mde thus no fields or schedules were updated.')
             return;
         }
 
@@ -124,20 +119,12 @@ export default function UpdateReceptionist(
         const result = await updateReceptionist({ data, userId: user.user.id });
 
         if (result.error) {
-            console.log('testing errro')
-            toast({
-                title: "Error",
-                description: result.error,
-                variant: "destructive",
-            })
+            getErrorMessage(result.error)
             setIsLoading(false)
             return;
         }
 
-        toast({
-            title: 'Success',
-            description: result?.message
-        })
+        toast(result.message)
         setIsLoading(false)
         form.reset()
         setOpen(false)

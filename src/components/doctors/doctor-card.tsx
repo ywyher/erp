@@ -3,18 +3,15 @@ import { Badge } from '@/components/ui/badge'
 import { Doctor, Schedule, User } from '@/lib/db/schema'
 import Pfp from '@/components/pfp'
 import { ScheduleDisplay } from '@/components/schedule-display'
-import { useBookDoctorStore } from '@/components/doctors/store'
+import { useAppointmentReservationStore } from '@/components/doctors/store'
 import { useState } from 'react'
-import { useToast } from '@/hooks/use-toast'
 
 export function DoctorCard({ data, book = false }: { data: { user: User, doctor: Doctor, schedules: Schedule[] }, book?: boolean }) {
-    const { toast } = useToast()
-
     const [open, setOpen] = useState<boolean>(false)
-    const { doctor, schedule, setSchedule, setDoctor } = useBookDoctorStore()
+    const { doctorId, schedule, setSchedule, setDoctorId } = useAppointmentReservationStore()
 
     const handleBookDoctor = (scheudle: Schedule) => {
-        setDoctor(data.doctor)
+        setDoctorId(data.doctor.id)
         setSchedule(scheudle)
 
         setOpen(false)

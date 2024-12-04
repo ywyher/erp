@@ -8,7 +8,6 @@ import { format } from "date-fns";
 import { eq } from "drizzle-orm";
 import { headers } from "next/headers";
 import Link from "next/link";
-import { redirect } from "next/navigation";
 
 const listAppointments = async (userId: User['id'], role: User['role']) => {
     let appointments;

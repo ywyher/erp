@@ -5,14 +5,13 @@ import { getSession } from "@/lib/auth-client"
 import { Input } from "@/components/ui/input"
 import { useQuery, useQueryClient } from "@tanstack/react-query"
 import { uploadPfp, uploadToS3 } from "@/app/actions"
-import { useToast } from "@/hooks/use-toast"
 import Pfp from "@/components/pfp"
 import { useImageStore } from "@/app/store"
+import { toast } from "sonner"
 
 export default function UploadPfp() {
     const [file, setFile] = useState<File | null>(null)
     const [previewUrl, setPreviewUrl] = useState<string>()
-    const { toast } = useToast()
     const queryClient = useQueryClient()
     const trigger = useImageStore((state) => state.trigger)
     const setTrigger = useImageStore((state) => state.setTrigger)
@@ -26,7 +25,6 @@ export default function UploadPfp() {
     })
 
     useEffect(() => {
-        // Clean up the object URL when the component unmounts or when the file changes
         return () => {
             if (previewUrl) {
                 URL.revokeObjectURL(previewUrl)
@@ -47,12 +45,15 @@ export default function UploadPfp() {
     const handleUploadPfp = useCallback(async () => {
         if (!user || !file) return
 
-        const result = await uploadToS3({ file })
+        const result = await uploadToS3({ files: file })
 
-        if (!result) throw new Error('Failed to upload file')
+        if (!result || result.length === 0 || 'error' in result[0]) {
+            toast.error('Failed to upload file')
+            return;
+        }
 
         const pfpResult = await uploadPfp({
-            fileName: result.fileName,
+            fileName: result[0].fileName,
             userId: user.id,
             oldFileName: user.image || '',
         })
@@ -63,12 +64,11 @@ export default function UploadPfp() {
             setTrigger(false)
             await queryClient.invalidateQueries({ queryKey: ['session'] })
             console.log('pfp updated !!')
-            toast({
-                title: 'Profile Picture Updated',
-                description: 'Your profile picture was successfully updated.',
-            })
+            toast('Your profile picture was successfully updated.')
+        } else {
+            toast.error('Failed to update profile picture')
         }
-    }, [user, file, queryClient, setTrigger, toast])
+    }, [user, file, queryClient, setTrigger])
 
     useEffect(() => {
         if (trigger) {
@@ -76,7 +76,7 @@ export default function UploadPfp() {
         }
     }, [trigger, handleUploadPfp])
 
-    if (!user || isPending) return
+    if (!user || isPending) return null
 
     return (
         <div className="flex flex-col items-center gap-4 sm:flex-row sm:items-center sm:gap-5 w-full">

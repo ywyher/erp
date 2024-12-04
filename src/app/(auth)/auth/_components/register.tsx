@@ -16,6 +16,7 @@ import { useToast } from "@/hooks/use-toast"
 import { generateFakeField } from "@/lib/funcs"
 import { z } from "zod"
 import { FormFieldWrapper } from "@/components/formFieldWrapper"
+import { getErrorMessage } from "@/lib/handle-error"
 
 export default function Register() {
     const [isLoading, setIsLoading] = useState(false)
@@ -24,7 +25,6 @@ export default function Register() {
     const setOperation = useVerifyStore((state) => state.setOperation)
     const setPassword = useVerifyStore((state) => state.setPassword)
     const queryClient = useQueryClient()
-    const { toast } = useToast()
 
     const form = useForm<z.infer<typeof registerSchema>>({
         resolver: zodResolver(registerSchema),
@@ -66,11 +66,7 @@ export default function Register() {
                     })
                 },
                 onError: (ctx) => {
-                    toast({
-                        title: "Something went wrong",
-                        description: ctx.error.message,
-                        variant: 'destructive'
-                    })
+                    getErrorMessage(ctx.error.message)
                 }
             });
         } else if (context == 'phoneNumber') {

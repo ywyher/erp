@@ -15,9 +15,9 @@ import {
 } from "@/components/ui/popover";
 import { TimePicker } from "@/components/ui/datetime-picker";
 import { format } from "date-fns";
-import { useToast } from "@/hooks/use-toast";
 import { Schedules } from "@/app/(authenticated)/dashboard/types";
 import { transformArrToObj } from "@/lib/funcs";
+import { getErrorMessage } from "@/lib/handle-error";
 
 export default function ScheduleSelector({
     schedules,
@@ -32,7 +32,6 @@ export default function ScheduleSelector({
 }) {
     const [startTime, setStartTime] = useState<Date | undefined>(undefined);
     const [endTime, setEndTime] = useState<Date | undefined>(undefined);
-    const { toast } = useToast();
 
     const handleDaysChange = (selectedOptions: any) => {
         const selectedValues = selectedOptions.map((option: any) => option.value); // Extract values
@@ -53,20 +52,12 @@ export default function ScheduleSelector({
 
     const addSchedule = (day: string) => {
         if (!startTime || !endTime) {
-            toast({
-                title: 'Error',
-                description: "Please select both start and end times.",
-                variant: "destructive",
-            });
+            getErrorMessage("Please select both start and end times.")
             return;
         }
 
         if (startTime >= endTime) {
-            toast({
-                title: 'Invalid Time Range',
-                description: "The start time must be earlier than the end time.",
-                variant: "destructive",
-            });
+            getErrorMessage("Invalid Time Range The start time must be earlier than the end time.")
             return;
         }
 
