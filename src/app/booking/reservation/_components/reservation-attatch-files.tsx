@@ -21,6 +21,7 @@ import { useRouter } from "next/navigation"
 import LoadingBtn from "@/components/loading-btn"
 import { useFileUpload } from "@/hooks/use-upload-file"
 import { toast } from "sonner"
+import { deleteFile } from "@/lib/s3"
 
 const schema = z.object({
     files: z.array(z.instanceof(File)),
@@ -30,7 +31,7 @@ type Schema = z.infer<typeof schema>
 
 export default function ReservationAttatchFiles() {
     const [isLoading, setIsLoading] = React.useState(false);
-    const { handleUpload } = useFileUpload();
+    const { handleUpload, progresses } = useFileUpload();
     const reservation = useAppointmentReservationStore((state) => state.reserved);
     const setReserved = useAppointmentReservationStore((state) => state.setReserved);
     const router = useRouter();
@@ -43,11 +44,17 @@ export default function ReservationAttatchFiles() {
     })
 
     async function onSubmit(input: Schema) {
+        if (!input.files.length) {
+            toast.error('Please upload at least one file');
+            return;
+        }
         if (!reservation.appointmentId) {
             toast.error('Please select an appointment');
             return;
         }
         setIsLoading(true);
+        const toastId = toast.loading('Uploading files...');
+
         try {
             const uploadPromises = input.files.map(async (file) => {
                 const fileName = await handleUpload(file);
@@ -57,14 +64,27 @@ export default function ReservationAttatchFiles() {
                     throw new Error('Failed to upload file');
                 }
 
-                return saveMedicalFilesInDb({ name: fileName, type: file.type, appointmentId: reservation.appointmentId as string });
+                try {
+                    await saveMedicalFilesInDb({
+                        name: fileName,
+                        type: file.type,
+                        appointmentId: reservation.appointmentId as string,
+                    });
+                } catch (dbError) {
+                    console.error("Database error:", dbError);
+
+                    await deleteFile(fileName);
+                    throw new Error(`Failed to save file ${file.name} to the database. It has been deleted.`);
+                }
             });
 
             await Promise.all(uploadPromises);
 
-            toast.success('All files have been uploaded and saved successfully');
+            toast.success('All files have been uploaded and saved successfully', {
+                id: toastId,
+            });
             form.reset();
-            // setReserved({ reserved: false, appointmentId: null })
+            setReserved({ reserved: false, appointmentId: null })
             router.replace('/dashboard/appointments');
             setIsLoading(false);
         } catch (err) {
@@ -93,12 +113,13 @@ export default function ReservationAttatchFiles() {
                                         value={field.value}
                                         onValueChange={field.onChange}
                                         maxFileCount={10}
-                                        maxSize={5 * 1024 * 1024}
+                                        maxSize={11 * 1024 * 1024}
                                         disabled={isLoading}
                                         accept={{
                                             'image/*': [''],
                                             'application/pdf': [''],
                                         }}
+                                        progresses={progresses}
                                     />
                                 </FormControl>
                                 <FormMessage />

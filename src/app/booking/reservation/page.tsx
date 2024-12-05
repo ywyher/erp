@@ -14,10 +14,12 @@ export default function Reserved() {
     const router = useRouter();
     const reservation = useAppointmentReservationStore((state) => state.reserved);
 
-    if (!reservation.reserved || !reservation.appointmentId) {
-        router.replace('/dashboard/appointments')
-        return;
-    }
+    useEffect(() => {
+        if (!reservation.reserved || !reservation.appointmentId) {
+            router.replace('/dashboard/appointments')
+            return;
+        }
+    }, [router])
 
     const { data: appointmentData, isLoading } = useQuery({
         queryKey: ['reservation', reservation.appointmentId],
@@ -27,7 +29,8 @@ export default function Reserved() {
                 appointment: Appointment,
                 doctor: Doctor & { user: User },
             };
-        }
+        },
+        enabled: !!reservation.appointmentId
     })
 
     if (isLoading) return <>Loading...</>

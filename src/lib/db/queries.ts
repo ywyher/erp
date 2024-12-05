@@ -4,7 +4,8 @@ import { Doctor, Roles, Schedule } from "@/app/types";
 import { auth } from "@/lib/auth";
 import { signIn, User } from "@/lib/auth-client";
 import db from "@/lib/db";
-import { account, appointment, doctor, Receptionist, receptionist, schedule, session, Tables, user } from "@/lib/db/schema";
+import { account, appointment, doctor, medicalFile, Receptionist, receptionist, schedule, session, Tables, user } from "@/lib/db/schema";
+import { deleteFile } from "@/lib/s3";
 import { and, ConsoleLogWriter, eq, like, or, sql } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { headers } from "next/headers";
@@ -181,6 +182,34 @@ export async function deleteById(id: string, tableName: Tables) {
         throw new Error(`Invalid table name: ${tableName}`);
     }
 
+    if (tableName === 'appointment') {
+        // Query all files associated with the appointment
+        const files = await db
+            .select({
+                id: medicalFile.id,
+                name: medicalFile.name,
+            })
+            .from(medicalFile)
+            .where(eq(medicalFile.appointmentId, id));
+
+        if (files.length > 0) {
+            // Delete each file from S3 using your deleteFile function
+            await Promise.all(
+                files.map(async (file) => {
+                    try {
+                        await deleteFile(file.name); // Call your deleteFile function here
+                    } catch (error) {
+                        console.error(`Error deleting file: ${file.name}`, error);
+                    }
+                })
+            );
+
+            // Delete records from the medicalFile table
+            await db.delete(medicalFile).where(eq(medicalFile.appointmentId, id));
+        }
+    }
+
+    // Delete the appointment itself from the appointments table
     const deleted = await db.delete(table).where(eq(table.id, id)).returning();
 
     if (deleted.length > 0) {

@@ -1,5 +1,5 @@
-import { Appointment, Doctor, Schedule } from '@/lib/db/schema'
-import { create } from 'zustand'
+import { Appointment, Doctor, Schedule } from '@/lib/db/schema';
+import { create } from 'zustand';
 
 type ReservedState = {
   reserved: boolean | null;
@@ -12,7 +12,7 @@ type AppointmentReservationStore = {
   schedule: Schedule | null;
   setSchedule: (schedule: Schedule | null) => void;
   reserved: ReservedState;
-  setReserved: (reserved: ReservedState) => void;
+  setReserved: (partialReserved: Partial<ReservedState>) => void; // Accepts partial updates
 };
 
 export const useAppointmentReservationStore = create<AppointmentReservationStore>((set) => ({
@@ -21,8 +21,13 @@ export const useAppointmentReservationStore = create<AppointmentReservationStore
   schedule: null,
   setSchedule: (schedule) => set({ schedule }),
   reserved: {
-    reserved: true,
-    appointmentId: 'QNe0Rk4WDU6W8rFQ4bygJ',
+    reserved: false,
+    appointmentId: null,
   },
-  setReserved: (reserved) => set({ reserved }), // Correctly sets the reserved object
+  setReserved: (reserved) => set({
+    reserved: {
+      reserved: reserved.reserved ?? null,
+      appointmentId: reserved.appointmentId ?? null
+    }
+  }),
 }));
