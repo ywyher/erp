@@ -1,6 +1,5 @@
 'use server'
 
-import { UploadedFile } from "@/hooks/use-upload-file"
 import { getSession } from "@/lib/auth-client"
 import db from "@/lib/db"
 import { appointment, Appointment, doctor, medicalFile, user } from "@/lib/db/schema"
@@ -39,12 +38,13 @@ export const getAppointment = async (appointmentId: Appointment['id']) => {
 
 export const saveMedicalFilesInDb = async ({
     appointmentId,
-    files
+    name,
+    type,
 }: {
     appointmentId: Appointment['id'],
-    files: UploadedFile[]
+    name: string,
+    type: File['type']
 }) => {
-    console.log(files)
     const { data } = await getSession({
         fetchOptions: {
             headers: await headers()
@@ -56,33 +56,25 @@ export const saveMedicalFilesInDb = async ({
     }
 
     const patient = data.user;
-    const savedFiles = [];
 
-    for (const file of files) {
-        if (!file.name || !file.type) {
-            return {
-                error: 'Invalid file',
-            }
-        }
-        try {
-            const savedFile = await db.insert(medicalFile).values({
-                id: generateId(),
-                name: file.name,
-                type: file.type,
-                patientId: patient.id,
-                appointmentId: appointmentId
-            });
-            savedFiles.push(savedFile);
-        } catch (error) {
-            return {
-                error: error
-            }
+    if (!name || !type) {
+        return {
+            error: 'Invalid file',
         }
     }
+
+    const [file] = await db.insert(medicalFile).values({
+        id: generateId(),
+        name: name,
+        type: type,
+        patientId: patient.id,
+        appointmentId: appointmentId
+    }).returning();
+
 
     return {
         success: true,
         message: 'Files uploaded successfully',
-        savedFiles
+        file
     };
 };

@@ -22,7 +22,7 @@ export const useAppointmentReservationStore = create<AppointmentReservationStore
   setSchedule: (schedule) => set({ schedule }),
   reserved: {
     reserved: true,
-    appointmentId: null,
+    appointmentId: 'QNe0Rk4WDU6W8rFQ4bygJ',
   },
   setReserved: (reserved) => set({ reserved }), // Correctly sets the reserved object
 }));
