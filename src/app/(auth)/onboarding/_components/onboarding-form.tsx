@@ -63,7 +63,9 @@ export default function OnboardingForm({
                     name="nationalId"
                     label="National Id"
                 />
-                <LoadingBtn isLoading={isLoading} label="Save" />
+                <LoadingBtn isLoading={isLoading}>
+                    Save
+                </LoadingBtn>
             </form>
         </Form>
     )

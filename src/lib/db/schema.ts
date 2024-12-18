@@ -22,10 +22,14 @@ export const user = pgTable("user", {
 	updatedAt: timestamp('updatedAt').notNull()
 });
 
-const userRelation = relations(user, ({ one, many }) => ({
+export const userRelation = relations(user, ({ one, many }) => ({
 	doctor: one(doctor, {
 		fields: [user.id],
 		references: [doctor.userId]
+	}),
+	receptionist: one(receptionist, {
+		fields: [user.id],
+		references: [receptionist.userId]
 	}),
 	schedules: many(schedule),
 	appointments: many(appointment),
@@ -40,7 +44,7 @@ export const doctor = pgTable('doctor', {
 	userId: text('userId').references(() => user.id, { onDelete: 'cascade', onUpdate: 'cascade' }).notNull(),
 })
 
-const doctorRelation = relations(doctor, ({ one, many }) => ({
+export const doctorRelation = relations(doctor, ({ one, many }) => ({
 	user: one(user, {
 		fields: [doctor.userId],
 		references: [user.id]
@@ -93,7 +97,7 @@ export const receptionist = pgTable('receptionist', {
 	updatedAt: timestamp('updatedAt').notNull().defaultNow(),
 });
 
-const receptionistRelation = relations(receptionist, ({ one, many }) => ({
+export const receptionistRelation = relations(receptionist, ({ one, many }) => ({
 	user: one(user, {
 		fields: [receptionist.userId],
 		references: [user.id]

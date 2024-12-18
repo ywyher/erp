@@ -16,7 +16,7 @@ import { useToast } from "@/hooks/use-toast"
 import { generateFakeField } from "@/lib/funcs"
 import { z } from "zod"
 import { FormFieldWrapper } from "@/components/formFieldWrapper"
-import { getErrorMessage } from "@/lib/handle-error"
+import { toast } from "sonner"
 
 export default function Register() {
     const [isLoading, setIsLoading] = useState(false)
@@ -66,7 +66,7 @@ export default function Register() {
                     })
                 },
                 onError: (ctx) => {
-                    getErrorMessage(ctx.error.message)
+                    toast.error(ctx.error.message)
                 }
             });
         } else if (context == 'phoneNumber') {
@@ -93,7 +93,9 @@ export default function Register() {
                     <FormFieldWrapper form={form} name='password' label='Password' />
                     <FormFieldWrapper form={form} name='confirmPassword' label='Confirm Password' />
                     <div className="mt-2">
-                        <LoadingBtn isLoading={isLoading} label="Authenticate" />
+                        <LoadingBtn isLoading={isLoading}>
+                            Register
+                        </LoadingBtn>
                     </div>
                 </form>
             </Form>

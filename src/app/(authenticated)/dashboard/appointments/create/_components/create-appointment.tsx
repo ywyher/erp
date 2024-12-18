@@ -11,7 +11,6 @@ import { useAppointmentReservationStore } from "@/components/doctors/store"
 import { createAppointment } from "@/app/(authenticated)/dashboard/appointments/actions"
 import NewUser from "@/app/(authenticated)/dashboard/appointments/create/_components/new-user"
 import { toast } from "sonner"
-import { getErrorMessage } from "@/lib/handle-error"
 
 export default function CreateAppointment({ userId, role }: { userId: string, role: 'doctor' | 'receptionist' }) {
     const router = useRouter();
@@ -40,7 +39,7 @@ export default function CreateAppointment({ userId, role }: { userId: string, ro
                     setSchedule(null)
                     router.push(`/dashboard/appointments`)
                 } else {
-                    getErrorMessage(result?.message)
+                    toast.error(result?.message)
                     setDoctorId(null)
                     setSchedule(null)
                     return;

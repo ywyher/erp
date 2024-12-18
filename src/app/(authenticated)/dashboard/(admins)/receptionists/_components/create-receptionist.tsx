@@ -16,7 +16,7 @@ import { useRouter } from "next/navigation";
 import { z } from "zod";
 import { createReceptionistSchema } from "@/app/(authenticated)/dashboard/(admins)/receptionists/types";
 import { createReceptionist } from "@/app/(authenticated)/dashboard/(admins)/receptionists/actions";
-import { getErrorMessage } from "@/lib/handle-error";
+
 import { toast } from "sonner";
 
 function CreateDialog({ children, open, setOpen }: { children: React.ReactNode, open: boolean, setOpen: Dispatch<SetStateAction<boolean>> }) {
@@ -53,14 +53,14 @@ export default function CreateReceptionist() {
 
     const onSubmit = async (data: z.infer<typeof createReceptionistSchema>) => {
         if (selectedDays.length == 0) {
-            getErrorMessage(`Work days are required`)
+            toast.error(`Work days are required`)
             return;
         }
 
         const missingSchedules = selectedDays.filter((day) => !schedules[day] || schedules[day].length === 0);
 
         if (missingSchedules.length > 0) {
-            getErrorMessage(`The following days are missing schedules: ${missingSchedules.join(", ")}`)
+            toast.error(`The following days are missing schedules: ${missingSchedules.join(", ")}`)
             return;
         }
 
@@ -68,7 +68,7 @@ export default function CreateReceptionist() {
         const result = await createReceptionist({ userData: data, schedulesData: schedules })
 
         if (result?.error) {
-            getErrorMessage(result.error)
+            toast.error(result.error)
             setIsLoading(false)
             return;
         }
@@ -81,7 +81,7 @@ export default function CreateReceptionist() {
     };
 
     const onError = () => {
-        getErrorMessage(`Please check all tabs for potential errors`)
+        toast.error(`Please check all tabs for potential errors`)
     }
 
     return (
@@ -128,7 +128,9 @@ export default function CreateReceptionist() {
                         </TabsContent>
                     </Tabs>
                     <div className="mt-4">
-                        <LoadingBtn isLoading={isLoading} label="Submit" />
+                        <LoadingBtn isLoading={isLoading}>
+                            Create
+                        </LoadingBtn>
                     </div>
                 </form>
             </Form>

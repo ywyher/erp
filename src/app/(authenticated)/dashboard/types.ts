@@ -1,5 +1,5 @@
 import { nationalIdRegex, phoneNumberRegex } from "@/app/types";
-import { LucideIcon } from "lucide-react"; // Assuming you're using Lucide for the icons
+import { LucideIcon } from 'lucide-react'; // Assuming you're using Lucide for the icons
 import { z } from "zod";
 
 type MenuItemActions = {

@@ -58,7 +58,9 @@ export default function VerifyForm({
                                 </FormItem>
                             )}
                         />
-                        <LoadingBtn isLoading={isLoading} label="Verify" />
+                        <LoadingBtn isLoading={isLoading}>
+                            Verify
+                        </LoadingBtn>
                     </form>
                 </Form>
                 <Button variant="link" onClick={(() => onSendOtp())}>Didnt receive an email? Click here to resend</Button>

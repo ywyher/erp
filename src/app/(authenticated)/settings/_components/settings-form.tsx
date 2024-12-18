@@ -26,7 +26,6 @@ import { updateUser } from "@/app/actions"
 import { date } from "drizzle-orm/mysql-core"
 import { FormFieldWrapper } from "@/components/formFieldWrapper"
 import { getUserRegistrationType } from "@/lib/db/queries"
-import { getErrorMessage } from "@/lib/handle-error"
 import { toast } from "sonner"
 
 type UpdateField = {
@@ -92,7 +91,7 @@ export default function SettingsForm() {
         }
 
         if (Object.keys(changedFields).length === 0) {
-            getErrorMessage("No Changes thus no fields were updated.");
+            toast.error("No Changes thus no fields were updated.");
             return;
         }
 
@@ -106,7 +105,7 @@ export default function SettingsForm() {
         const result = await updateUser({ data, userId: user.id });
 
         if (result && result.error) {
-            getErrorMessage(result.error)
+            toast.error(result.error)
             return;
         }
 
@@ -154,7 +153,9 @@ export default function SettingsForm() {
                     name='nationalId'
                     label="National Id"
                 />
-                <LoadingBtn label="Update" isLoading={isLoading} />
+                <LoadingBtn isLoading={isLoading}>
+                    Update
+                </LoadingBtn>
             </form>
         </Form>
     )

@@ -8,7 +8,7 @@ import LoadingBtn from "@/components/loading-btn";
 import { User } from "@/lib/auth-client";
 import { getUserById } from "@/lib/db/queries";
 import { groupSchedules, transformSchedulesToRecords } from "@/lib/funcs";
-import { getErrorMessage } from "@/lib/handle-error";
+
 import { useQuery } from "@tanstack/react-query";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { toast } from "sonner";
@@ -44,14 +44,14 @@ export default function UpdateSchedule({ userId, setOpen }: { userId: string, se
             }
 
             if (selectedDays.length == 0) {
-                getErrorMessage('Schedule is required')
+                toast.error('Schedule is required')
                 return;
             }
 
             const missingSchedules = selectedDays.filter((day) => !schedules[day] || schedules[day].length === 0);
 
             if (missingSchedules.length > 0) {
-                getErrorMessage(`The following days are missing schedules: ${missingSchedules.join(", ")}`)
+                toast.error(`The following days are missing schedules: ${missingSchedules.join(", ")}`)
                 return;
             }
 
@@ -61,7 +61,7 @@ export default function UpdateSchedule({ userId, setOpen }: { userId: string, se
             const areSchedulesEqual = compareSchedules(sessionSchedules, newSchedules);
 
             if (areSchedulesEqual) {
-                getErrorMessage("The schedules are the same as the current ones. No updates needed.")
+                toast.error("The schedules are the same as the current ones. No updates needed.")
                 return;
             }
 
@@ -74,7 +74,7 @@ export default function UpdateSchedule({ userId, setOpen }: { userId: string, se
             }
         } catch (error) {
             console.error("Error updating schedule:", error);
-            getErrorMessage("An error occurred while updating the schedule.")
+            toast.error("An error occurred while updating the schedule.")
         } finally {
             setIsLoading(false);
         }
@@ -108,7 +108,10 @@ export default function UpdateSchedule({ userId, setOpen }: { userId: string, se
                 setSelectedDays={setSelectedDays}
             />
             <div className="mt-4">
-                <LoadingBtn isLoading={isLoading} label="Submit" onClick={onSubmit} />
+
+                <LoadingBtn isLoading={isLoading} onClick={onSubmit}>
+                    Update
+                </LoadingBtn>
             </div>
         </div>
     )

@@ -17,7 +17,8 @@ import { TimePicker } from "@/components/ui/datetime-picker";
 import { format } from "date-fns";
 import { Schedules } from "@/app/(authenticated)/dashboard/types";
 import { transformArrToObj } from "@/lib/funcs";
-import { getErrorMessage } from "@/lib/handle-error";
+import { toast } from "sonner";
+
 
 export default function ScheduleSelector({
     schedules,
@@ -52,12 +53,12 @@ export default function ScheduleSelector({
 
     const addSchedule = (day: string) => {
         if (!startTime || !endTime) {
-            getErrorMessage("Please select both start and end times.")
+            toast.error("Please select both start and end times.")
             return;
         }
 
         if (startTime >= endTime) {
-            getErrorMessage("Invalid Time Range The start time must be earlier than the end time.")
+            toast.error("Invalid Time Range The start time must be earlier than the end time.")
             return;
         }
 

@@ -22,8 +22,6 @@ import { checkFieldAvailability } from "@/lib/db/queries"
 import { z } from "zod"
 import { FormFieldWrapper } from "@/components/formFieldWrapper"
 import { toast } from "sonner"
-import { getErrorMessage } from "@/lib/handle-error"
-
 
 export default function Check({ setPort }: { setPort: Dispatch<React.SetStateAction<'check' | 'register' | 'login'>> }) {
     const [isLoading, setIsLoading] = useState(false)
@@ -48,7 +46,7 @@ export default function Check({ setPort }: { setPort: Dispatch<React.SetStateAct
         const fieldType = checkField(data.field)
 
         if (fieldType == 'unknown') {
-            getErrorMessage('Validation Error')
+            toast.error('Only email or phone number')
             setIsLoading(false)
             return;
         }
@@ -142,7 +140,9 @@ export default function Check({ setPort }: { setPort: Dispatch<React.SetStateAct
             <Form {...form}>
                 <form onSubmit={form.handleSubmit(handleCheck)} className="space-y-4">
                     <FormFieldWrapper form={form} name='field' placeholder="Email Or Phone number" />
-                    <LoadingBtn isLoading={isLoading} label="Authenticate" />
+                    <LoadingBtn isLoading={isLoading}>
+                        Authenticate
+                    </LoadingBtn>
                 </form>
             </Form>
         </div>

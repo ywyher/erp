@@ -12,7 +12,6 @@ import { createAppointment } from "@/app/(authenticated)/dashboard/appointments/
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { getErrorMessage } from "@/lib/handle-error"
 import { toast } from "sonner"
 
 export default function ExistingUser({ userId, role, setPatientId, setIsCreateUser }: {
@@ -35,7 +34,7 @@ export default function ExistingUser({ userId, role, setPatientId, setIsCreateUs
             const results = await searchUsers(query, 'all')
             setSearchResults(results)
         } catch (error) {
-            getErrorMessage(`Error searching patients, Please try again later.`)
+            toast.error(`Error searching patients, Please try again later.`)
         } finally {
             setIsSearching(false)
         }
@@ -51,7 +50,7 @@ export default function ExistingUser({ userId, role, setPatientId, setIsCreateUs
 
     const handleCreateAppointment = async (patientId: string, doctorId: string) => {
         if (!patientId) {
-            getErrorMessage(`Patient id not found!`)
+            toast.error(`Patient id not found!`)
             return;
         }
 

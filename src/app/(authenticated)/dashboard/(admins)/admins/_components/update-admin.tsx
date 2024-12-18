@@ -17,7 +17,7 @@ import LoadingBtn from "@/components/loading-btn";
 import { updateAdmin } from "@/app/(authenticated)/dashboard/(admins)/admins/action";
 import { userSchema } from "@/app/types";
 import { z } from "zod";
-import { getErrorMessage } from "@/lib/handle-error";
+
 import { toast } from "sonner";
 
 function UpdateDialog({ children, open, setOpen }: { children: React.ReactNode, open: boolean, setOpen: Dispatch<SetStateAction<boolean>> }) {
@@ -87,7 +87,7 @@ export default function UpdateAdmin(
         }
 
         if (Object.keys(changedFields).length === 0) {
-            getErrorMessage("No changes made");
+            toast.error("No changes made");
             return;
         }
 
@@ -110,7 +110,7 @@ export default function UpdateAdmin(
         const result = await updateAdmin({ data, userId: userId })
 
         if (result?.error) {
-            getErrorMessage(result.error);
+            toast.error(result.error);
             setIsLoading(false)
             return;
         }
@@ -165,7 +165,9 @@ export default function UpdateAdmin(
                                 label="National Id"
                             />
                             <div className="mt-4">
-                                <LoadingBtn isLoading={isLoading} label="Submit" />
+                                <LoadingBtn isLoading={isLoading}>
+                                    Submit
+                                </LoadingBtn>
                             </div>
                         </form>
                     </Form>

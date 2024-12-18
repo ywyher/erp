@@ -15,7 +15,6 @@ import { createUser } from "@/app/(authenticated)/dashboard/actions"
 import { createAppointment } from "@/app/(authenticated)/dashboard/appointments/actions"
 import { createUserSchema } from "@/app/(authenticated)/dashboard/types"
 import { User } from "@/lib/db/schema"
-import { getErrorMessage } from "@/lib/handle-error"
 import { toast } from "sonner"
 
 export default function NewUser({ userId, role, setPatientId }: {
@@ -38,7 +37,7 @@ export default function NewUser({ userId, role, setPatientId }: {
         const createdUser = await createUser({ data: data as z.infer<typeof createUserSchema>, role: 'user' })
 
         if (!createdUser || !createdUser?.success || createdUser?.error) {
-            getErrorMessage(createdUser?.error)
+            toast.error(createdUser?.error)
             setIsLoading(false)
             return;
         }
@@ -60,7 +59,7 @@ export default function NewUser({ userId, role, setPatientId }: {
         })
 
         if (!createdAppointment || !createdAppointment?.success) {
-            getErrorMessage("Error while creating the appointment.")
+            toast.error("Error while creating the appointment.")
             return;
         }
 
@@ -89,7 +88,9 @@ export default function NewUser({ userId, role, setPatientId }: {
                         </div>
                         <FormFieldWrapper form={form} name="nationalId" label="National Id" />
                         <div className="mt-4">
-                            <LoadingBtn isLoading={isLoading} label="Submit" />
+                            <LoadingBtn isLoading={isLoading}>
+                                Create
+                            </LoadingBtn>
                         </div>
                     </form>
                 </Form >

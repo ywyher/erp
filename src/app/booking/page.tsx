@@ -5,7 +5,7 @@ import DoctorsList from "@/components/doctors/doctors-list";
 import { useAppointmentReservationStore } from "@/components/doctors/store";
 import Header from "@/components/header";
 import { getSession } from "@/lib/auth-client";
-import { getErrorMessage } from "@/lib/handle-error";
+
 import { useQuery } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
@@ -29,7 +29,7 @@ export default function Booking() {
             try {
                 if (!doctorId || !schedule) return;
                 if (!user) {
-                    getErrorMessage("Unauthorized, Redirecting to /auth.")
+                    toast.error("Unauthorized, Redirecting to /auth.")
                     router.push('/auth')
                     return;
                 }
@@ -50,13 +50,13 @@ export default function Booking() {
                     })
                     router.push(`/booking/reservation`)
                 } else {
-                    getErrorMessage(createdAppointment?.message)
+                    toast.error(createdAppointment?.message)
                     setDoctorId(null)
                     setSchedule(null)
                     return;
                 }
             } catch (err) {
-                getErrorMessage(err)
+                toast.error(err as string)
             }
         }
 

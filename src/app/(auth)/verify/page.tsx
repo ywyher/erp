@@ -12,7 +12,7 @@ import { updatePhoneNumberVerified } from "@/app/(auth)/actions";
 import { useQueryClient } from "@tanstack/react-query";
 import { generateFakeField } from "@/lib/funcs";
 import { z } from "zod";
-import { getErrorMessage } from "@/lib/handle-error";
+
 import { toast } from "sonner";
 
 export default function Verify() {
@@ -61,7 +61,7 @@ export default function Verify() {
                     console.log('loading')
                 },
                 onError: (ctx) => {
-                    getErrorMessage(ctx.error.message)
+                    toast.error(ctx.error.message)
                     setIsLoading(false)
                 },
             });
@@ -109,7 +109,7 @@ export default function Verify() {
                     }
                 },
                 onError: (ctx) => {
-                    getErrorMessage(ctx.error.message)
+                    toast.error(ctx.error.message)
                     setIsLoading(false)
                 }
             })
@@ -132,7 +132,7 @@ export default function Verify() {
                     setIsLoading(false)
                 },
                 onError: (ctx) => {
-                    getErrorMessage(ctx.error.message)
+                    toast.error(ctx.error.message)
                     setIsLoading(false)
                     return;
                 }
@@ -148,7 +148,7 @@ export default function Verify() {
                     setIsLoading(false)
                 },
                 onError: (ctx) => {
-                    getErrorMessage(ctx.error.message)
+                    toast.error(ctx.error.message)
                     setIsLoading(false)
                     return;
                 }

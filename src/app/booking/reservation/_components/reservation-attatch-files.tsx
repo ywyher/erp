@@ -5,7 +5,6 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
 
-import { getErrorMessage } from "@/lib/handle-error"
 import {
     Form,
     FormControl,
@@ -88,9 +87,9 @@ export default function ReservationAttatchFiles() {
             router.replace('/dashboard/appointments');
             setIsLoading(false);
         } catch (err) {
-            const errorMessage = getErrorMessage(err);
+            const errorMessage = toast.error(err as string);
             toast.error(errorMessage);
-            form.setError('files', { type: 'manual', message: errorMessage });
+            form.setError('files', { type: 'manual', message: errorMessage.toString() });
             setIsLoading(false);
         }
     }
@@ -127,7 +126,9 @@ export default function ReservationAttatchFiles() {
                         </div>
                     )}
                 />
-                <LoadingBtn isLoading={isLoading} label="Send Files" />
+                <LoadingBtn isLoading={isLoading}>
+                    Send Files
+                </LoadingBtn>
             </form>
         </Form>
     )

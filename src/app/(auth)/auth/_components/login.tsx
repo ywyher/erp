@@ -14,13 +14,11 @@ import { Input } from "@/components/ui/input"
 import { useForm } from "react-hook-form";
 import { redirect } from "next/navigation";
 import { loginSchema } from "@/app/(auth)/types";
-import { useEffect, useState } from "react";
-import { useToast } from "@/hooks/use-toast";
+import { useState } from "react";
 import LoadingBtn from "@/components/loading-btn";
 import { useVerifyStore } from "@/app/(auth)/store";
 import { z } from "zod";
 import { FormFieldWrapper } from "@/components/formFieldWrapper";
-import { getErrorMessage } from "@/lib/handle-error";
 import { toast } from "sonner";
 
 export default function Login() {
@@ -33,6 +31,10 @@ export default function Login() {
     const login = async (data: z.infer<typeof loginSchema>) => {
         setIsLoading(true)
         if (context == 'email') {
+            console.log({
+                email: value || data.value,
+                password: data.password,
+            })
             await signIn.email({
                 email: value || data.value,
                 password: data.password,
@@ -42,14 +44,23 @@ export default function Login() {
                     redirect("/")
                 },
                 onError: (ctx) => {
-                    getErrorMessage(ctx.error.message);
+                    toast.error(ctx.error.message);
                     setIsLoading(false)
                 },
             });
         } else if (context == 'phoneNumber') {
-            const { error } = await signIn.phoneNumber({
+            await signIn.phoneNumber({
                 phoneNumber: value || data.value,
                 password: data.password,
+            }, {
+                onSuccess: () => {
+                    setIsLoading(false)
+                    redirect("/")
+                },
+                onError: (ctx) => {
+                    toast.error(ctx.error.message);
+                    setIsLoading(false)
+                },
             })
         }
     }
@@ -93,7 +104,9 @@ export default function Login() {
                         <FormFieldWrapper form={form} name="password" label='Password' />
                         <div>Forget Your Password, <span className="cursor-pointer text-blue-600 underline" onClick={() => resetPassword()}>Click Here</span></div>
                     </div>
-                    <LoadingBtn isLoading={isLoading} label="Login" />
+                    <LoadingBtn isLoading={isLoading}>
+                        Login
+                    </LoadingBtn>
                 </form>
             </Form>
         </div>

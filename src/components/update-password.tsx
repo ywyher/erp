@@ -45,7 +45,7 @@ export default function UpdatePassword(
                 <form onSubmit={form.handleSubmit(onUpdatePassword)}>
                     <FormFieldWrapper form={form} name='password' label="password" />
                     <FormFieldWrapper form={form} name='confirmPassword' label="Confirm password" />
-                    <LoadingBtn isLoading={isLoading} label="Submit" />
+                    <LoadingBtn isLoading={isLoading}>Update</LoadingBtn>
                 </form>
             </Form>
         </div>

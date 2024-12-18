@@ -21,7 +21,7 @@ import { z } from "zod";
 import { updateReceptionist } from "@/app/(authenticated)/dashboard/(admins)/receptionists/actions";
 import { updateReceptionistSchema } from "@/app/(authenticated)/dashboard/(admins)/receptionists/types";
 import { Receptionist } from "@/lib/db/schema";
-import { getErrorMessage } from "@/lib/handle-error";
+
 import { toast } from "sonner";
 
 function UpdateDialog({ children, open, setOpen }: { children: React.ReactNode, open: boolean, setOpen: Dispatch<SetStateAction<boolean>> }) {
@@ -104,7 +104,7 @@ export default function UpdateReceptionist(
         }
 
         if (Object.keys(changedFields).length === 0) {
-            getErrorMessage('No changes were mde thus no fields or schedules were updated.')
+            toast.error('No changes were mde thus no fields or schedules were updated.')
             return;
         }
 
@@ -119,7 +119,7 @@ export default function UpdateReceptionist(
         const result = await updateReceptionist({ data, userId: user.user.id });
 
         if (result.error) {
-            getErrorMessage(result.error)
+            toast.error(result.error)
             setIsLoading(false)
             return;
         }
@@ -162,7 +162,9 @@ export default function UpdateReceptionist(
                                 />
                             </div>
                             <div className="mt-4">
-                                <LoadingBtn isLoading={isLoading} label="Submit" />
+                                <LoadingBtn isLoading={isLoading}>
+                                    Update
+                                </LoadingBtn>
                             </div>
                         </form>
                     </Form>

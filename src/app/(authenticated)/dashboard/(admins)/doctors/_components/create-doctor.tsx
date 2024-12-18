@@ -19,7 +19,7 @@ import { Schedules } from "@/app/(authenticated)/dashboard/types";
 import { useRouter } from "next/navigation";
 import { normalizeData } from "@/lib/funcs";
 import { z } from "zod";
-import { getErrorMessage } from "@/lib/handle-error";
+
 import { toast } from "sonner";
 
 function CreateDialog({ children, open, setOpen }: { children: React.ReactNode, open: boolean, setOpen: Dispatch<SetStateAction<boolean>> }) {
@@ -56,14 +56,14 @@ export default function CreateDoctor() {
 
     const onSubmit = async (data: z.infer<typeof createDoctorSchema>) => {
         if (selectedDays.length == 0) {
-            getErrorMessage(`Work days is required`)
+            toast.error(`Work days is required`)
             return;
         }
 
         const missingSchedules = selectedDays.filter((day) => !schedules[day] || schedules[day].length === 0);
 
         if (missingSchedules.length > 0) {
-            getErrorMessage(`The following days are missing schedules: ${missingSchedules.join(", ")}`)
+            toast.error(`The following days are missing schedules: ${missingSchedules.join(", ")}`)
             return;
         }
 
@@ -80,7 +80,7 @@ export default function CreateDoctor() {
         const result = await createDoctor({ userData: normalizedData, schedulesData: schedules })
 
         if (result?.error) {
-            getErrorMessage(result.error)
+            toast.error(result.error)
             setIsLoading(false)
             return;
         }
@@ -93,7 +93,7 @@ export default function CreateDoctor() {
     };
 
     const onError = () => {
-        getErrorMessage('Please check all tabs for potential errors')
+        toast.error('Please check all tabs for potential errors')
     }
 
     return (
@@ -139,7 +139,9 @@ export default function CreateDoctor() {
                         </TabsContent>
                     </Tabs>
                     <div className="mt-4">
-                        <LoadingBtn isLoading={isLoading} label="Submit" />
+                        <LoadingBtn isLoading={isLoading}>
+                            Create
+                        </LoadingBtn>
                     </div>
                 </form>
             </Form>

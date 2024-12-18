@@ -12,7 +12,7 @@ import { createUser } from "@/app/(authenticated)/dashboard/actions";
 import LoadingBtn from "@/components/loading-btn";
 import { z } from "zod";
 import { createUserSchema } from "@/app/(authenticated)/dashboard/types";
-import { getErrorMessage } from "@/lib/handle-error";
+
 import { toast } from "sonner";
 import { revalidate } from "@/app/actions";
 
@@ -50,7 +50,7 @@ export default function CreateUser() {
         const result = await createUser({ data, role: 'user' })
 
         if (result?.error) {
-            getErrorMessage(result.error)
+            toast.error(result.error)
             setIsLoading(false)
             return;
         }
@@ -65,7 +65,7 @@ export default function CreateUser() {
     };
 
     const onError = () => {
-        getErrorMessage(`Please check all tabs for potential errors`)
+        toast.error(`Please check all tabs for potential errors`)
     }
 
     return (
@@ -96,7 +96,9 @@ export default function CreateUser() {
                         </TabsContent>
                     </Tabs>
                     <div className="mt-4">
-                        <LoadingBtn isLoading={isLoading} label="Submit" />
+                        <LoadingBtn isLoading={isLoading}>
+                            Create
+                        </LoadingBtn>
                     </div>
                 </form>
             </Form>

@@ -19,7 +19,7 @@ import { revalidate, updateUser } from "@/app/actions";
 import { z } from "zod";
 import { userSchema } from "@/app/types";
 import { revalidatePath } from "next/cache";
-import { getErrorMessage } from "@/lib/handle-error";
+
 import { toast } from "sonner";
 
 function UpdateDialog({ children, open, setOpen }: { children: React.ReactNode, open: boolean, setOpen: Dispatch<SetStateAction<boolean>> }) {
@@ -89,7 +89,7 @@ export default function UpdateUser(
         }
 
         if (Object.keys(changedFields).length === 0) {
-            getErrorMessage("No changes were made thus no fields were updated.")
+            toast.error("No changes were made thus no fields were updated.")
             return;
         }
 
@@ -112,7 +112,7 @@ export default function UpdateUser(
         const result = await updateUser({ data, userId: userId })
 
         if (result?.error) {
-            getErrorMessage(result.error)
+            toast.error(result.error)
             setIsLoading(false)
             return;
         }
@@ -168,7 +168,9 @@ export default function UpdateUser(
                                 label="National Id"
                             />
                             <div className="mt-4">
-                                <LoadingBtn isLoading={isLoading} label="Submit" />
+                                <LoadingBtn isLoading={isLoading}>
+                                    Update
+                                </LoadingBtn>
                             </div>
                         </form>
                     </Form>

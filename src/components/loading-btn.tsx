@@ -1,17 +1,19 @@
+import React from "react";
 import { Button } from "@/components/ui/button";
 
-export default function LoadingBtn(
-    {
-        isLoading,
-        label,
-        variant = 'default',
-        onClick,
-    }: {
-        isLoading: boolean,
-        label: string,
-        variant?: 'default' | 'destructive',
-        onClick?: () => void
-    }) {
+export default function LoadingBtn({
+    isLoading,
+    variant = 'default',
+    onClick,
+    children,
+    className
+}: {
+    isLoading: boolean;
+    variant?: 'default' | 'destructive';
+    onClick?: () => void;
+    children: React.ReactNode;
+    className?: string;
+}) {
     return (
         <Button
             type="submit"
@@ -37,7 +39,7 @@ export default function LoadingBtn(
                     ></path>
                 </svg>
             ) : (
-                `${label}`
+                children
             )}
         </Button>
     )

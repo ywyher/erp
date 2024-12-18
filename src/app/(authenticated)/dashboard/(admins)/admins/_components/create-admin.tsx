@@ -13,7 +13,7 @@ import { normalizeData } from "@/lib/funcs";
 import { createUserSchema } from "@/app/(authenticated)/dashboard/types";
 import { z } from "zod";
 import { createAdmin } from "@/app/(authenticated)/dashboard/(admins)/admins/action";
-import { getErrorMessage } from "@/lib/handle-error";
+
 import { toast } from "sonner";
 
 function AddDialog({ children, open, setOpen }: { children: React.ReactNode, open: boolean, setOpen: Dispatch<SetStateAction<boolean>> }) {
@@ -50,7 +50,7 @@ export default function Create() {
         const result = await createAdmin(data)
 
         if (result?.error) {
-            getErrorMessage(result.error)
+            toast.error(result.error)
             setIsLoading(false)
             return;
         }
@@ -66,7 +66,7 @@ export default function Create() {
     };
 
     const onError = () => {
-        getErrorMessage(`Please check all tabs for potential errors`)
+        toast.error(`Please check all tabs for potential errors`)
     }
 
     return (
@@ -97,7 +97,10 @@ export default function Create() {
                         </TabsContent>
                     </Tabs>
                     <div className="mt-4">
-                        <LoadingBtn isLoading={isLoading} label="Submit" />
+
+                        <LoadingBtn isLoading={isLoading}>
+                            Submit
+                        </LoadingBtn>
                     </div>
                 </form>
             </Form>

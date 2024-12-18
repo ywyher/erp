@@ -17,7 +17,6 @@ import { getUserRegistrationType } from "@/lib/db/queries"
 import { updateUser } from "@/app/actions"
 import { excludeField } from "@/lib/funcs"
 import { updateOnboarding } from "@/app/(auth)/actions"
-import { getErrorMessage } from "@/lib/handle-error"
 import { toast } from "sonner"
 
 export default function Onboarding() {
@@ -88,7 +87,7 @@ export default function Onboarding() {
 
         if (updatedUser && updatedUser.error) {
             setIsLoading(false)
-            getErrorMessage(updatedUser.error)
+            toast.error(updatedUser.error)
             return;
         }
 

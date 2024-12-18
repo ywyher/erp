@@ -23,7 +23,7 @@ import { isFakeEmail, normalizeData } from "@/lib/funcs";
 import { updateDoctor } from "@/app/(authenticated)/dashboard/(admins)/doctors/actions";
 import UpdateSchedule from "@/app/(authenticated)/dashboard/_components/update-schedule";
 import { z } from "zod";
-import { getErrorMessage } from "@/lib/handle-error";
+
 import { toast } from "sonner";
 
 function UpdateDialog({ children, open, setOpen }: { children: React.ReactNode, open: boolean, setOpen: Dispatch<SetStateAction<boolean>> }) {
@@ -106,7 +106,7 @@ export default function UpdateDoctor(
         }
 
         if (Object.keys(changedFields).length === 0) {
-            getErrorMessage('No fields chagned thus no fields or schedules were updated.')
+            toast.error('No fields chagned thus no fields or schedules were updated.')
             return;
         }
 
@@ -121,7 +121,7 @@ export default function UpdateDoctor(
         const result = await updateDoctor({ data, userId: user.user.id });
 
         if (result.error) {
-            getErrorMessage(result.error)
+            toast.error(result.error)
             setIsLoading(false)
             return;
         }
@@ -165,7 +165,9 @@ export default function UpdateDoctor(
                                 />
                             </div>
                             <div className="mt-4">
-                                <LoadingBtn isLoading={isLoading} label="Submit" />
+                                <LoadingBtn isLoading={isLoading}>
+                                    Update
+                                </LoadingBtn>
                             </div>
                         </form>
                     </Form>

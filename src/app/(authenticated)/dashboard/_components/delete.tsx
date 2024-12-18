@@ -57,10 +57,11 @@ export default function Delete({ id, table, setPopOpen, label = 'delete' }: {
                     <AlertDialogCancel className="w-full">Cancel</AlertDialogCancel>
                     <LoadingBtn
                         isLoading={isLoading}
-                        label='Proceed'
                         variant="destructive"
                         onClick={() => handleDelete()}
-                    />
+                    >
+                        Procced
+                    </LoadingBtn>
                 </AlertDialogFooter>
             </AlertDialogContent>
         </AlertDialog>
