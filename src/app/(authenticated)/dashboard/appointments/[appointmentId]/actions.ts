@@ -1,8 +1,9 @@
 'use server'
 
+import { PrescriptionTypes } from "@/app/(authenticated)/dashboard/appointments/[appointmentId]/types";
 import { consultationSchema } from "@/app/(authenticated)/dashboard/appointments/types";
 import db from "@/lib/db";
-import { Appointment, Doctor, User } from "@/lib/db/schema";
+import { Appointment, Consultation, Doctor, prescription, User } from "@/lib/db/schema";
 import { consultation } from "@/lib/db/schema/consultation";
 import { generateId } from "@/lib/funcs";
 import { z } from "zod";
@@ -14,7 +15,12 @@ type CreateConsultation = {
   patientId: User['id']
 }
 
-export async function createConsultation({ data, appointmentId, doctorId, patientId }: CreateConsultation) {
+export async function createConsultation({ 
+   data,
+   appointmentId,
+   doctorId,
+   patientId
+  }: CreateConsultation) {
   const consultationId = generateId();
 
   // Convert arrays to comma-separated strings
@@ -22,7 +28,7 @@ export async function createConsultation({ data, appointmentId, doctorId, patien
   const radiologiesString = data.radiologies.join(', ');
   const medicinesString = data.medicines.join(', ');
 
-  const creation = await db.insert(consultation).values({
+  const [creation] = await db.insert(consultation).values({
       id: consultationId,     
       appointmentId: appointmentId,
       doctorId: doctorId,
@@ -36,12 +42,55 @@ export async function createConsultation({ data, appointmentId, doctorId, patien
       updatedAt: new Date(),
   }).returning({ id: consultation.id });
 
-  if(!creation[0].id) return { 
+  if(!creation.id) return { 
       error: "Couldn't create consultation"
   };
 
   return {
+      id: creation.id,
       message: "Consultation created successfully",
       error: null,
+  }
+}
+
+type CreatePrescription = {
+  content: string;
+  type: PrescriptionTypes;
+  appointmentId: Appointment['id'];
+  consultationId: Consultation['id'];
+  doctorId: Doctor['id'];
+  patientId: User['id']
+}
+
+export async function createPrescription({ 
+    content,
+    type,
+    appointmentId,
+    doctorId,
+    consultationId,
+    patientId 
+  }: CreatePrescription) {
+
+  const prescriptionId = generateId();
+
+  const [createdPrescription] = await db.insert(prescription).values({
+    id: prescriptionId,
+    content: content,
+    type: type,
+    appointmentId: appointmentId,
+    doctorId: doctorId,
+    consultationId: consultationId,
+    patientId: patientId,
+    createdAt: new Date(),
+    updatedAt: new Date(),
+  }).returning({ id: prescription.id })
+
+  if(!createdPrescription.id) return {
+    error: "Failed to create prescription!"
+  }
+
+  return {
+    message: 'Prescription Created Successfully',
+    error: null
   }
 }

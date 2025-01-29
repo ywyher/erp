@@ -3,6 +3,7 @@ import { doctor, receptionist, user } from "./roles";
 import { relations } from "drizzle-orm";
 import { medicalFile } from "./medical-file";
 import { consultation } from "./consultation";
+import { prescription } from "@/lib/db/schema/prescriptions";
 
 // Appointment table
 
@@ -35,6 +36,10 @@ export const appointmentRelations = relations(appointment, ({ one, many }) => ({
     fields: [appointment.receptionistId],
     references: [receptionist.id],
   }),
+  consultation: one(consultation, {
+    fields: [appointment.id], // appointment.id should match consultation.appointmentId
+    references: [consultation.appointmentId],
+  }),
   medicalFiles: many(medicalFile),
-  consultations: many(consultation)
+  prescriptions: many(prescription),
 }));

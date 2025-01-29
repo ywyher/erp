@@ -107,14 +107,12 @@ export const FormFieldWrapper: React.FC<FormFieldWrapperProps> = ({
                                     emptyIndicator={<p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">no results found.</p>}
                                     
                                     value={
-                                        defaultValue ?
-                                            defaultValue
-                                        :
                                         (field.value || []).map((value: string) => {
-                                            const option = (options as { value: string; label: string }[]).find(opt => opt.value === value);
-                                            return option ? option : { value, label: value };
+                                          const option = (options as { value: string; label: string }[]).find(opt => opt.value === value);
+                                          return option ? option : { value, label: value };
                                         })
-                                    }
+                                      }
+                                      
                                 />
                             )}
                         </div>

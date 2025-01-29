@@ -4,6 +4,7 @@ import { schedule } from "./schedule";
 import { appointment } from "./appointment";
 import { medicalFile } from "./medical-file";
 import { consultation } from "./consultation";
+import { prescription } from "@/lib/db/schema/prescriptions";
 
 export const roleEnum = pgEnum('role', ['user', 'admin', 'doctor', 'receptionist'])
 
@@ -38,6 +39,7 @@ export const userRelation = relations(user, ({ one, many }) => ({
   appointments: many(appointment),
   medicalFiles: many(medicalFile),
   consultations: many(consultation),
+  prescriptions: many(prescription),
 }))
 
 // Doctor
@@ -55,6 +57,7 @@ export const doctorRelation = relations(doctor, ({ one, many }) => ({
   }),
   appointments: many(appointment),
   consultations: many(consultation),
+  prescriptions: many(prescription),
 }))
 
 // Receptionist

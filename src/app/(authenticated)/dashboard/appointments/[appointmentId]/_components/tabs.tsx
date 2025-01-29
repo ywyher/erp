@@ -17,22 +17,15 @@ type AppointmentTabs = {
 }
 
 export default function AppointmentTabs({ user, medicalFiles, appointmentId, doctorId }: AppointmentTabs) {
-  const { setHasPrescriptions, hasPrescriptions } = useConsultationStore(appointmentId)
+  const { selectedPrescriptions } = useConsultationStore(appointmentId); // Invoke the Zustand store function
   const [activeTab, setActiveTab] = useState<"user" | "prescriptions" | "consultation">("user")
-  const [hasPrescriptionsState, setHasPrescriptionsState] = useState<boolean>(false)
 
   useEffect(() => {
-    if (hasPrescriptionsState) {
-      setActiveTab("prescriptions")
-      setHasPrescriptions(true)
-    }
-  }, [hasPrescriptionsState])
-
-  useEffect(() => {
-    if(hasPrescriptions) {
+    if(selectedPrescriptions.length > 0) {
+      console.log(selectedPrescriptions)
       setActiveTab('prescriptions')
     }
-  }, [hasPrescriptions])
+  }, [selectedPrescriptions])
 
   return (
     <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as typeof activeTab)} className="w-full">
@@ -43,7 +36,7 @@ export default function AppointmentTabs({ user, medicalFiles, appointmentId, doc
         <TabsTrigger className="w-full" value="consultation">
           Consultation
         </TabsTrigger>
-        {(hasPrescriptionsState || hasPrescriptions) && (
+        {selectedPrescriptions.length > 0 && (
           <TabsTrigger className="w-full" value="prescriptions">
             Prescriptions
           </TabsTrigger>
@@ -55,14 +48,17 @@ export default function AppointmentTabs({ user, medicalFiles, appointmentId, doc
       </TabsContent>
       <TabsContent value="consultation">
         <Consultation
-         setHasPrescriptions={setHasPrescriptionsState}
          appointmentId={appointmentId}
          doctorId={doctorId} patientId={user.id}
         />
       </TabsContent>
-      {(hasPrescriptionsState || hasPrescriptions) && (
+      {selectedPrescriptions.length > 0 && (
         <TabsContent value="prescriptions">
-          <Prescriptions appointmentId={appointmentId} />
+          <Prescriptions 
+            appointmentId={appointmentId} 
+            doctorId={doctorId}
+            patientId={user.id}
+          />
         </TabsContent>
       )}
     </Tabs>

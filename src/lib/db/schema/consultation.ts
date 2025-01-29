@@ -2,6 +2,7 @@ import { pgTable, text, timestamp, boolean, pgEnum } from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm";
 import { appointment } from "./appointment";
 import { doctor, user } from "./roles";
+import { prescription } from "@/lib/db/schema/prescriptions";
 
 export const consultation = pgTable('consultation', {
   id: text('id').primaryKey(),
@@ -17,7 +18,7 @@ export const consultation = pgTable('consultation', {
   updatedAt: timestamp('updatedAt').notNull(),
 });
 
-export const consultationRelations = relations(consultation, ({ one }) => ({
+export const consultationRelations = relations(consultation, ({ one, many }) => ({
   appointment: one(appointment, {
     fields: [consultation.appointmentId],
     references: [appointment.id],
@@ -30,4 +31,5 @@ export const consultationRelations = relations(consultation, ({ one }) => ({
     fields: [consultation.patientId],
     references: [user.id]
   }),
+  prescriptions: many(prescription)
 }));

@@ -5,6 +5,7 @@ import db from "@/lib/db"
 import { Appointment, appointment, Doctor, Schedule, User } from "@/lib/db/schema"
 import { consultation } from "@/lib/db/schema/consultation"
 import { generateId } from "@/lib/funcs"
+import { eq } from "drizzle-orm"
 import { revalidatePath } from "next/cache"
 import { z } from "zod"
 
@@ -43,5 +44,22 @@ export async function createAppointment({
             message: 'Appointment Created Successfuly',
             appointmentId: createdAppointment[0].id,
         }
+    }
+}
+
+export async function updateAppointmentStatus({ appointmentId, status }: { appointmentId: Appointment['id'], status: Appointment['status'] }) {
+    const [updatedAppointment] = await db.update(appointment).set({
+        status: status
+    })
+        .where(eq(appointment.id, appointmentId))
+        .returning({ id: appointment.id })
+
+    if(!updatedAppointment.id) return {
+        error: "Failed to update appointment status!"
+    } 
+
+    return {
+        message: `Appointment Status Updated To ${status}`,
+        error: null
     }
 }

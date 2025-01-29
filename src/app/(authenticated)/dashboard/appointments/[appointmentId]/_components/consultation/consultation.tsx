@@ -1,5 +1,6 @@
 "use client"
 
+import { handleFinish } from "@/app/(authenticated)/dashboard/appointments/[appointmentId]/handleFinish"
 import { useConsultationStore } from "@/app/(authenticated)/dashboard/appointments/[appointmentId]/store"
 import { consultationSchema } from "@/app/(authenticated)/dashboard/appointments/types"
 import {
@@ -9,26 +10,21 @@ import {
 } from "@/app/(authenticated)/dashboard/constants"
 import { FormFieldWrapper } from "@/components/formFieldWrapper"
 import LoadingBtn from "@/components/loading-btn"
-import { Button } from "@/components/ui/button"
-import { Form, FormItem, FormLabel, FormControl, FormDescription, FormMessage } from "@/components/ui/form"
-import MultipleSelector, { Option } from "@/components/ui/multi-select"
+import { Form, FormItem, FormLabel, FormControl, FormDescription, FormMessage, FormField } from "@/components/ui/form"
 import type { Appointment, Doctor, User } from "@/lib/db/schema"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { Dispatch, SetStateAction, useEffect, useState } from "react"
+import { useEffect, useState } from "react"
 import { useForm } from "react-hook-form"
-import { toast } from "sonner"
 import type { z } from "zod"
 
 export default function Consultation({
   appointmentId,
   doctorId,
   patientId,
-  setHasPrescriptions
 }: {
   appointmentId: Appointment["id"]
   doctorId: Doctor["id"]
   patientId: User["id"]
-  setHasPrescriptions: Dispatch<SetStateAction<boolean>>
 }) {
   const [isLoading, setIsLoading] = useState<boolean>(false)
 
@@ -43,64 +39,97 @@ export default function Consultation({
     setLaboratories,
     setMedicines,
     setRadiologies,
-  } = useConsultationStore(appointmentId)
+    setSelectedPrescriptions,
 
+    // Prescriptions
+    setLaboratory,
+    setMedicine,
+    setRadiology,
+    
+    reset
+  } = useConsultationStore(appointmentId);
 
   const form = useForm<z.infer<typeof consultationSchema>>({
     resolver: zodResolver(consultationSchema),
     defaultValues: {
       history: history || "",
       diagnosis: diagnosis || "",
-      laboratories: laboratories || [],
-      radiologies: radiologies || [],
-      medicines: medicines || [],
     },
   })
+
+  const normalizeText = (text: string) => 
+    text
+      .split('_')
+      .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(' ');
 
   const handleConsultation = async (data: z.infer<typeof consultationSchema>) => {
     setIsLoading(true)
     setHistory(data.history)
     setDiagnosis(data.diagnosis)
+    
+    const newSelectedPrescriptions: string[] = []
 
-    const hasLaboratories = data.laboratories && data.laboratories.length > 0
-    const hasMedicines = data.medicines && data.medicines.length > 0
-    const hasRadiologies = data.radiologies && data.radiologies.length > 0
-
-    if (hasLaboratories) {
-      setLaboratories(data.laboratories)
+    setLaboratories(data.laboratories);
+    setLaboratory(data.laboratories.map(normalizeText).join('\n'));
+    if (data.laboratories.length > 0) {
+      newSelectedPrescriptions.push("laboratory");
     }
-    if (hasMedicines) {
-      setMedicines(data.medicines)
+    
+    setMedicines(data.medicines);
+    setMedicine(data.medicines.map(normalizeText).join('\n'))
+    if (data.medicines.length > 0) {
+      newSelectedPrescriptions.push("medicine");
     }
-    if (hasRadiologies) {
-      setRadiologies(data.radiologies)
+    
+    setRadiologies(data.radiologies);
+    setRadiology(data.radiologies.map(normalizeText).join('\n'))
+    if (data.radiologies.length > 0) {
+      newSelectedPrescriptions.push("radiology");
     }
-
-    if (hasLaboratories || hasMedicines || hasRadiologies) {
-      console.log("Setting hasPrescriptions to true")
-      setHasPrescriptions(true)
-    } else {
-      console.log("Setting hasPrescriptions to false")
-      setHasPrescriptions(false)
-    }
-
+    
+    setSelectedPrescriptions(newSelectedPrescriptions)
     setIsLoading(false)
+
+    if (newSelectedPrescriptions.length === 0) {
+      await handleFinish({
+        history: data.history,
+        diagnosis: data.diagnosis,
+        laboratories: data.laboratories,
+        radiologies: data.radiologies,
+        medicines: data.medicines,
+        laboratory: null,
+        radiology: null,
+        medicine: null,
+        appointmentId,
+        doctorId,
+        patientId,
+        reset,
+        setIsLoading,
+      });
+    }
+
   }
+
+  useEffect(() => {
+    form.setValue("laboratories", laboratories);
+    form.setValue("radiologies", radiologies);
+    form.setValue("medicines", medicines);
+  }, [laboratories, radiologies, medicines]);
 
   return (
     <>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(handleConsultation)} className="flex flex-col gap-4">
           <div className="flex flex-col gap-2">
-            <FormFieldWrapper form={form} defaultValue={history} name="history" label="History" type="textarea" />
-            <FormFieldWrapper form={form} defaultValue={diagnosis} name="diagnosis" label="Diagnosis" />
+            <FormFieldWrapper form={form} name="history" label="History" type="textarea" />
+            <FormFieldWrapper form={form} name="diagnosis" label="Diagnosis" />
             <FormFieldWrapper
               form={form}
               name="laboratories"
               label="Laboratories"
               type="multi-select"
               options={laboratoriesConst}
-              defaultValue={laboratories.map((val) => ({ value: val, label: val }))}
             />
             <FormFieldWrapper
               form={form}
@@ -108,7 +137,6 @@ export default function Consultation({
               label="Radiologies"
               type="multi-select"
               options={radiologiesConst}
-              defaultValue={radiologies.map((val) => ({ value: val, label: val }))}
             />
             <FormFieldWrapper
               form={form}
@@ -116,7 +144,6 @@ export default function Consultation({
               label="Medicines"
               type="multi-select"
               options={medicinesConst}
-              defaultValue={medicines.map((val) => ({ value: val, label: val }))}
             />
           </div>
           <LoadingBtn isLoading={isLoading}>Submit Consultation</LoadingBtn>

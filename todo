@@ -3,5 +3,9 @@ if email isnt verified on login redirect to verify page !!
 allow user to add files when booking an appointment !!
 make the hook accept one file per request and see if it works instead !!
 
+when the doctor go the finish session but the content of the textarea is different from the content saved in the zustand store show a warning to alert him
+also add an alert button on handle session so the doctor doesnt click by mistake and screw everything up lmfao
 
-!!!!!!consultationRecord
+also when the appointment is done add the ability to see the details
+
+oh boy we have a lot to do dont we lmfao
