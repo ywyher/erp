@@ -2,10 +2,8 @@
 
 import Header from "@/components/header"
 import Seeder from "@/components/seeder"
-import { Button } from "@/components/ui/button"
 import { getSession } from "@/lib/auth-client"
 import { getUserRegistrationType } from "@/lib/db/queries"
-import { seed, reset } from "@/lib/db/seed"
 import { useQuery } from "@tanstack/react-query"
 import { useRouter } from "next/navigation"
 import { useEffect } from "react"
@@ -21,8 +19,7 @@ export default function Home() {
   })
 
   useEffect(() => {
-    if (!user) return;
-
+    if(!user) return;
     (async () => {
       try {
         const registeredWith = await getUserRegistrationType(user.id)
@@ -40,8 +37,7 @@ export default function Home() {
       } catch (error) {
         console.error("Error in handleRules:", error)
       }
-    })
-
+    })()
   }, [user, router]);
 
   return (

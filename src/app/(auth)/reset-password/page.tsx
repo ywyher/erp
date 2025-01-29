@@ -17,7 +17,6 @@ import { Input } from "@/components/ui/input";
 import { useState } from "react";
 import { resetPassword } from "@/lib/auth-client";
 import { passwordSchema, TPasswordSchema } from "@/app/types";
-import { auth } from "@/lib/auth";
 import { toast } from "sonner";
 
 export default function ResetPassword() {

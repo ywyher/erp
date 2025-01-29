@@ -9,11 +9,6 @@ import { useVerifyStore } from "@/app/(auth)/store"
 
 export default function Auth() {
     const [port, setPort] = useState<'check' | 'register' | 'login'>('check')
-    const { value } = useVerifyStore()
-
-    useEffect(() => {
-        console.log(`page.tsx`, value)
-    }, [value])
 
     return (
         <AuthLayout>

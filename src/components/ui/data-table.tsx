@@ -75,9 +75,7 @@ export function DataTable<TData, TValue>({
     return (
         <div>
             <div className="py-4">
-                {filter && (
-                    <DataTableToolbar table={table} filter={filter} />
-                )}
+                <DataTableToolbar table={table} filter={filter} />
             </div>
             <div className="rounded-md border ">
                 <Table>

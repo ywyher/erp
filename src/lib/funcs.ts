@@ -13,9 +13,27 @@ export const checkFieldType = (column: string): 'email' | 'phoneNumber' | 'unkno
     }
 };
 
-export const normalizeData = (value: string | undefined | null): string => {
-    return value?.trim().toLowerCase().replace(/\s/g, "") || '';
-};
+export function normalizeData(value: string): string;
+export function normalizeData(value: Record<string, any>, type: "object"): Record<string, any>;
+export function normalizeData(
+    value: string | Record<string, any>,
+    type: "string" | "object" = "string"
+): string | Record<string, any> {
+    if (type === "string") {
+        return (value as string).trim().toLowerCase().replace(/\s/g, "") || "";
+    }
+
+    if (type === "object") {
+        return Object.fromEntries(
+            Object.entries(value as Record<string, any>).map(([key, val]) => [
+                key,
+                typeof val === "string" ? normalizeData(val) : val,
+            ])
+        );
+    }
+
+    return "";
+}
 
 export const generateFakeField = (
     field: 'username' | 'name' | 'email',
@@ -111,7 +129,7 @@ export function groupSchedulesByDay(schedules: Schedule[]): Record<string, Sched
     }, {} as Record<string, Schedule[]>);
 }
 
-export const getImageUrl = (name: string) => {
+export const getFileUrl = (name: string) => {
     if (name == 'pfp.jpg') {
         return `/images/${name}`
     }

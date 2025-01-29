@@ -2,15 +2,7 @@
 
 import { forgetPassword, signIn } from "@/lib/auth-client"; //import the auth client
 import { zodResolver } from "@hookform/resolvers/zod"
-import {
-    Form,
-    FormControl,
-    FormField,
-    FormItem,
-    FormLabel,
-    FormMessage,
-} from "@/components/ui/form"
-import { Input } from "@/components/ui/input"
+import { Form } from "@/components/ui/form"
 import { useForm } from "react-hook-form";
 import { redirect } from "next/navigation";
 import { loginSchema } from "@/app/(auth)/types";
@@ -31,10 +23,6 @@ export default function Login() {
     const login = async (data: z.infer<typeof loginSchema>) => {
         setIsLoading(true)
         if (context == 'email') {
-            console.log({
-                email: value || data.value,
-                password: data.password,
-            })
             await signIn.email({
                 email: value || data.value,
                 password: data.password,

@@ -117,6 +117,7 @@ export default function ReservationAttatchFiles() {
                                         accept={{
                                             'image/*': [''],
                                             'application/pdf': [''],
+                                            'video/mp4': ['']
                                         }}
                                         progresses={progresses}
                                     />

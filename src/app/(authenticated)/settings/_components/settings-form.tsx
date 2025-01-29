@@ -2,31 +2,19 @@
 
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
-import {
-    Form,
-    FormControl,
-    FormField,
-    FormItem,
-    FormLabel,
-    FormMessage,
-} from "@/components/ui/form"
-import { Input } from "@/components/ui/input"
-import { Button } from "@/components/ui/button"
+import { Form } from "@/components/ui/form"
 import { useQuery, useQueryClient } from "@tanstack/react-query"
 import { getSession } from "@/lib/auth-client"
 import { useEffect, useState } from "react"
-import { updateSettings } from "@/app/(authenticated)/settings/settings.actions"
 import { useImageStore } from "@/app/store"
 import LoadingBtn from "@/components/loading-btn"
-import { Textarea } from "@/components/ui/textarea"
 import { isFakeEmail, normalizeData } from "@/lib/funcs"
 import { z } from "zod"
 import { userSchema } from "@/app/types"
-import { updateUser } from "@/app/actions"
-import { date } from "drizzle-orm/mysql-core"
 import { FormFieldWrapper } from "@/components/formFieldWrapper"
 import { getUserRegistrationType } from "@/lib/db/queries"
 import { toast } from "sonner"
+import { updateUser } from "@/lib/db/mutations"
 
 type UpdateField = {
     value: string | null;
@@ -74,15 +62,15 @@ export default function SettingsForm() {
         const normalizedSessionData = {
             name: normalizeData(user.name),
             email: isFakeEmail(user.email) ? '' : normalizeData(user.email),
-            username: normalizeData(user.username),
-            phoneNumber: normalizeData(user.phoneNumber),
-            nationalId: normalizeData(user.nationalId)
+            username: normalizeData(user.username || ""),
+            phoneNumber: normalizeData(user.phoneNumber || ""),
+            nationalId: normalizeData(user.nationalId || "")
         };
 
         const changedFields: Partial<z.infer<typeof userSchema>> = {};
 
         for (const key in normalizedSessionData) {
-            let formValue = normalizeData(data[key as keyof z.infer<typeof userSchema>]);
+            let formValue = normalizeData(data[key as keyof z.infer<typeof userSchema>] as string);
             const sessionValue = normalizedSessionData[key as keyof typeof normalizedSessionData];
 
             if (formValue !== sessionValue) {
@@ -147,6 +135,7 @@ export default function SettingsForm() {
                             ${user.phoneNumber && user.phoneNumberVerified ? '(verified)' : '(Unverified)'}
                         `}
                     optional={registeredWith != 'phoneNumber' && isFakeEmail(user.phoneNumber) ? true : false}
+                    disabled={user.phoneNumberVerified ? true : false}
                 />
                 <FormFieldWrapper
                     form={form}

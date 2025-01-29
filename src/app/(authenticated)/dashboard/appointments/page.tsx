@@ -12,7 +12,6 @@ import Link from "next/link";
 const listAppointments = async (userId: User['id'], role: User['role']) => {
     let appointments;
 
-
     if (role == 'admin') {
         appointments = await db.select().from(appointment)
     }
@@ -47,7 +46,8 @@ const listAppointments = async (userId: User['id'], role: User['role']) => {
         status: appointment.status,
         patientId: appointment.patientId,
         doctorId: appointment.doctorId,
-        createdBy: appointment.createdBy
+        createdBy: appointment.createdBy,
+        role: role,
     }));
 }
 

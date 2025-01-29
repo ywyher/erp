@@ -10,6 +10,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Select, SelectItem, SelectTrigger, SelectValue, SelectContent } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
+import MultipleSelector from "@/components/ui/multi-select";
 
 interface FormFieldWrapperProps {
     form: {
@@ -20,11 +21,11 @@ interface FormFieldWrapperProps {
     };
     name: string;
     label?: string;
-    defaultValue?: string;
+    defaultValue?: any;
     disabled?: boolean;
     optional?: boolean;
     placeholder?: string;
-    type?: "text" | "select" | 'textarea';
+    type?: "text" | "select" | 'textarea' | 'multi-select';
     options?: { value: string; label: string }[] | string[] | readonly string[];
 }
 
@@ -46,10 +47,10 @@ export const FormFieldWrapper: React.FC<FormFieldWrapperProps> = ({
             control={form.control}
             name={name}
             defaultValue={defaultValue ? defaultValue : ""}
-            render={({ field }) => (
+            render={({ field, formState }) => (
                 <FormItem>
                     {label && (
-                        <FormLabel>
+                        <FormLabel className="capitalize">
                             {label} {optional && <span className="text-sm text-muted">(Optional)</span>}
                         </FormLabel>
                     )}
@@ -91,6 +92,30 @@ export const FormFieldWrapper: React.FC<FormFieldWrapperProps> = ({
                                         })}
                                     </SelectContent>
                                 </Select>
+                            )}
+                            {type === 'multi-select' && (
+                                <MultipleSelector
+                                    {...field}
+                                    defaultOptions={options as { value: string; label: string }[]}
+                                    placeholder={`${options.length == 0 ? `Select ${name} you like...` : ""}`}
+                                    onChange={(selectedOptions) => {
+                                        // Map the selected options to an array of values
+                                        const selectedValues = selectedOptions.map((option) => option.value);
+                                        // Call the original onChange with the array of values
+                                        field.onChange(selectedValues);
+                                    }}
+                                    emptyIndicator={<p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">no results found.</p>}
+                                    
+                                    value={
+                                        defaultValue ?
+                                            defaultValue
+                                        :
+                                        (field.value || []).map((value: string) => {
+                                            const option = (options as { value: string; label: string }[]).find(opt => opt.value === value);
+                                            return option ? option : { value, label: value };
+                                        })
+                                    }
+                                />
                             )}
                         </div>
                     </FormControl>

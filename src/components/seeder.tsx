@@ -34,7 +34,6 @@ export default function Seeder() {
     }
 
     const reseter = async () => {
-
         if (isSeedLoading) {
             toast.error('Seed in progress')
             return;

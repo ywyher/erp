@@ -1,14 +1,14 @@
 'use server'
 
-import { createUser } from "@/app/(authenticated)/dashboard/actions";
+import { createUser } from "@/lib/db/mutations"
 import db from "@/lib/db";
 import { user } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
-import { updateUser } from "@/app/actions";
 import { userSchema } from "@/app/types";
 import { createUserSchema } from "@/app/(authenticated)/dashboard/types";
 import { z } from "zod";
 import { revalidatePath } from "next/cache";
+import { updateUser } from "@/lib/db/mutations";
 
 export async function createAdmin(data: z.infer<typeof createUserSchema>) {
     const result = await createUser({ data, role: 'admin' });

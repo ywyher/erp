@@ -2,75 +2,11 @@
 
 import { userSchema } from "@/app/types"
 import db from "@/lib/db"
-import { checkFieldInUserTable } from "@/lib/db/queries"
 import { user } from "@/lib/db/schema"
 import { deleteFile, getPreSignedUrl } from "@/lib/s3"
 import { eq } from "drizzle-orm"
 import { revalidatePath } from "next/cache"
 import { z } from "zod"
-
-export async function updateUser({ data, userId }: { data: z.infer<typeof userSchema>, userId: string }) {
-    const updateUserPayload: Partial<z.infer<typeof userSchema>> = {}
-
-    if (data.username) {
-        const { error } = await checkFieldInUserTable({ field: 'username', value: data.username })
-        if (error) {
-            console.log(error)
-            return {
-                error: error
-            }
-        }
-    }
-
-    if (data.email) {
-        const { error } = await checkFieldInUserTable({ field: 'email', value: data.email })
-        if (error) {
-            console.log(error)
-            return {
-                error: error
-            }
-        } else {
-            updateUserPayload.email = data.email
-        }
-    }
-
-    if (data.phoneNumber) {
-        const { error } = await checkFieldInUserTable({ field: 'phoneNumber', value: data.phoneNumber })
-        if (error) {
-            console.log(error)
-            return {
-                error: error
-            }
-        } else {
-            updateUserPayload.phoneNumber = data.phoneNumber
-        }
-    }
-
-    if (data.name) {
-        updateUserPayload.name = data.name
-    }
-
-    if (data.username) {
-        updateUserPayload.username = data.username
-    }
-
-    if (data.nationalId) {
-        updateUserPayload.nationalId = data.nationalId
-    }
-
-    const updatedUser = await db.update(user).set({
-        ...updateUserPayload,
-        updatedAt: new Date(),
-    }).where(eq(user.id, userId)).returning()
-
-    if (updatedUser) {
-        return {
-            success: true,
-            message: 'User updated successfully!',
-            userId: updatedUser[0].id,
-        }
-    }
-}
 
 export const computeSHA256 = async (file: File) => {
     const buffer = await file.arrayBuffer()
@@ -144,7 +80,6 @@ export async function uploadPfp({
     };
 }
 
-
 export async function revalidate(path: string) {
-    await revalidatePath(path)
+    revalidatePath(path)
 }

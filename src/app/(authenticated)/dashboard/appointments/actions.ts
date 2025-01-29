@@ -1,9 +1,12 @@
 'use server'
 
+import { consultationSchema } from "@/app/(authenticated)/dashboard/appointments/types"
 import db from "@/lib/db"
-import { Appointment, appointment, Schedule } from "@/lib/db/schema"
+import { Appointment, appointment, Doctor, Schedule, User } from "@/lib/db/schema"
+import { consultation } from "@/lib/db/schema/consultation"
 import { generateId } from "@/lib/funcs"
 import { revalidatePath } from "next/cache"
+import { z } from "zod"
 
 export async function createAppointment({
     doctorId,

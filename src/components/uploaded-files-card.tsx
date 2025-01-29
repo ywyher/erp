@@ -8,7 +8,7 @@ import {
 } from "@/components/ui/card"
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
 import { EmptyCard } from "@/components/empty-card"
-import { getImageUrl } from "@/lib/funcs"
+import { getFileUrl } from "@/lib/funcs"
 
 export function UploadedFilesCard({ uploadedFiles }: { uploadedFiles: any }) {
   return (
@@ -26,7 +26,7 @@ export function UploadedFilesCard({ uploadedFiles }: { uploadedFiles: any }) {
                   {file.type.startsWith("image/") && (
                     <div key={file.name} className="relative aspect-video w-64">
                       <Image
-                        src={getImageUrl(file.name)}
+                        src={getFileUrl(file.name)}
                         alt={file.name}
                         fill
                         sizes="(min-width: 640px) 640px, 100vw"

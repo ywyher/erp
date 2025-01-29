@@ -4,11 +4,12 @@ import { Doctor, Roles, Schedule } from "@/app/types";
 import { auth } from "@/lib/auth";
 import { signIn, User } from "@/lib/auth-client";
 import db from "@/lib/db";
-import { account, appointment, doctor, medicalFile, Receptionist, receptionist, schedule, session, Tables, user } from "@/lib/db/schema";
+import { account, appointment, doctor, Receptionist, receptionist, schedule, session, Tables, user } from "@/lib/db/schema";
 import { deleteFile } from "@/lib/s3";
 import { and, ConsoleLogWriter, eq, like, or, sql } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { headers } from "next/headers";
+import { medicalFile } from "./schema/medical-file";
 
 const tableMap = {
     user: user,
@@ -34,13 +35,14 @@ export async function getUserProvider(userId: string): Promise<{ provider: 'soci
     }
 }
 
-export async function checkFieldInUserTable({ field, value }: { field: 'email' | 'username' | 'phoneNumber' | 'nationalId', value: string }) {
+export async function checkFieldAvailability({ field, value }: { field: 'email' | 'username' | 'phoneNumber' | 'nationalId', value: string }) {
     const doesFieldExists = await db.query.user.findFirst({
         where: (user, { eq }) => eq(user[field], value)
     });
 
     return {
-        error: doesFieldExists && doesFieldExists.id !== value && `${field} already exists!`,
+        isAvailable: doesFieldExists?.createdAt ? false : true,
+        error: doesFieldExists?.createdAt && doesFieldExists?.id !== value && `${field} already exists!`,
     };
 }
 
@@ -244,23 +246,6 @@ export async function searchUsers(query: string, role: Roles | 'all') {
         .limit(10);
 
     return results;
-}
-
-export async function checkFieldAvailability(column: string, columnType: 'email' | 'phoneNumber') {
-    const result = await db.query.user.findFirst({
-        where: (user, { eq }) => {
-            switch (columnType) {
-                case 'email':
-                    return eq(user.email, column)
-                case 'phoneNumber':
-                    return eq(user.phoneNumber, column)
-            }
-        }
-    })
-
-    return {
-        isAvailable: result ? false : true
-    }
 }
 
 export async function getUserRegistrationType(userId: string) {

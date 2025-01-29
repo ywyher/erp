@@ -11,16 +11,17 @@ import { Dispatch, SetStateAction, useState } from "react"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { generateFakeField } from "@/lib/funcs"
-import { createUser } from "@/app/(authenticated)/dashboard/actions"
 import { createAppointment } from "@/app/(authenticated)/dashboard/appointments/actions"
 import { createUserSchema } from "@/app/(authenticated)/dashboard/types"
 import { User } from "@/lib/db/schema"
 import { toast } from "sonner"
+import { createUser } from "@/lib/db/mutations"
 
-export default function NewUser({ userId, role, setPatientId }: {
+export default function NewUser({ userId, role, setPatientId, setIsCreateUser }: {
     userId: string,
     role: 'receptionist' | 'doctor',
     setPatientId: Dispatch<SetStateAction<User['id'] | null>>
+    setIsCreateUser: Dispatch<SetStateAction<boolean>>
 }) {
     const [isLoading, setIsLoading] = useState<boolean>(false)
     const [open, setOpen] = useState<boolean>(true)
@@ -71,7 +72,7 @@ export default function NewUser({ userId, role, setPatientId }: {
     }
 
     return (
-        <Dialog open={open} onOpenChange={setOpen}>
+        <Dialog open={open} onOpenChange={setIsCreateUser}>
             <DialogContent className="sm:max-w-[425px]">
                 <DialogHeader>
                     <DialogTitle>Create New User</DialogTitle>

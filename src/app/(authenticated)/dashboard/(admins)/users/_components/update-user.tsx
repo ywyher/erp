@@ -15,12 +15,13 @@ import UpdatePassword from "@/components/update-password";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { User } from "@/lib/auth-client";
 import LoadingBtn from "@/components/loading-btn";
-import { revalidate, updateUser } from "@/app/actions";
+import { revalidate } from "@/app/actions";
 import { z } from "zod";
 import { userSchema } from "@/app/types";
 import { revalidatePath } from "next/cache";
 
 import { toast } from "sonner";
+import { updateUser } from "@/lib/db/mutations";
 
 function UpdateDialog({ children, open, setOpen }: { children: React.ReactNode, open: boolean, setOpen: Dispatch<SetStateAction<boolean>> }) {
     return (
@@ -72,15 +73,15 @@ export default function UpdateUser(
         const normalizedSessionData = {
             name: normalizeData(user.name),
             email: isFakeEmail(user.email) ? '' : normalizeData(user.email),
-            username: normalizeData(user.username),
-            phoneNumber: normalizeData(user.phoneNumber),
-            nationalId: normalizeData(user.nationalId)
+            username: normalizeData(user.username || ""),
+            phoneNumber: normalizeData(user.phoneNumber || ""),
+            nationalId: normalizeData(user.nationalId || ""),
         };
 
         const changedFields: Partial<z.infer<typeof userSchema>> = {};
 
         for (const key in normalizedSessionData) {
-            let formValue = normalizeData(data[key as keyof z.infer<typeof userSchema>]);
+            let formValue = normalizeData(data[key as keyof z.infer<typeof userSchema>] as string);
             const sessionValue = normalizedSessionData[key as keyof typeof normalizedSessionData];
 
             if (formValue !== sessionValue) {

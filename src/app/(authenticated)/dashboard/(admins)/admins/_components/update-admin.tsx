@@ -70,15 +70,15 @@ export default function UpdateAdmin(
         const normalizedSessionData = {
             name: normalizeData(user.name),
             email: isFakeEmail(user.email) ? '' : normalizeData(user.email),
-            username: normalizeData(user.username),
-            phoneNumber: normalizeData(user.phoneNumber),
-            nationalId: normalizeData(user.nationalId),
+            username: normalizeData(user.username || ""),
+            phoneNumber: normalizeData(user.phoneNumber || ""),
+            nationalId: normalizeData(user.nationalId || ""),
         };
 
         const changedFields: Partial<z.infer<typeof userSchema>> = {};
 
         for (const key in normalizedSessionData) {
-            let formValue = normalizeData(data[key as keyof z.infer<typeof userSchema>]);
+            let formValue = normalizeData(data[key as keyof z.infer<typeof userSchema>] as string);
             const sessionValue = normalizedSessionData[key as keyof typeof normalizedSessionData];
 
             if (formValue !== sessionValue) {

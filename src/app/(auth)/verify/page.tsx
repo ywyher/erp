@@ -36,7 +36,6 @@ export default function Verify() {
     const onVerify = async (data: z.infer<typeof verifyOtpSchema>) => {
         setIsLoading(true)
         if (!value) return;
-        if (operation == 'register' && !password) redirect('/auth')
         if (context == 'email') {
             await emailOtp.verifyEmail({
                 email: value,
@@ -73,7 +72,6 @@ export default function Verify() {
                 onSuccess: async () => {
                     if (operation == 'register') {
                         if (!password) return
-                        console.log('register')
                         const username = generateFakeField("username");
                         const name = generateFakeField("name");
                         const email = generateFakeField('email', value) // value: password
@@ -98,7 +96,6 @@ export default function Verify() {
                         setIsLoading(false)
                         redirect("/onboarding")
                     } else {
-                        console.log('verify')
                         await queryClient.invalidateQueries({ queryKey: ['session'] })
                         setIsLoading(false)
                         if (redirectTo) {

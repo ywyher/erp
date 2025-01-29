@@ -14,6 +14,7 @@ const appointmentColumns = [
     { value: "createdBy", header: "Created By" },
     { value: "doctorId", header: "Doctor Data" },
     { value: "patientId", header: "Patient Data" },
+    { value: 'role', header: 'Role' }
 ]
 
 export const appointmentTableColumns: ColumnDef<any>[] = [
@@ -45,10 +46,10 @@ export const appointmentTableColumns: ColumnDef<any>[] = [
             ),
             cell: ({ row, table }: { row: Row<any>, table: Table<any> }) => {
                 const cellValue = row.getValue(value);
-                const createdBy = row.getValue('createdBy'); // Get the createdBy field correctly
+                const role = row.getValue('role'); // Get the role field correctly
 
-                if (value === 'doctorId') {
-                    if ((createdBy === 'user' || createdBy === 'receptionist')) {
+                if (value == 'doctorId') {
+                    if ((role == 'user' || role == 'receptionist')) {
                         return (
                             <UserData
                                 userId={cellValue as string}
@@ -60,8 +61,8 @@ export const appointmentTableColumns: ColumnDef<any>[] = [
                     }
                 }
 
-                if (value === 'patientId') {
-                    if ((createdBy === 'doctor' || createdBy === 'receptionist')) {
+                if (value == 'patientId') {
+                    if ((role == 'doctor' || role == 'receptionist')) {
                         return (
                             <UserData
                                 userId={cellValue as string}
@@ -85,7 +86,7 @@ export const appointmentTableColumns: ColumnDef<any>[] = [
                 <AppointmentActions
                     appointmentId={appointment.id}
                     status={appointment.status}
-                    createdBy={appointment.createdBy}
+                    role={appointment.role}
                 />
             )
         },

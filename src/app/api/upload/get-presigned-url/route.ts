@@ -16,7 +16,7 @@ const s3 = new S3Client({
 
 const generateFileName = (bytes = 32) => crypto.randomBytes(bytes).toString('hex')
 
-const acceptedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'application/pdf']
+const acceptedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'application/pdf', 'video/mp4']
 const maxFileSize = 11 * 1024 * 1024
 
 export async function POST(req: NextRequest) {

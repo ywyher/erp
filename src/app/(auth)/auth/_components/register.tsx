@@ -1,9 +1,7 @@
 'use client'
 
 import { useForm } from "react-hook-form"
-import {
-    Form,
-} from "@/components/ui/form"
+import { Form } from "@/components/ui/form"
 import { registerSchema } from "@/app/(auth)/types"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useVerifyStore } from "@/app/(auth)/store"
@@ -12,7 +10,6 @@ import { useState } from "react"
 import { redirect } from "next/navigation"
 import { emailOtp, phoneNumber, signUp } from "@/lib/auth-client"
 import { useQueryClient } from "@tanstack/react-query"
-import { useToast } from "@/hooks/use-toast"
 import { generateFakeField } from "@/lib/funcs"
 import { z } from "zod"
 import { FormFieldWrapper } from "@/components/formFieldWrapper"
@@ -47,7 +44,6 @@ export default function Register() {
                 username: username,
                 name: name,
                 password: data.password,
-                role: 'user'
             }, {
                 onSuccess: async () => {
                     await emailOtp.sendVerificationOtp({
@@ -88,7 +84,7 @@ export default function Register() {
     return (
         <div className="flex flex-col gap-2">
             <Form {...form}>
-                <form onSubmit={form.handleSubmit(handleRegister)} className="space-y-4">
+                <form onSubmit={form.handleSubmit(handleRegister)} className="space-y-2">
                     <FormFieldWrapper disabled={true} form={form} name='field' label={context || ""} placeholder="Email Or Phone number" />
                     <FormFieldWrapper form={form} name='password' label='Password' />
                     <FormFieldWrapper form={form} name='confirmPassword' label='Confirm Password' />

@@ -88,16 +88,16 @@ export default function UpdateDoctor(
         const normalizedSessionData = {
             name: normalizeData(user.user.name),
             email: isFakeEmail(user.user.email) ? '' : normalizeData(user.user.email),
-            username: normalizeData(user.user.username),
-            phoneNumber: normalizeData(user.user.phoneNumber),
-            nationalId: normalizeData(user.user.nationalId),
+            username: normalizeData(user.user.username || ""),
+            phoneNumber: normalizeData(user.user.phoneNumber || ""),
+            nationalId: normalizeData(user.user.nationalId || ""),
             specialty: normalizeData(user.doctor.specialty),
         };
 
         const changedFields: Partial<{ [key in keyof z.infer<typeof updateDoctorSchema>]: string | null }> = {};
 
         for (const key in normalizedSessionData) {
-            let formValue = normalizeData(data[key as keyof z.infer<typeof updateDoctorSchema>]);
+            let formValue = normalizeData(data[key as keyof z.infer<typeof updateDoctorSchema>] as string);
             const sessionValue = normalizedSessionData[key as keyof typeof normalizedSessionData];
 
             if (formValue !== sessionValue) {

@@ -28,7 +28,7 @@ export default async function AuthenticatedLayout({
         return null;
     }
 
-    const registeredWith = getUserRegistrationType(data.user.id)
+    const registeredWith = await getUserRegistrationType(data.user.id)
 
     if (
         (registeredWith === 'email' && !emailVerified) ||

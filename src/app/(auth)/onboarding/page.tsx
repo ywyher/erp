@@ -14,10 +14,10 @@ import { useImageStore } from "@/app/store"
 import { z } from "zod"
 import { userSchema } from "@/app/types"
 import { getUserRegistrationType } from "@/lib/db/queries"
-import { updateUser } from "@/app/actions"
-import { excludeField } from "@/lib/funcs"
+import { excludeField, normalizeData } from "@/lib/funcs"
 import { updateOnboarding } from "@/app/(auth)/actions"
 import { toast } from "sonner"
+import { updateUser } from "@/lib/db/mutations"
 
 export default function Onboarding() {
     const router = useRouter();
@@ -54,7 +54,6 @@ export default function Onboarding() {
                 }
             } catch (error) {
                 console.error("Error in handleRules:", error)
-                // Handle error appropriately
             }
         }
 
@@ -78,26 +77,27 @@ export default function Onboarding() {
         if (!user || !context) return;
 
         const fieldToRemove = context; // Could be "email" or "phoneNumber"
-        const dataWithoutField = excludeField(data, fieldToRemove);
+        const normalizedData = normalizeData(data, "object") as z.infer<typeof userSchema>;
+        const dataWithoutField = excludeField(normalizedData, fieldToRemove);
 
-        const updatedUser = await updateUser({
+        const { success, message, error, userId } = await updateUser({
             data: dataWithoutField,
             userId: user.id
         })
 
-        if (updatedUser && updatedUser.error) {
+        if (error) {
             setIsLoading(false)
-            toast.error(updatedUser.error)
+            toast.error(error)
             return;
         }
 
-        const updatedOnboarding = await updateOnboarding(updatedUser?.userId || '', false)
+        const updatedOnboarding = await updateOnboarding(userId || '', false)
 
-        if (updatedUser && updatedUser.success && updatedOnboarding && updatedOnboarding.success) {
+        if (success && updatedOnboarding && updatedOnboarding.success) {
             setIsLoading(false)
             setTrigger(true)
             await queryClient.invalidateQueries({ queryKey: ['session'] })
-            toast('Account updated successfully')
+            toast(message)
             router.replace("/");
         }
     }

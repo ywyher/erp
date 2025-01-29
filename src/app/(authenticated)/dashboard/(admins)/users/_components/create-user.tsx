@@ -8,7 +8,7 @@ import { Dispatch, SetStateAction, useState } from "react";
 import { FieldErrors, useForm } from "react-hook-form";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
-import { createUser } from "@/app/(authenticated)/dashboard/actions";
+import { createUser } from "@/lib/db/mutations"
 import LoadingBtn from "@/components/loading-btn";
 import { z } from "zod";
 import { createUserSchema } from "@/app/(authenticated)/dashboard/types";

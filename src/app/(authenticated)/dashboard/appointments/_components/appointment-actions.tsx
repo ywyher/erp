@@ -8,11 +8,14 @@ import { MoreHorizontal } from "lucide-react";
 import { useState } from "react";
 import { Appointment } from "@/lib/db/schema";
 import Link from "next/link";
+import { useQuery } from "@tanstack/react-query";
+import { getSession } from "@/lib/auth-client";
+import { Roles } from "@/app/types";
 
-export default function AppointmentActions({ appointmentId, status, createdBy }: {
+export default function AppointmentActions({ appointmentId, status, role }: {
     appointmentId: string,
     status: Appointment['status']
-    createdBy: Appointment['createdBy']
+    role: Roles
 }) {
     const [open, setOpen] = useState<boolean>(false)
 
@@ -28,7 +31,7 @@ export default function AppointmentActions({ appointmentId, status, createdBy }:
                 <DropdownMenuLabel>Actions</DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <div className="flex flex-col gap-2">
-                    {createdBy == 'doctor' && (status == 'pending' || status == 'ongoing') && (
+                    {role == 'doctor' && (status == 'pending' || status == 'ongoing') && (
                         <Link href={`/dashboard/appointments/${appointmentId}`}>
                             <Button className="w-full">
                                 Start

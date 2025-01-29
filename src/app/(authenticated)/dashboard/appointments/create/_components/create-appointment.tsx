@@ -60,7 +60,7 @@ export default function CreateAppointment({ userId, role }: { userId: string, ro
                 <>
                     <ExistingUser setIsCreateUser={setIsCreateUser} setPatientId={setPatientId} userId={userId} role={role} />
                     {isCreateUser && (
-                        <NewUser userId={userId} role={role} setPatientId={setPatientId} />
+                        <NewUser userId={userId} role={role} setPatientId={setPatientId} setIsCreateUser={setIsCreateUser} />
                     )}
                 </>
             )}

@@ -13,7 +13,7 @@ export async function reset() {
     try {
         // Truncate all tables
         await db.execute(sql`
-      TRUNCATE TABLE "verification", "account", "session", "medical_record", "medical_file", 
+      TRUNCATE TABLE "verification", "account", "session", "medical_file", 
       "appointment", "schedule", "receptionist", "doctor", "user" CASCADE;
     `);
 

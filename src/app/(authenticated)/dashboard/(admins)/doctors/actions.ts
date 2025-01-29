@@ -1,6 +1,6 @@
 'use server'
 
-import { createUser } from "@/app/(authenticated)/dashboard/actions";
+import { createUser, updateUser } from "@/lib/db/mutations"
 import { Schedules } from "@/app/(authenticated)/dashboard/types";
 import db from "@/lib/db";
 import { deleteById } from "@/lib/db/queries";
@@ -8,7 +8,6 @@ import { doctor, schedule, user } from "@/lib/db/schema";
 import { generateId, transformSchedulesToRecords } from "@/lib/funcs";
 import { eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
-import { updateUser } from "@/app/actions";
 import { createDoctorSchema, updateDoctorSchema } from "@/app/(authenticated)/dashboard/(admins)/doctors/types";
 import { z } from "zod";
 
