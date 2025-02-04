@@ -52,6 +52,15 @@ export default function CreateDoctor() {
 
     const form = useForm<z.infer<typeof createDoctorSchema>>({
         resolver: zodResolver(createDoctorSchema),
+        defaultValues: {
+            username: 'doc',
+            email: 'doc@gmail.com',
+            nationalId: '30801201100198',
+            specialty: 'cardiology',
+            name: 'doc',
+            password: 'doc',
+            confirmPassword: 'doc',
+        }
     });
 
     const onSubmit = async (data: z.infer<typeof createDoctorSchema>) => {

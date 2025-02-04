@@ -1,6 +1,6 @@
 import AppointmentTabs from "@/app/(authenticated)/dashboard/appointments/[appointmentId]/_components/tabs"
 import db from "@/lib/db"
-import { Doctor, MedicalFile, medicalFile as TMedicalFile, User } from "@/lib/db/schema"
+import { Consultation, Doctor, MedicalFile, Prescription, medicalFile as TMedicalFile, User } from "@/lib/db/schema"
 import { medicalFile } from "@/lib/db/schema/medical-file"
 import { and, eq } from "drizzle-orm"
 import { redirect } from "next/navigation"
@@ -17,6 +17,14 @@ const getUserData = async (appointmentId: string) => {
 
     if (!appointment) redirect('/dashboard/appointments');
 
+    const consultation = await db.query.consultation.findFirst({
+        where: (consultation, { eq }) => eq(consultation.appointmentId, appointmentId)
+    })
+
+    const prescriptions = consultation ? await db.query.prescription.findMany({
+        where: (prescription, { eq }) => eq(prescription.consultationId, consultation.id)
+    }) : [];
+
     const user = await db.query.user.findFirst({
         where: (user, { eq }) => eq(user.id, appointment.patientId)
     })
@@ -29,12 +37,22 @@ const getUserData = async (appointmentId: string) => {
     return {
         user,
         doctorId: appointment.doctorId,
-        medicalFiles: medicalFiles || null
+        medicalFiles: medicalFiles || null,
+        operation: consultation?.id ? 'update' : 'create',
+        consultation,
+        prescriptions
     };
 }
 
 export default async function Appointment({ params: { appointmentId } }: { params: { appointmentId: string } }) {
-    const { user, medicalFiles, doctorId } = await getUserData(appointmentId) as { user: User, doctorId: Doctor['id'], medicalFiles: MedicalFile[] };
+    const { user, medicalFiles, doctorId, operation, consultation, prescriptions } = await getUserData(appointmentId) as {
+         user: User,
+         doctorId: Doctor['id'],
+         medicalFiles: MedicalFile[],
+         operation: 'update' | 'create';
+         consultation?: Consultation;
+         prescriptions?: Prescription[];
+    };
 
     return (
         <AppointmentTabs 
@@ -42,6 +60,9 @@ export default async function Appointment({ params: { appointmentId } }: { param
             medicalFiles={medicalFiles}
             appointmentId={appointmentId}
             doctorId={doctorId}
+            operation={operation}
+            consultation={consultation}
+            prescriptions={prescriptions}
         />
     )
 }

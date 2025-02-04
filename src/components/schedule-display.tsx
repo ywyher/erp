@@ -1,19 +1,32 @@
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
+import {
+    Dialog,
+    DialogContent,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
+} from "@/components/ui/dialog"
 import { Badge } from "@/components/ui/badge"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Card, CardContent } from "@/components/ui/card"
-import { groupSchedulesByDay } from "@/lib/funcs"
+import { getDateByDayName, groupSchedulesByDay, parseTimeStringToDate } from "@/lib/funcs"
 import { Schedule } from "@/lib/db/schema"
 import { format } from "date-fns"
 import { Button } from "@/components/ui/button"
 import { CalendarIcon } from 'lucide-react'
 import { Dispatch, SetStateAction } from "react"
 
-export function ScheduleDisplay({ schedules, onClick, open, setOpen }: {
+export function ScheduleDisplay({
+    schedules,
+    onClick,
+    open,
+    setOpen,
+    dialog = true,
+}: {
     schedules: Schedule[],
-    onClick?: (schedule: Schedule) => void
+    onClick?: (date: Date) => void
     open?: boolean
     setOpen?: Dispatch<SetStateAction<boolean>>
+    dialog?: boolean
 }) {
     const getDayColor = (day: string) => {
         const colors: { [key: string]: string } = {
@@ -31,11 +44,73 @@ export function ScheduleDisplay({ schedules, onClick, open, setOpen }: {
     const groupedSchedules = groupSchedulesByDay(schedules)
 
     const sortedDays = Object.keys(groupedSchedules).sort((a, b) => {
-        const days = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday']
+        const days = [
+            'monday',
+            'tuesday',
+            'wednesday',
+            'thursday',
+            'friday',
+            'saturday',
+            'sunday',
+        ]
         return days.indexOf(a) - days.indexOf(b)
     })
 
-    return (
+    const content = (
+        <ScrollArea className="h-[400px] w-full rounded-md border border-gray-700">
+            <div className="p-4 space-y-4">
+                {sortedDays.map((day) => (
+                    <Card
+                        key={day}
+                        className="overflow-hidden bg-gray-900 border-gray-700"
+                    >
+                        <CardContent className="p-0">
+                            <div className={`p-3 ${getDayColor(day)}`}>
+                                <h3 className="font-semibold text-lg">
+                                    {format(getDateByDayName(day), 'EEEE, d MMMM')}
+                                </h3>
+                            </div>
+                            <div className="p-3 space-y-3">
+                                {groupedSchedules[day].map((schedule, index) => (
+                                    <div
+                                        key={index}
+                                        className="flex flex-row justify-between"
+                                    >
+                                        <div className="flex items-center space-x-2">
+                                            <Badge
+                                                variant="secondary"
+                                                className="w-20 justify-center"
+                                            >
+                                                {schedule.startTime}
+                                            </Badge>
+                                            <span className="text-sm text-gray-400">to</span>
+                                            <Badge
+                                                variant="secondary"
+                                                className="w-20 justify-center"
+                                            >
+                                                {schedule.endTime}
+                                            </Badge>
+                                        </div>
+                                        {onClick && (
+                                            <Button
+                                                variant="outline"
+                                                onClick={() => onClick(parseTimeStringToDate(schedule.startTime))}
+                                                className="ml-auto"
+                                            >
+                                                Select
+                                            </Button>
+                                        )}
+                                    </div>
+                                ))}
+                            </div>
+                        </CardContent>
+                    </Card>
+                ))}
+            </div>
+        </ScrollArea>
+    )
+
+    return dialog ? (
         <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
                 <Button variant="outline">
@@ -47,46 +122,10 @@ export function ScheduleDisplay({ schedules, onClick, open, setOpen }: {
                 <DialogHeader>
                     <DialogTitle>Weekly Schedules</DialogTitle>
                 </DialogHeader>
-                <ScrollArea className="h-[400px] w-full rounded-md border border-gray-700">
-                    <div className="p-4 space-y-4">
-                        {sortedDays.map((day) => (
-                            <Card key={day} className="overflow-hidden bg-gray-900 border-gray-700">
-                                <CardContent className="p-0">
-                                    <div className={`p-3 ${getDayColor(day)}`}>
-                                        <h3 className="font-semibold text-lg">
-                                            {day.charAt(0).toUpperCase() + day.slice(1)}
-                                        </h3>
-                                    </div>
-                                    <div className="p-3 space-y-3">
-                                        {groupedSchedules[day].map((schedule, index) => (
-                                            <div key={index} className="flex flex-row justify-between">
-                                                <div className="flex items-center space-x-2">
-                                                    <Badge variant="secondary" className="w-20 justify-center">
-                                                        {format(schedule.startTime, 'HH:mm')}
-                                                    </Badge>
-                                                    <span className="text-sm text-gray-400">to</span>
-                                                    <Badge variant="secondary" className="w-20 justify-center">
-                                                        {format(schedule.endTime, 'HH:mm')}
-                                                    </Badge>
-                                                </div>
-                                                {onClick && (
-                                                    <Button
-                                                        variant="outline"
-                                                        onClick={() => onClick(schedule)}
-                                                        className="ml-auto"
-                                                    >
-                                                        Select
-                                                    </Button>
-                                                )}
-                                            </div>
-                                        ))}
-                                    </div>
-                                </CardContent>
-                            </Card>
-                        ))}
-                    </div>
-                </ScrollArea>
+                {content}
             </DialogContent>
         </Dialog>
+    ) : (
+        content
     )
 }

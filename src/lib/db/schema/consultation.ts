@@ -2,7 +2,7 @@ import { pgTable, text, timestamp, boolean, pgEnum } from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm";
 import { appointment } from "./appointment";
 import { doctor, user } from "./roles";
-import { prescription } from "@/lib/db/schema/prescriptions";
+import { prescription } from "@/lib/db/schema/prescription";
 
 export const consultation = pgTable('consultation', {
   id: text('id').primaryKey(),

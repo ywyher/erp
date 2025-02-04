@@ -3,17 +3,47 @@ import { Badge } from '@/components/ui/badge'
 import { Doctor, Schedule, User } from '@/lib/db/schema'
 import Pfp from '@/components/pfp'
 import { ScheduleDisplay } from '@/components/schedule-display'
-import { useAppointmentReservationStore } from '@/components/doctors/store'
-import { useState } from 'react'
+import { useDoctorIdStore, useDateStore } from '@/components/doctors/store'
+import { useEffect, useState } from 'react'
+import {
+    Tabs,
+    TabsContent,
+    TabsList,
+    TabsTrigger,
+} from "@/components/ui/tabs"
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
+} from "@/components/ui/dialog"
+import CustomDate from '@/components/custom-date'
+import { Button } from '@/components/ui/button'
 
-export function DoctorCard({ data, book = false }: { data: { user: User, doctor: Doctor, schedules: Schedule[] }, book?: boolean }) {
+type DoctorCard = {
+    data: {
+        user: User,
+        doctor: Doctor,
+        schedules: Schedule[]
+    };
+    book?: boolean;
+    customSchedule?: boolean
+}
+
+export function DoctorCard({ 
+        data,
+        book = false,
+        customSchedule = false
+    }:  DoctorCard) {
     const [open, setOpen] = useState<boolean>(false)
-    const { doctorId, schedule, setSchedule, setDoctorId } = useAppointmentReservationStore()
+    const { setDoctorId } = useDoctorIdStore()
+    const { setDate } = useDateStore()
 
-    const handleBookDoctor = (scheudle: Schedule) => {
+    const handleBookDoctor = (date: Date) => {
         setDoctorId(data.doctor.id)
-        setSchedule(scheudle)
-
+        setDate(date)
         setOpen(false)
     }
 
@@ -31,12 +61,47 @@ export function DoctorCard({ data, book = false }: { data: { user: User, doctor:
                     <p className="text-sm"><strong>Role:</strong> {data.user.role}</p>
                     <p className="text-sm"><strong>National ID:</strong> {data.user.nationalId}</p>
                     {book ? (
-                        <ScheduleDisplay
-                            open={open}
-                            setOpen={setOpen}
-                            schedules={data.schedules}
-                            onClick={(e) => handleBookDoctor(e)}
-                        />
+                        customSchedule ? (
+                            <Dialog>
+                                <DialogTrigger asChild>
+                                    <Button variant="outline" className="w-full">
+                                        Select Schedules
+                                    </Button>
+                                </DialogTrigger>
+                                <DialogContent>
+                                <DialogHeader>
+                                    <DialogTitle>Schedules</DialogTitle>
+                                </DialogHeader>
+                                    <Tabs defaultValue="custom">
+                                    <TabsList>
+                                        <TabsTrigger value="offical">Offical</TabsTrigger>
+                                        <TabsTrigger value="custom">Custom</TabsTrigger>
+                                    </TabsList>
+                                    <TabsContent value="offical">
+                                        <ScheduleDisplay
+                                            open={open}
+                                            setOpen={setOpen}
+                                            schedules={data.schedules}
+                                            onClick={(e) => handleBookDoctor(e)}
+                                            dialog={false}
+                                        />
+                                    </TabsContent>
+                                    <TabsContent value="custom">
+                                        <CustomDate
+                                            onClick={(e) => handleBookDoctor(e)}
+                                        />
+                                    </TabsContent>
+                                    </Tabs>
+                                </DialogContent>
+                            </Dialog>
+                        ): (
+                            <ScheduleDisplay
+                                open={open}
+                                setOpen={setOpen}
+                                schedules={data.schedules}
+                                onClick={(e) => handleBookDoctor(e)}
+                            />
+                        )
                     ) : (
                         <ScheduleDisplay
                             open={open}

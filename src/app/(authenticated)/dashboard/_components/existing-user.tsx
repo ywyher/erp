@@ -8,20 +8,14 @@ import { useDebounce } from "use-debounce"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { MoreHorizontal, Loader2, UserPlus } from 'lucide-react'
-import { createAppointment } from "@/app/(authenticated)/dashboard/appointments/actions"
-import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { toast } from "sonner"
 
-export default function ExistingUser({ userId, role, setPatientId, setIsCreateUser }: {
-    userId: string,
-    role: 'doctor' | 'receptionist',
-    setPatientId: Dispatch<SetStateAction<User['id'] | null>>
-    setIsCreateUser: Dispatch<SetStateAction<boolean>>
+export default function ExistingUser({ setSelectedUserId, setIsCreateUser }: {
+    setSelectedUserId: Dispatch<SetStateAction<User['id'] | null>>,
+    setIsCreateUser?: Dispatch<SetStateAction<boolean>>,
 }) {
-    const router = useRouter()
-
     const [searchQuery, setSearchQuery] = useState<string>('')
     const [searchResults, setSearchResults] = useState<User[]>([])
     const [isSearching, setIsSearching] = useState<boolean>(false)
@@ -48,36 +42,10 @@ export default function ExistingUser({ userId, role, setPatientId, setIsCreateUs
         }
     }, [debouncedSearchQuery])
 
-    const handleCreateAppointment = async (patientId: string, doctorId: string) => {
-        if (!patientId) {
-            toast.error(`Patient id not found!`)
-            return;
-        }
-
-        const result = await createAppointment({
-            patientId: patientId,
-            doctorId: doctorId,
-            createdBy: role,
-        })
-
-        if (result?.success) {
-            toast(result.message)
-            setSearchQuery('')
-            router.push(`/dashboard/appointments/${result.appointmentId}`)
-        } else {
-            toast(result?.message)
-        }
-    }
-
     const handlePatientSelection = (patient: User) => {
-        if (role === 'receptionist') {
-            setPatientId(patient.id)
-            setSearchQuery('')
-            setIsSearching(false)
-        }
-        if (role === 'doctor') {
-            handleCreateAppointment(patient.id, userId)
-        }
+        setSelectedUserId(patient.id)
+        setSearchQuery('')
+        setIsSearching(false)
     }
 
     return (
@@ -102,7 +70,7 @@ export default function ExistingUser({ userId, role, setPatientId, setIsCreateUs
                                 <Loader2 className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 animate-spin text-muted-foreground" />
                             )}
                         </div>
-                        <Button className="ml-4" onClick={() => setIsCreateUser(true)}>
+                        <Button className="ml-4" onClick={() => setIsCreateUser && setIsCreateUser(true)}>
                             <UserPlus className="mr-2 h-4 w-4" />
                             New User
                         </Button>

@@ -71,7 +71,7 @@ export const generateId = (size?: number) => {
 
 export const groupSchedules = (schedules: Schedule[]) => {
     console.log(schedules)
-    const groupedSchedules: Record<string, { startTime: Date; endTime: Date }[]> = {};
+    const groupedSchedules: Record<string, { startTime: string; endTime: string }[]> = {};
 
     schedules.forEach(item => {
         const { day, startTime, endTime } = item;
@@ -102,8 +102,8 @@ export const transformSchedulesToRecords = (schedules: Schedules, userId: string
         timeRanges.map(({ startTime, endTime }) => ({
             id: generateId(),
             day: day as "sunday" | "monday" | "tuesday" | "wednesday" | "thursday" | "friday" | "saturday",
-            startTime: new Date(startTime),
-            endTime: new Date(endTime),
+            startTime: startTime,
+            endTime: endTime,
             userId: userId,
             createdAt: new Date(),
             updatedAt: new Date()
@@ -139,3 +139,32 @@ export const getFileUrl = (name: string) => {
         return `${process.env.NEXT_PUBLIC_S3_DEV_URL}` + name
     }
 }
+
+export function getDateByDayName(day: string) {
+    const daysOfWeek = ["sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"];
+    const today = new Date();
+    const currentDayIndex = today.getDay();
+    const targetDayIndex = daysOfWeek.indexOf(day.toLowerCase());
+
+    if (targetDayIndex === -1) {
+        throw new Error("Invalid day name");
+    }
+
+    // Calculate the difference in days
+    let daysToAdd = targetDayIndex - currentDayIndex;
+    if (daysToAdd < 0) {
+        daysToAdd += 7; // Move to next week if the day has passed
+    }
+
+    const targetDate = new Date();
+    targetDate.setDate(today.getDate() + daysToAdd);
+
+    return targetDate; // Format as a readable date string
+}
+
+export const parseTimeStringToDate = (timeString: string): Date => {
+    const [hours, minutes] = timeString?.split(":").map(Number) ?? [0, 0];
+    const now = new Date();
+    now.setHours(hours, minutes, 0, 0);
+    return now;
+};

@@ -3,10 +3,10 @@
 import { Column, ColumnDef, Row, Table } from "@tanstack/react-table"
 import { Checkbox } from "@/components/ui/checkbox"
 import { DataTableColumnHeader } from "@/components/ui/data-table-column-header"
-import AppointmentActions from "@/app/(authenticated)/dashboard/appointments/_components/appointment-actions"
+import OperationActions from "@/app/(authenticated)/dashboard/operations/_components/operation-actions"
 import UserDataDialog from "@/app/(authenticated)/dashboard/_components/user-data-dialog"
 
-const appointmentColumns = [
+const operationColumns = [
     { value: 'id', header: 'ID', isVisible: false },
     { value: "date", header: "Date" },
     { value: "startTime", header: "Start Time" },
@@ -15,10 +15,11 @@ const appointmentColumns = [
     { value: "doctorId", header: "Doctor Data" },
     { value: "patientId", header: "Patient Data" },
     { value: "status", header: "Status" },
+    { value: "type", header: "Type" },
     { value: 'role', header: 'Role' }
 ]
 
-export const appointmentTableColumns: ColumnDef<any>[] = [
+export const operationTableColumns: ColumnDef<any>[] = [
     {
         id: "select",
         header: ({ table }) => (
@@ -38,7 +39,7 @@ export const appointmentTableColumns: ColumnDef<any>[] = [
         enableSorting: false,
         enableHiding: false,
     },
-    ...appointmentColumns
+    ...operationColumns
         .filter(({ isVisible }) => isVisible !== false)
         .map(({ value, header }) => ({
             accessorKey: value,
@@ -82,12 +83,12 @@ export const appointmentTableColumns: ColumnDef<any>[] = [
     {
         id: "actions",
         cell: ({ row }) => {
-            const appointment = row.original
+            const operation = row.original
             return (
-                <AppointmentActions
-                    appointmentId={appointment.id}
-                    status={appointment.status}
-                    role={appointment.role}
+                <OperationActions
+                    operationId={operation.id}
+                    status={operation.status}
+                    role={operation.role}
                 />
             )
         },

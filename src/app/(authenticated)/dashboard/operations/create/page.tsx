@@ -1,12 +1,12 @@
-import CreateAppointment from "@/app/(authenticated)/dashboard/appointments/create/_components/create-appointment";
+import CreateOperation from "@/app/(authenticated)/dashboard/operations/create/_components/create-operation";
 import { getSession, User } from "@/lib/auth-client"
 import db from "@/lib/db";
-import { doctor, receptionist, Schedule, schedule } from "@/lib/db/schema";
+import { doctor, receptionist } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
 import { headers } from "next/headers"
 import { redirect } from "next/navigation";
 
-const getUserWorkId = async (data: User, role: 'doctor' | 'receptionist') => {
+const getWorkId = async (data: User, role: 'doctor' | 'receptionist') => {
     if (!data) throw new Error('Unauthorized');
 
     let userData
@@ -26,16 +26,7 @@ const getUserWorkId = async (data: User, role: 'doctor' | 'receptionist') => {
     return userData[0].id;
 }
 
-const getUserSchedules = async (userId: User['id']) => {
-    const schedules = await db.select().from(schedule)
-        .where(eq(schedule.userId, userId))
-
-    if(!schedules) return;
-
-    return schedules
-}
-
-export default async function CreateAppointmentPage() {
+export default async function CreateOperationPage() {
     const { data } = await getSession({
         fetchOptions: {
             headers: await headers()
@@ -46,12 +37,11 @@ export default async function CreateAppointmentPage() {
 
     if (!data.user) return;
 
-    const workId = await getUserWorkId(data.user, data.user.role)
-    const schedules = await getUserSchedules(data.user.id) as Schedule[];
+    const workId = await getWorkId(data.user, data.user.role)
 
     return (
         <div className='w-full'>
-            <CreateAppointment schedules={schedules} workId={workId} role={data?.user.role} />
+            <CreateOperation workId={workId} role={data?.user.role} />
         </div>
     )
 }

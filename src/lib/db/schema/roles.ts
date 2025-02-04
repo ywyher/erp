@@ -4,7 +4,7 @@ import { schedule } from "./schedule";
 import { appointment } from "./appointment";
 import { medicalFile } from "./medical-file";
 import { consultation } from "./consultation";
-import { prescription } from "@/lib/db/schema/prescriptions";
+import { prescription } from "@/lib/db/schema/prescription";
 
 export const roleEnum = pgEnum('role', ['user', 'admin', 'doctor', 'receptionist'])
 

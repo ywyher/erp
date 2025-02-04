@@ -41,6 +41,14 @@ export default function ReceptionistDashboard() {
                 hasActions: false,
             },
         },
+        {
+            title: "Operations",
+            url: "/dashboard/operations",
+            icon: CalendarCheck,
+            actions: {
+                hasActions: false,
+            },
+        },
     ];
 
     return (

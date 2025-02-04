@@ -20,8 +20,8 @@ export type MenuItem = {
 
 
 export type Schedule = {
-    startTime: Date;
-    endTime: Date;
+    startTime: string;
+    endTime: string;
 };
 
 export type Schedules = Record<string, Schedule[]>;

@@ -16,8 +16,9 @@ import {
 import { TimePicker } from "@/components/ui/datetime-picker";
 import { format } from "date-fns";
 import { Schedules } from "@/app/(authenticated)/dashboard/types";
-import { transformArrToObj } from "@/lib/funcs";
+import { parseTimeStringToDate, transformArrToObj } from "@/lib/funcs";
 import { toast } from "sonner";
+import { Trash2 } from "lucide-react";
 
 
 export default function ScheduleSelector({
@@ -31,8 +32,8 @@ export default function ScheduleSelector({
     selectedDays: string[];
     setSelectedDays: Dispatch<SetStateAction<string[]>>;
 }) {
-    const [startTime, setStartTime] = useState<Date | undefined>(undefined);
-    const [endTime, setEndTime] = useState<Date | undefined>(undefined);
+    const [startTime, setStartTime] = useState<string | undefined>(undefined);
+    const [endTime, setEndTime] = useState<string | undefined>(undefined);
 
     const handleDaysChange = (selectedOptions: any) => {
         const selectedValues = selectedOptions.map((option: any) => option.value); // Extract values
@@ -75,6 +76,15 @@ export default function ScheduleSelector({
         setEndTime(undefined);
     };
 
+    const removeSchedule = (day: string, index: number) => {
+        setSchedules((prevSchedules) => {
+            const updatedSchedules = { ...prevSchedules };
+            updatedSchedules[day] = updatedSchedules[day].filter((_, i) => i !== index);
+            if (updatedSchedules[day].length === 0) delete updatedSchedules[day];
+            return updatedSchedules;
+        });
+    };
+
     return (
         <div className="flex flex-col gap-3">
             <div className="flex flex-col gap-2">
@@ -103,8 +113,8 @@ export default function ScheduleSelector({
                                     <Button onClick={() => addSchedule(day)}>Add Schedule</Button>
                                     <div className="flex flex-row gap-2">
                                         <TimePicker
-                                            date={startTime}
-                                            onChange={setStartTime}
+                                            date={parseTimeStringToDate(startTime)}
+                                            onChange={(date) => setStartTime(date ? format(date, "HH:mm") : undefined)}
                                             granularity="minute"
                                             hourCycle={12}
                                             label="Start Time"
@@ -112,8 +122,8 @@ export default function ScheduleSelector({
                                     </div>
                                     <div className="flex flex-row gap-2">
                                         <TimePicker
-                                            date={endTime}
-                                            onChange={setEndTime}
+                                            date={parseTimeStringToDate(endTime)}
+                                            onChange={(date) => setEndTime(date ? format(date, "HH:mm") : undefined)}
                                             granularity="minute"
                                             hourCycle={12}
                                             label="End Time"
@@ -126,8 +136,12 @@ export default function ScheduleSelector({
                                             <label className="text-xl font-bold capitalize">{day} Schedule</label>
                                             <ul>
                                                 {schedules[day].map((range, i) => (
-                                                    <li key={i}>
-                                                        {format(range.startTime, 'HH:mm')} - {format(range.endTime, 'HH:mm')}
+                                                    <li key={i} className="flex flex-row justify-between">
+                                                        {range.startTime} - {range.endTime}
+                                                        <Trash2
+                                                            className="w-4 h-4 text-red-500 cursor-pointer hover:text-red-700"
+                                                            onClick={() => removeSchedule(day, i)}
+                                                        />
                                                     </li>
                                                 ))}
                                             </ul>

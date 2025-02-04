@@ -1,10 +1,10 @@
 'use server'
 
-import { Doctor, Roles, Schedule } from "@/app/types";
+import { Roles } from "@/app/types";
 import { auth } from "@/lib/auth";
 import { signIn, User } from "@/lib/auth-client";
 import db from "@/lib/db";
-import { account, appointment, doctor, Receptionist, receptionist, schedule, session, Tables, user } from "@/lib/db/schema";
+import { account, appointment, Doctor, doctor, receptionist, Recseptionist, Schedule, schedule, session, Tables, user } from "@/lib/db/schema";
 import { deleteFile } from "@/lib/s3";
 import { and, ConsoleLogWriter, eq, like, or, sql } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
@@ -67,8 +67,6 @@ export async function getUserById(userId: string, role: Roles) {
             .where(eq(user.id, userId))
             .groupBy(user.id, doctor.id);
 
-        console.log(result)
-
         return result[0] as { user: User, doctor: Doctor, schedules: Schedule[] };
     }
     if (role == 'receptionist') {
@@ -84,7 +82,7 @@ export async function getUserById(userId: string, role: Roles) {
             .where(eq(user.id, userId))
             .groupBy(user.id, receptionist.id);
 
-        return result[0] as { user: User, receptionist: Receptionist, schedules: Schedule[] };
+        return result[0] as { user: User, receptionist: Recseptionist, schedules: Schedule[] };
     }
 
 }

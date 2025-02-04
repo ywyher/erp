@@ -58,8 +58,8 @@ export async function seed() {
         await db.insert(schema.schedule).values({
             id: generateId(),
             day: 'monday',
-            startTime: new Date('2023-01-01T09:00:00'),
-            endTime: new Date('2023-01-01T17:00:00'),
+            startTime:  "09:00",
+            endTime:  "17:00",
             userId: doctorUser[0].id,
             createdAt: new Date(),
             updatedAt: new Date(),
@@ -110,8 +110,8 @@ export async function seed() {
         await db.insert(schema.schedule).values({
             id: generateId(),
             day: 'monday',
-            startTime: new Date('2023-01-01T09:00:00'),
-            endTime: new Date('2023-01-01T17:00:00'),
+            startTime: "09:00",
+            endTime: "17:00",
             userId: receptionistUser[0].id,
             createdAt: new Date(),
             updatedAt: new Date(),

@@ -11,22 +11,17 @@ import { Dispatch, SetStateAction, useState } from "react"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { generateFakeField } from "@/lib/funcs"
-import { createAppointment } from "@/app/(authenticated)/dashboard/appointments/actions"
 import { createUserSchema } from "@/app/(authenticated)/dashboard/types"
 import { User } from "@/lib/db/schema"
 import { toast } from "sonner"
 import { createUser } from "@/lib/db/mutations"
 
-export default function NewUser({ userId, role, setPatientId, setIsCreateUser }: {
-    userId: string,
-    role: 'receptionist' | 'doctor',
-    setPatientId: Dispatch<SetStateAction<User['id'] | null>>
-    setIsCreateUser: Dispatch<SetStateAction<boolean>>
+export default function NewUser({ setCreatedUserId, setIsCreateUser }: {
+    setCreatedUserId: Dispatch<SetStateAction<User['id'] | null>>,
+    setIsCreateUser: Dispatch<SetStateAction<boolean>>,
 }) {
     const [isLoading, setIsLoading] = useState<boolean>(false)
     const [open, setOpen] = useState<boolean>(true)
-
-    const router = useRouter()
 
     const form = useForm<z.infer<typeof userSchema>>({
         resolver: zodResolver(userSchema)
@@ -43,32 +38,8 @@ export default function NewUser({ userId, role, setPatientId, setIsCreateUser }:
             return;
         }
 
-        if (role == 'doctor') {
-            handleCreateAppointment(createdUser.userId, userId)
-        } else if (role == 'receptionist') {
-            setPatientId(createdUser.userId)
-            setOpen(false)
-        }
-
-    }
-
-    const handleCreateAppointment = async (patientId: string, doctorId: string) => {
-        const createdAppointment = await createAppointment({
-            doctorId: doctorId,
-            patientId: patientId,
-            createdBy: role
-        })
-
-        if (!createdAppointment || !createdAppointment?.success) {
-            toast.error("Error while creating the appointment.")
-            return;
-        }
-
-        if (createdAppointment?.success) {
-            toast(createdAppointment.message)
-            setOpen(false)
-            router.push(`/dashboard/appointments/${createdAppointment.appointmentId}`)
-        }
+        setCreatedUserId(createdUser.userId)
+        setOpen(false)
     }
 
     return (

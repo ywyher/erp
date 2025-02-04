@@ -7,19 +7,11 @@ type ReservedState = {
 };
 
 type AppointmentReservationStore = {
-  doctorId: Doctor['id'] | null;
-  setDoctorId: (doctorId: Doctor['id'] | null) => void;
-  schedule: Schedule | null;
-  setSchedule: (schedule: Schedule | null) => void;
   reserved: ReservedState;
   setReserved: (partialReserved: Partial<ReservedState>) => void; // Accepts partial updates
 };
 
 export const useAppointmentReservationStore = create<AppointmentReservationStore>((set) => ({
-  doctorId: null,
-  setDoctorId: (doctorId) => set({ doctorId }),
-  schedule: null,
-  setSchedule: (schedule) => set({ schedule }),
   reserved: {
     reserved: false,
     appointmentId: null,
@@ -30,4 +22,24 @@ export const useAppointmentReservationStore = create<AppointmentReservationStore
       appointmentId: reserved.appointmentId ?? null
     }
   }),
+}));
+
+type DoctorIdStore = {
+  doctorId: Doctor['id'] | null;
+  setDoctorId: (doctorId: Doctor['id'] | null) => void;
+}
+
+export const useDoctorIdStore = create<DoctorIdStore>((set) => ({
+  doctorId: null,
+  setDoctorId: (doctorId) => set({ doctorId }),
+}));
+
+type TDate = {
+  date: Date | null;
+  setDate: (date: Date | null) => void;
+}
+
+export const useDateStore = create<TDate>((set) => ({
+  date: null,
+  setDate: (date) => set({ date }),
 }));

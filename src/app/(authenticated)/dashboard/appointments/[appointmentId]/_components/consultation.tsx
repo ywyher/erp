@@ -11,22 +11,41 @@ import {
 import { FormFieldWrapper } from "@/components/formFieldWrapper"
 import LoadingBtn from "@/components/loading-btn"
 import { Form, FormItem, FormLabel, FormControl, FormDescription, FormMessage, FormField } from "@/components/ui/form"
-import type { Appointment, Doctor, User } from "@/lib/db/schema"
+import type { Appointment, Consultation, Doctor, Prescription, User } from "@/lib/db/schema"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useEffect, useState } from "react"
 import { useForm } from "react-hook-form"
 import type { z } from "zod"
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog"
+import { Button } from "@/components/ui/button"
 
 export default function Consultation({
   appointmentId,
   doctorId,
   patientId,
+  consultationId,
+  prescriptions,
+  operation
 }: {
   appointmentId: Appointment["id"]
   doctorId: Doctor["id"]
   patientId: User["id"]
+  consultationId?: Consultation['id']
+  prescriptions?: Prescription[]
+  operation: 'update' | 'create'
 }) {
   const [isLoading, setIsLoading] = useState<boolean>(false)
+  const [showAlert, setShowAlert] = useState<boolean>(false)
 
   const {
     history,
@@ -91,24 +110,33 @@ export default function Consultation({
     setSelectedPrescriptions(newSelectedPrescriptions)
     setIsLoading(false)
 
+    // Show alert if no prescriptions are selected
     if (newSelectedPrescriptions.length === 0) {
-      await handleFinish({
-        history: data.history,
-        diagnosis: data.diagnosis,
-        laboratories: data.laboratories,
-        radiologies: data.radiologies,
-        medicines: data.medicines,
-        laboratory: null,
-        radiology: null,
-        medicine: null,
-        appointmentId,
-        doctorId,
-        patientId,
-        reset,
-        setIsLoading,
-      });
+      setShowAlert(true); // Show the alert dialog
     }
+  }
 
+  const handleFinishSession = async () => {
+    const data = form.getValues();
+    await handleFinish({
+      history: data.history,
+      diagnosis: data.diagnosis,
+      laboratories: data.laboratories,
+      radiologies: data.radiologies,
+      medicines: data.medicines,
+      laboratory: null,
+      radiology: null,
+      medicine: null,
+      appointmentId,
+      doctorId,
+      patientId,
+      reset,
+      setIsLoading,
+      operation,
+      consultationId: consultationId || '',
+      prescriptions: prescriptions || []
+    });
+    setShowAlert(false); // Close the alert dialog
   }
 
   useEffect(() => {
@@ -149,6 +177,22 @@ export default function Consultation({
           <LoadingBtn isLoading={isLoading}>Submit Consultation</LoadingBtn>
         </form>
       </Form>
+
+      {/* Alert Dialog for Ending Session */}
+      <AlertDialog open={showAlert} onOpenChange={setShowAlert}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you sure you want to end the session?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This will save the consultation and end the session. You cannot undo this action.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => setShowAlert(false)}>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleFinishSession}>End Session</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </>
   )
 }

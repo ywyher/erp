@@ -11,7 +11,7 @@ import "react-photo-album/rows.css";
 import type { Photo } from "react-photo-album";
 
 import { useEffect, useRef, useState } from "react";
-import { medicalFile } from "@/lib/db/schema";
+import { MedicalFile, medicalFile } from "@/lib/db/schema";
 import { getFileUrl } from "@/lib/funcs";
 
 import NextJsImage from "@/components/next-js-image";
@@ -51,7 +51,7 @@ function renderNextImage(
   );
 }
 
-export default function Images({ files }: { files: medicalFile[] }) {
+export default function Images({ files }: { files: MedicalFile[] }) {
   const [images, setImages] = useState<Photo[]>([]);
   const [open, setOpen] = useState<boolean>();
   const [index, setIndex] = useState(-1);

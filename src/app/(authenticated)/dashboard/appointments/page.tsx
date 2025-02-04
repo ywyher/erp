@@ -41,6 +41,7 @@ const listAppointments = async (userId: User['id'], role: User['role']) => {
 
     return appointments.map(appointment => ({
         id: appointment.id,
+        date: format(appointment.startTime, 'EEEE, d MMMM'), // Example format
         startTime: format(appointment.startTime, 'HH:mm'),
         endTime: format(appointment.endTime, 'HH:mm'),
         status: appointment.status,

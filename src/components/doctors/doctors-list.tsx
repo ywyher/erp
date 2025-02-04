@@ -11,7 +11,7 @@ import { parseAsJson } from 'nuqs'
 import { z } from "zod"
 import { useEffect } from "react";
 
-export default function DoctorsList({ book }: { book: boolean }) {
+export default function DoctorsList({ book, customSchedule = false }: { book: boolean, customSchedule?: boolean }) {
     const [specialties, setSpecialties] = useQueryState('specialties', parseAsArrayOf(parseAsString))
     const [name, setName] = useQueryState('name')
     const [date, setDate] = useQueryState(
@@ -55,7 +55,7 @@ export default function DoctorsList({ book }: { book: boolean }) {
                 {
                     doctors && doctors.length != 0 && doctors.map((doctor) => {
                         return (
-                            <DoctorCard key={doctor.user.id} data={doctor} book={book} />
+                            <DoctorCard key={doctor.user.id} data={doctor} book={book} customSchedule={customSchedule} />
                         )
                     })
                 }

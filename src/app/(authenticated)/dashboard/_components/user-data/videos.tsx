@@ -1,6 +1,6 @@
 "use client"
 
-import type { medicalFile } from "@/lib/db/schema"
+import type { MedicalFile, medicalFile } from "@/lib/db/schema"
 import { getFileUrl } from "@/lib/funcs"
 import { useEffect, useState } from "react"
 
@@ -10,7 +10,7 @@ type Video = {
   type: string
 }
 
-export default function Videos({ files }: { files: medicalFile[] }) {
+export default function Videos({ files }: { files: MedicalFile[] }) {
   const [videos, setVideos] = useState<Video[]>()
 
   useEffect(() => {

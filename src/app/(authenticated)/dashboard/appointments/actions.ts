@@ -13,13 +13,15 @@ export async function createAppointment({
     doctorId,
     patientId,
     createdBy,
-    schedule,
+    date,
+    status = 'pending',
     receptionistId,
 }: {
     doctorId: string,
     patientId: string,
     createdBy: Appointment['createdBy'],
-    schedule?: Schedule;
+    status: Appointment['status'],
+    date: Date;
     receptionistId?: string
 }) {
 
@@ -28,9 +30,8 @@ export async function createAppointment({
         patientId: patientId,
         doctorId: doctorId,
         receptionistId: receptionistId ? receptionistId : null,
-        startTime: schedule?.startTime ? new Date(schedule.startTime) : new Date(),
-        endTime: schedule?.endTime ? new Date(schedule.endTime) : new Date(),
-        status: 'ongoing',
+        startTime: date,
+        status: status,
         createdBy: createdBy,
         createdAt: new Date(),
         updatedAt: new Date(),
@@ -61,5 +62,21 @@ export async function updateAppointmentStatus({ appointmentId, status }: { appoi
     return {
         message: `Appointment Status Updated To ${status}`,
         error: null
+    }
+}
+
+export async function updateAppointmentEndTime({ appointmentId, date }: { appointmentId: Appointment['id'] ,date: Date }) {
+    const [updatedAppointment] = await db.update(appointment).set({
+        endTime: date
+    }).returning()
+
+    if(!updatedAppointment.id) return {
+        error: "Couldn't update the end time!"
+    }
+
+    return {
+        appointmentId: updatedAppointment.id,
+        message: 'End time updated!!',
+        error: null,
     }
 }

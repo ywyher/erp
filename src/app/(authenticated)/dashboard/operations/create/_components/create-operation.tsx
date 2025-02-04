@@ -1,38 +1,33 @@
 "use client"
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+
 import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
-import type { Schedule, User } from "@/lib/db/schema"
+import type { User } from "@/lib/db/schema"
 import DoctorsList from "@/components/doctors/doctors-list"
 import { useDoctorIdStore, useDateStore } from "@/components/doctors/store"
-import { createAppointment } from "@/app/(authenticated)/dashboard/appointments/actions"
+import { createOperation } from "@/app/(authenticated)/dashboard/operations/actions"
 import { toast } from "sonner"
 import ExistingUser from "@/app/(authenticated)/dashboard/_components/existing-user"
 import NewUser from "@/app/(authenticated)/dashboard/_components/new-user"
-import { ScheduleDisplay } from "@/components/schedule-display"
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import CustomDate from "@/components/custom-date"
 
-export default function CreateAppointment({
-  schedules,
-  workId,
-  role,
-}: { schedules: Schedule[]; workId: string; role: "doctor" | "receptionist" }) {
+export default function CreateOperation({ workId, role }: { workId: string; role: "doctor" | "receptionist" }) {
   const router = useRouter()
 
   const [isCreateUser, setIsCreateUser] = useState<boolean>(false)
-  const [patientId, setPatientId] = useState<User["id"] | null>("")
+  const [patientId, setPatientId] = useState<User["id"] | null>(null)
   const [open, setOpen] = useState<boolean>(false)
 
   const { setDate, date } = useDateStore()
   const { doctorId, setDoctorId } = useDoctorIdStore()
 
   useEffect(() => {
-    async function handleCreateAppointment() {
+    async function handleCreateOperation() {
       try {
         if (!doctorId || !date || !patientId) return
 
-        const result = await createAppointment({
+        const result = await createOperation({
           patientId: patientId,
           doctorId: doctorId,
           createdBy: role,
@@ -45,11 +40,7 @@ export default function CreateAppointment({
           toast(result.message)
           setDoctorId(null)
           setDate(null)
-          if (role == "doctor") {
-            router.push(`/dashboard/appointments/${result.appointmentId}`)
-          } else {
-            router.push(`/dashboard/appointments`)
-          }
+          router.push(`/dashboard/operations/${result.operationId}`)
         } else {
           toast.error(result?.message)
           setDoctorId(null)
@@ -61,17 +52,16 @@ export default function CreateAppointment({
       }
     }
 
-    handleCreateAppointment()
-  }, [ doctorId, date, patientId, workId, role, router, setDate ]), 
-  
-  // Added setDate to dependencies
-    // Set the date for the doctor role and open dialog
-    useEffect(() => {
-      if (role === "doctor" && patientId) {
-        setDoctorId(workId)
-        setOpen(true)
-      }
-    }, [patientId, role, workId, setDoctorId])
+    handleCreateOperation()
+  }, [doctorId, date, patientId, role, workId, router, setDate, setDoctorId])
+
+  // Set the date for the doctor role and open dialog
+  useEffect(() => {
+    if (role === "doctor" && patientId) {
+      setDoctorId(workId)
+      setOpen(true)
+    }
+  }, [patientId, role, workId, setDoctorId])
 
   return (
     <div className="p-2">
@@ -81,20 +71,9 @@ export default function CreateAppointment({
         <Dialog open={open} onOpenChange={setOpen}>
           <DialogContent>
             <DialogHeader>
-              <DialogTitle>Schedules</DialogTitle>
+              <DialogTitle>Select Date</DialogTitle>
             </DialogHeader>
-            <Tabs defaultValue="custom">
-              <TabsList>
-                <TabsTrigger value="offical">Official</TabsTrigger>
-                <TabsTrigger value="custom">Custom</TabsTrigger>
-              </TabsList>
-              <TabsContent value="offical">
-                <ScheduleDisplay onClick={(e) => setDate(e)} dialog={false} schedules={schedules} />
-              </TabsContent>
-              <TabsContent value="custom">
-                <CustomDate onClick={(e) => setDate(e)} />
-              </TabsContent>
-            </Tabs>
+            <CustomDate onClick={(e) => setDate(e)} />
           </DialogContent>
         </Dialog>
       )}

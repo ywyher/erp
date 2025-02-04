@@ -3,10 +3,10 @@
 import ScheduleSelector from "@/app/(authenticated)/dashboard/_components/schedule-selector";
 import { updateSchedule } from "@/app/(authenticated)/dashboard/actions";
 import { Schedules } from "@/app/(authenticated)/dashboard/types";
-import { Schedule } from "@/app/types";
 import LoadingBtn from "@/components/loading-btn";
 import { User } from "@/lib/auth-client";
 import { getUserById } from "@/lib/db/queries";
+import { Schedule } from "@/lib/db/schema";
 import { groupSchedules, transformSchedulesToRecords } from "@/lib/funcs";
 
 import { useQuery } from "@tanstack/react-query";
@@ -108,7 +108,6 @@ export default function UpdateSchedule({ userId, setOpen }: { userId: string, se
                 setSelectedDays={setSelectedDays}
             />
             <div className="mt-4">
-
                 <LoadingBtn isLoading={isLoading} onClick={onSubmit}>
                     Update
                 </LoadingBtn>

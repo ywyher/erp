@@ -1,31 +1,29 @@
 'use client'
 
 import Delete from "@/app/(authenticated)/dashboard/_components/delete";
-import UpdateUser from "@/app/(authenticated)/dashboard/(admins)/users/_components/update-user";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { MoreHorizontal } from "lucide-react";
 import { useState } from "react";
-import { Appointment } from "@/lib/db/schema";
+import { Operation } from "@/lib/db/schema";
 import Link from "next/link";
-import { useQuery } from "@tanstack/react-query";
-import { getSession } from "@/lib/auth-client";
 import { Roles } from "@/app/types";
 import { useRouter } from "next/navigation";
-import { updateAppointmentStatus } from "@/app/(authenticated)/dashboard/appointments/actions";
+import { updateOperationStatus } from "@/app/(authenticated)/dashboard/operations/actions";
 
-export default function AppointmentActions({ appointmentId, status, role }: {
-    appointmentId: string,
-    status: Appointment['status']
+export default function OperationActions({ operationId, status, role }: {
+    operationId: string,
+    status: Operation['status']
     role: Roles
-}) {
+}) {    
     const router = useRouter();
     const [open, setOpen] = useState<boolean>(false)
 
     const handleStart = async () => {
-        await updateAppointmentStatus({ appointmentId, status: 'ongoing' })
-        router.push(`/dashboard/appointments/${appointmentId}`)
+        await updateOperationStatus({ operationId, status: 'ongoing' })
+        router.push(`/dashboard/appointments/${operationId}`)
     }
+
 
     return (
         <DropdownMenu open={open} onOpenChange={setOpen}>
@@ -46,14 +44,14 @@ export default function AppointmentActions({ appointmentId, status, role }: {
                     )}
                     {status == 'pending' && (
                         <Delete
-                            id={appointmentId}
-                            table="appointment"
+                            id={operationId}
+                            table="operation"
                             label="cancel"
                             setPopOpen={setOpen}
                         />
                     )}
                     {role == 'doctor' && status == 'completed' && (
-                        <Link href={`/dashboard/appointments/${appointmentId}`}>
+                        <Link href={`/dashboard/operations/${operationId}`}>
                             <Button className="w-full">
                                 Details/Edit
                             </Button>

@@ -1,7 +1,8 @@
-import { createConsultation, createPrescription } from "@/app/(authenticated)/dashboard/appointments/[appointmentId]/actions"
-import { updateAppointmentStatus } from "@/app/(authenticated)/dashboard/appointments/actions"
+import { createConsultation, createPrescription, updateConsultation, updatePrescription } from "@/app/(authenticated)/dashboard/appointments/[appointmentId]/actions"
+import { updateAppointmentEndTime, updateAppointmentStatus } from "@/app/(authenticated)/dashboard/appointments/actions"
 import { toast } from "sonner"
 import { redirect, useRouter } from "next/navigation"
+import { Prescription } from "@/lib/db/schema"
 
 type HandleFinishParams = {
   history: string
@@ -33,73 +34,114 @@ export const handleFinish = async ({
   patientId,
   reset,
   setIsLoading,
-}: HandleFinishParams) => {
+  operation,
+  consultationId,
+  prescriptions
+}: HandleFinishParams & { operation: 'create' | 'update', consultationId?: string, prescriptions?: Prescription[] }) => {
   if (!history || !diagnosis) return;
 
   setIsLoading(true);
 
   const consultationData = { history, diagnosis, laboratories, radiologies, medicines };
 
-  const consultation = await createConsultation({
-    data: consultationData,
-    appointmentId,
-    doctorId,
-    patientId,
-  });
+  let consultationResult;
+  if (operation === 'create') {
+    consultationResult = await createConsultation({
+      data: consultationData,
+      appointmentId,
+      doctorId,
+      patientId,
+    });
+  } else if (operation === 'update' && consultationId) {
+    consultationResult = await updateConsultation({
+      data: consultationData,
+      consultationId,
+    });
+  }
 
-  if (!consultation.id || consultation.error) {
-    toast.error(consultation.error);
+  if (!consultationResult?.id || consultationResult.error) {
+    toast.error(consultationResult?.error);
     setIsLoading(false);
     return;
   }
 
-  // Create prescriptions for each category if they exist
+  // Create or update prescriptions for each category if they exist
   const prescriptionPromises = [];
 
   if (laboratory) {
-    prescriptionPromises.push(
-      createPrescription({
-        content: laboratory,
-        type: "laboratory",
-        appointmentId,
-        doctorId,
-        consultationId: consultation.id,
-        patientId,
-      })
-    );
+    const existingPrescription = prescriptions?.find(p => p.type === "laboratory");
+    if (existingPrescription) {
+      prescriptionPromises.push(
+        updatePrescription({
+          content: laboratory,
+          prescriptionId: existingPrescription.id,
+        })
+      );
+    } else {
+      prescriptionPromises.push(
+        createPrescription({
+          content: laboratory,
+          type: "laboratory",
+          appointmentId,
+          doctorId,
+          consultationId: consultationResult.id,
+          patientId,
+        })
+      );
+    }
   }
 
   if (radiology) {
-    prescriptionPromises.push(
-      createPrescription({
-        content: radiology,
-        type: "radiology",
-        appointmentId,
-        doctorId,
-        consultationId: consultation.id,
-        patientId,
-      })
-    );
+    const existingPrescription = prescriptions?.find(p => p.type === "radiology");
+    if (existingPrescription) {
+      prescriptionPromises.push(
+        updatePrescription({
+          content: radiology,
+          prescriptionId: existingPrescription.id,
+        })
+      );
+    } else {
+      prescriptionPromises.push(
+        createPrescription({
+          content: radiology,
+          type: "radiology",
+          appointmentId,
+          doctorId,
+          consultationId: consultationResult.id,
+          patientId,
+        })
+      );
+    }
   }
 
   if (medicine) {
-    prescriptionPromises.push(
-      createPrescription({
-        content: medicine,
-        type: "medicine",
-        appointmentId,
-        doctorId,
-        consultationId: consultation.id,
-        patientId,
-      })
-    );
+    const existingPrescription = prescriptions?.find(p => p.type === "medicine");
+    if (existingPrescription) {
+      prescriptionPromises.push(
+        updatePrescription({
+          content: medicine,
+          prescriptionId: existingPrescription.id,
+        })
+      );
+    } else {
+      prescriptionPromises.push(
+        createPrescription({
+          content: medicine,
+          type: "medicine",
+          appointmentId,
+          doctorId,
+          consultationId: consultationResult.id,
+          patientId,
+        })
+      );
+    }
   }
 
   const results = await Promise.all(prescriptionPromises);
-  const errors = results.filter((res) => res.error);
+  const errors = results.filter((res: any) => res.error);
 
   if (errors.length > 0) {
-    toast.error("Some prescriptions failed to be created!");
+    toast.error("Some prescriptions failed to be created or updated!");
     setIsLoading(false);
     return;
   }
@@ -112,7 +154,15 @@ export const handleFinish = async ({
     return;
   }
 
-  toast.success("Consultation and prescriptions created successfully!");
+  const updatedEndTime = await updateAppointmentEndTime({ appointmentId, date: new Date() });
+
+  if (updatedEndTime.error) {
+    toast.error(updatedEndTime.error);
+    setIsLoading(false);
+    return;
+  }
+
+  toast.success("Consultation and prescriptions processed successfully!");
   reset();
   setIsLoading(false);
 

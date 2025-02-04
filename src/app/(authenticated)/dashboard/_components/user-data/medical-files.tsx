@@ -1,10 +1,10 @@
-import type { medicalFile } from "@/lib/db/schema"
+import type { MedicalFile, medicalFile } from "@/lib/db/schema"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import Images from "./images"
 import Videos from "./videos"
 import Pdfs from "./pdfs"
 
-export default function UserMedicalFiles({ files }: { files: medicalFile[] }) {
+export default function UserMedicalFiles({ files }: { files: MedicalFile[] }) {
   const hasImages = files.some((file) => file.type.startsWith("image/"))
   const hasVideos = files.some((file) => file.type.startsWith("video/"))
   const hasPdfs = files.some((file) => file.type === "application/pdf")

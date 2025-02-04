@@ -1,26 +1,36 @@
 'use client'
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Button } from "@/components/ui/button"
 import { useConsultationStore } from "@/app/(authenticated)/dashboard/appointments/[appointmentId]/store"
-import { appointment, Doctor, User, type Appointment } from "@/lib/db/schema"
+import { Consultation, Doctor, Prescription as TPrescription, User, type Appointment } from "@/lib/db/schema"
 import Prescription from "@/app/(authenticated)/dashboard/appointments/[appointmentId]/_components/prescriptions/prescription"
-import { createConsultation, createPrescription } from "@/app/(authenticated)/dashboard/appointments/[appointmentId]/actions"
-import { toast } from "sonner"
 import { useState } from "react"
-import { PrescriptionTypes } from "@/app/(authenticated)/dashboard/appointments/[appointmentId]/types"
-import { updateAppointmentStatus } from "@/app/(authenticated)/dashboard/appointments/actions"
 import { useRouter } from "next/navigation"
 import LoadingBtn from "@/components/loading-btn"
 import { handleFinish } from "@/app/(authenticated)/dashboard/appointments/[appointmentId]/handleFinish"
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog"
+import { Button } from "@/components/ui/button"
 
 type Prescriptions = {
   appointmentId: Appointment['id'];
   doctorId: Doctor['id'];
   patientId: User['id'];
+  operation: 'update' | 'create'
+  consultationId?: Consultation['id']
+  prescriptions?: TPrescription[]
 }
 
-export default function Prescriptions({ appointmentId, doctorId, patientId }: Prescriptions) {
+export default function Prescriptions({ appointmentId, doctorId, patientId, operation, consultationId, prescriptions }: Prescriptions) {
   const router = useRouter()
 
   const [isLoading, setIsLoading] = useState<boolean>(false)
@@ -62,6 +72,9 @@ export default function Prescriptions({ appointmentId, doctorId, patientId }: Pr
       patientId,
       reset,
       setIsLoading,
+      operation,
+      consultationId: consultationId,
+      prescriptions: prescriptions
     });
   };
   
@@ -92,9 +105,26 @@ export default function Prescriptions({ appointmentId, doctorId, patientId }: Pr
         </Tabs>
       </div>
       <div className="p-4 bg-background border-t">
-        <LoadingBtn isLoading={isLoading} onClick={handleFinishClick} className="w-full">
-          End seesion
-        </LoadingBtn>
+        <AlertDialog>
+          <AlertDialogTrigger asChild>
+            <Button className="w-full">End session</Button>
+          </AlertDialogTrigger>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+              <AlertDialogDescription>
+                This action cannot be undone. This will permanently delete your
+                account and remove your data from our servers.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancel</AlertDialogCancel>
+              <AlertDialogAction  onClick={handleFinishClick}>
+                  Proceed
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </div>
     </div>
   )

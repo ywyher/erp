@@ -2,7 +2,7 @@
 
 import { createAppointment } from "@/app/(authenticated)/dashboard/appointments/actions";
 import DoctorsList from "@/components/doctors/doctors-list";
-import { useAppointmentReservationStore } from "@/components/doctors/store";
+import { useAppointmentReservationStore, useDoctorIdStore, useDateStore } from "@/components/doctors/store";
 import Header from "@/components/header";
 import { getSession } from "@/lib/auth-client";
 
@@ -22,12 +22,14 @@ export default function Booking() {
         }
     })
 
-    const { doctorId, schedule, setSchedule, setDoctorId, setReserved } = useAppointmentReservationStore()
+    const { setReserved } = useAppointmentReservationStore()
+    const { doctorId, setDoctorId } = useDoctorIdStore()
+    const { date, setDate } = useDateStore()
 
     useEffect(() => {
         async function handleCreateAppointment() {
             try {
-                if (!doctorId || !schedule) return;
+                if (!doctorId || !date) return;
                 if (!user) {
                     toast.error("Unauthorized, Redirecting to /auth.")
                     router.push('/auth')
@@ -37,13 +39,14 @@ export default function Booking() {
                     patientId: user.id,
                     doctorId: doctorId,
                     createdBy: 'user',
-                    schedule: schedule,
+                    status: 'pending',
+                    date,
                 })
 
                 if (createdAppointment?.success) {
                     toast(createdAppointment.message)
                     setDoctorId(null)
-                    setSchedule(null)
+                    setDate(null)
                     setReserved({
                         reserved: true,
                         appointmentId: createdAppointment?.appointmentId
@@ -52,7 +55,7 @@ export default function Booking() {
                 } else {
                     toast.error(createdAppointment?.message)
                     setDoctorId(null)
-                    setSchedule(null)
+                    setDate(null)
                     return;
                 }
             } catch (err) {
@@ -61,7 +64,7 @@ export default function Booking() {
         }
 
         handleCreateAppointment()
-    }, [doctorId, schedule, user])
+    }, [doctorId, date, user])
 
     return (
         <>

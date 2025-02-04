@@ -34,8 +34,16 @@ export default function DoctorDashboard() {
             },
         },
         {
-            title: "Appointment",
+            title: "Appointments",
             url: "/dashboard/appointments",
+            icon: CalendarCheck,
+            actions: {
+                hasActions: false,
+            }
+        },
+        {
+            title: "Operations",
+            url: "/dashboard/operations",
             icon: CalendarCheck,
             actions: {
                 hasActions: false,

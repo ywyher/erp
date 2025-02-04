@@ -1,45 +1,42 @@
-import { pgTable, text, timestamp, boolean, pgEnum } from "drizzle-orm/pg-core";
+import { pgEnum, pgTable, text, timestamp } from "drizzle-orm/pg-core";
 import { doctor, receptionist, user } from "./roles";
 import { relations } from "drizzle-orm";
-import { medicalFile } from "./medical-file";
-import { consultation } from "./consultation";
-import { prescription } from "@/lib/db/schema/prescription";
+import { appointment, createdByEnum } from "./appointment";
 import { statusEnum } from "@/lib/db/schema/enums";
 
-// Appointment table
+export const operationTypeEnum = pgEnum('type', ['surgical'])
 
-export const createdByEnum = pgEnum('createdBy', ['user', 'receptionist', 'doctor'])
-
-export const appointment = pgTable('appointment', {
-  id: text('id').primaryKey().notNull(),
+// Medical files for appointments
+export const operation = pgTable('operation', {
+  id: text('id').primaryKey(),
   patientId: text('patientId').references(() => user.id, { onDelete: 'cascade' }).notNull(),
   doctorId: text('doctorId').references(() => doctor.id, { onDelete: 'cascade' }).notNull(),
   receptionistId: text('receptionistId').references(() => receptionist.id, { onDelete: 'cascade' }),
+  appointmentId: text('appointmentId').references(() => appointment.id, { onDelete: 'cascade' }),
   startTime: timestamp('startTime').notNull(),
   endTime: timestamp('endTime'),
   status: statusEnum('status').notNull().default('pending'),
+  type: operationTypeEnum('type').notNull(),
   createdBy: createdByEnum('createdBy').notNull(),
   createdAt: timestamp('createdAt').notNull().defaultNow(),
   updatedAt: timestamp('updatedAt').notNull().defaultNow(),
-});
-// Relations
-export const appointmentRelations = relations(appointment, ({ one, many }) => ({
+})
+
+export const operationRelation = relations(operation, ({ one }) => ({
   user: one(user, {
-    fields: [appointment.patientId],
+    fields: [operation.patientId],
     references: [user.id],
   }),
   doctor: one(doctor, {
-    fields: [appointment.doctorId],
+    fields: [operation.doctorId],
     references: [doctor.id],
   }),
   receptionist: one(receptionist, {
-    fields: [appointment.receptionistId],
+    fields: [operation.receptionistId],
     references: [receptionist.id],
   }),
-  consultation: one(consultation, {
-    fields: [appointment.id], // appointment.id should match consultation.appointmentId
-    references: [consultation.appointmentId],
+  appointment: one(appointment, {
+    fields: [operation.appointmentId],
+    references: [appointment.id],
   }),
-  medicalFiles: many(medicalFile),
-  prescriptions: many(prescription),
-}));
+}))

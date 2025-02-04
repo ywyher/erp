@@ -6,6 +6,7 @@ import db from "@/lib/db";
 import { Appointment, Consultation, Doctor, prescription, User } from "@/lib/db/schema";
 import { consultation } from "@/lib/db/schema/consultation";
 import { generateId } from "@/lib/funcs";
+import { eq } from "drizzle-orm";
 import { z } from "zod";
 
 type CreateConsultation = {
@@ -91,6 +92,65 @@ export async function createPrescription({
 
   return {
     message: 'Prescription Created Successfully',
+    error: null
+  }
+}
+
+type UpdateConsultation = {
+  data: z.infer<typeof consultationSchema>,
+  consultationId: Consultation['id']
+}
+
+export async function updateConsultation({ 
+   data,
+   consultationId
+  }: UpdateConsultation) {
+  // Convert arrays to comma-separated strings
+  const laboratoriesString = data.laboratories.join(', ');
+  const radiologiesString = data.radiologies.join(', ');
+  const medicinesString = data.medicines.join(', ');
+
+  const [update] = await db.update(consultation).set({
+      diagnosis: data.diagnosis,
+      history: data.history,
+      laboratories: laboratoriesString, // Use the converted string
+      radiologies: radiologiesString,   // Use the converted string
+      medicines: medicinesString,       // Use the converted string
+      updatedAt: new Date(),
+  }).where(eq(consultation.id, consultationId)).returning({ id: consultation.id });
+
+  if(!update.id) return { 
+      error: "Couldn't update consultation"
+  };
+
+  return {
+      id: update.id,
+      message: "Consultation updated successfully",
+      error: null,
+  }
+}
+
+type UpdatePrescription = {
+  content: string;
+  prescriptionId: string;
+}
+
+export async function updatePrescription({ 
+    content,
+    prescriptionId
+  }: UpdatePrescription) {
+
+  const [updatedPrescription] = await db.update(prescription).set({
+    content: content,
+    updatedAt: new Date(),
+  }).where(eq(prescription.id, prescriptionId)).returning({ id: prescription.id })
+
+  if(!updatedPrescription.id) return {
+    error: "Failed to update prescription!"
+  }
+
+  return {
+    message: 'Prescription Updated Successfully',
     error: null
   }
 }
