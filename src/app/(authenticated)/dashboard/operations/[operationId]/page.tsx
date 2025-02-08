@@ -1,6 +1,6 @@
 import OperationTabs from "@/app/(authenticated)/dashboard/operations/[operationId]/_components/tabs"
 import db from "@/lib/db"
-import { consultation as consultationTable ,Consultation, Doctor, MedicalFile, Prescription, medicalFile as TMedicalFile, User } from "@/lib/db/schema"
+import { consultation as consultationTable ,Consultation, Doctor, MedicalFile, Prescription, medicalFile as TMedicalFile, User, operationData, OperationData } from "@/lib/db/schema"
 import { medicalFile } from "@/lib/db/schema/medical-file"
 import { and, eq } from "drizzle-orm"
 import { redirect } from "next/navigation"
@@ -31,6 +31,9 @@ const getUserData = async (operationId: string) => {
         where: (user, { eq }) => eq(user.id, operation.patientId)
     })
 
+    const operationDataVar = await db.query.operationData.findFirst({
+        where: (operationData, { eq }) => eq(operationData.operationId, operation.id)
+    })
 
     let medicalFiles
 
@@ -46,18 +49,27 @@ const getUserData = async (operationId: string) => {
         doctorId: operation.doctorId,
         medicalFiles: medicalFiles || null,
         consultation: consultation && consultation.length > 0 ? consultation[0] : undefined,
-        prescriptions
+        prescriptions,
+        operationData: operationDataVar,
     };
 }
 
 export default async function Operation({ params: { operationId } }: { params: { operationId: string } }) {
-    const { patient, medicalFiles, doctorId, consultation, prescriptions } = await getUserData(operationId) as {
-        patient: User;
-        doctorId: Doctor['id'];
-        medicalFiles: MedicalFile[];
-        consultation?: Consultation;
-        prescriptions?: Prescription[]
-    }
+    const {
+         patient,
+         medicalFiles,
+         doctorId,
+         consultation,
+         prescriptions,
+         operationData,
+        } = await getUserData(operationId) as {
+            patient: User;
+            doctorId: Doctor['id'];
+            medicalFiles: MedicalFile[];
+            consultation?: Consultation;
+            prescriptions?: Prescription[]
+            operationData?: OperationData
+        }
 
     return (
         <OperationTabs
@@ -67,6 +79,7 @@ export default async function Operation({ params: { operationId } }: { params: {
             doctorId={doctorId}
             consultation={consultation}
             prescriptions={prescriptions}
+            operationData={operationData}
         />
     )
 }

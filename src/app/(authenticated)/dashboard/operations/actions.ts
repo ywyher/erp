@@ -2,7 +2,7 @@
 
 import { operationDataSchema } from "@/app/(authenticated)/dashboard/operations/types"
 import db from "@/lib/db"
-import { Doctor, Operation, operation, operationData, Schedule, User } from "@/lib/db/schema"
+import { Doctor, Operation, operation, OperationData, operationData, Schedule, User } from "@/lib/db/schema"
 import { generateId } from "@/lib/funcs"
 import { eq } from "drizzle-orm"
 import { revalidatePath } from "next/cache"
@@ -92,14 +92,38 @@ export async function createOperationData({ data, operationId }: { data: z.infer
         two: data.two,
         three: data.three,
         operationId: operationId,
-    }).returning({ id: operationData.id })
+    }).returning()
 
-    if(createdOperationData.id) return {
+    if(!createdOperationData.id) return {
         error: "Failed to create operation data entry!!"
     }
 
     return {
+        data: createdOperationData as OperationData,
         message: "Operation data inserted!",
         error: null
     }
+}
+
+
+export async function updateOperationData({ data, operationDataId }: { data: Partial<z.infer<typeof operationDataSchema>>, operationDataId: OperationData['id'] }) {
+    const [updatedOperationData] = await db
+        .update(operationData)
+        .set({
+            ...data
+        })
+        .where(eq(operationData.id, operationDataId))
+        .returning();
+
+    if (!updatedOperationData) {
+        return {
+            error: "Failed to update operation data entry!"
+        };
+    }
+
+    return {
+        data: updatedOperationData as OperationData,
+        message: "Operation data updated successfully!",
+        error: null
+    };
 }
