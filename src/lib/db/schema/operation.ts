@@ -39,4 +39,23 @@ export const operationRelation = relations(operation, ({ one }) => ({
     fields: [operation.appointmentId],
     references: [appointment.id],
   }),
+  operationData: one(operationData, {
+    fields: [operation.id],
+    references: [operationData.operationId],
+  }),
+}))
+
+export const operationData = pgTable('operation_data', {
+  id: text('id').primaryKey(),
+  one: text('one'),
+  two: text('two'),
+  three: text('three'),
+  operationId: text('operationId').references(() => operation.id, { onDelete: 'cascade' }).notNull().unique(),
+})
+
+export const operationDataRelation = relations(operationData, ({ one }) => ({
+  operation: one(operation, {
+    fields: [operationData.operationId],
+    references: [operation.id],
+  }),
 }))

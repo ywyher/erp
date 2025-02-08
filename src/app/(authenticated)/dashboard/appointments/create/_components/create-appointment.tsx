@@ -21,7 +21,7 @@ export default function CreateAppointment({
   const router = useRouter()
 
   const [isCreateUser, setIsCreateUser] = useState<boolean>(false)
-  const [patientId, setPatientId] = useState<User["id"] | null>("")
+  const [patientId, setPatientId] = useState<User["id"] | null>("mMOh4tppw-RSdnx-wGwjU")
   const [open, setOpen] = useState<boolean>(false)
 
   const { setDate, date } = useDateStore()

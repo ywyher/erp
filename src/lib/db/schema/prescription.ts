@@ -4,12 +4,13 @@ import { appointment } from "./appointment";
 import { doctor, user } from "./roles";
 import { consultation } from "@/lib/db/schema/consultation";
 
-export const typeEnum = pgEnum('type', ['laboratory', 'radiology', 'medicine'])
+// having issue now
+// export const typeEnum = pgEnum('type', ['laboratory', 'radiology', 'medicine'])
 
 export const prescription = pgTable('prescription', {
   id: text('id').primaryKey(),
   content: text('content').notNull(),
-  type: typeEnum('type').notNull(),
+  type: text('type').notNull(),
   consultationId: text('consultationId').references(() => consultation.id, { onDelete: 'cascade' }).notNull(),
   appointmentId: text('appointmentId').references(() => appointment.id, { onDelete: 'cascade' }).notNull(),
   doctorId: text('doctorId').references(() => doctor.id, { onDelete: 'cascade' }).notNull(),

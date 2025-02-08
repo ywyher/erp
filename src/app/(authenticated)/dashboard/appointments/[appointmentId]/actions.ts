@@ -25,9 +25,9 @@ export async function createConsultation({
   const consultationId = generateId();
 
   // Convert arrays to comma-separated strings
-  const laboratoriesString = data.laboratories.join(', ');
-  const radiologiesString = data.radiologies.join(', ');
-  const medicinesString = data.medicines.join(', ');
+  const laboratoriesString = data.laboratories.join(',');
+  const radiologiesString = data.radiologies.join(',');
+  const medicinesString = data.medicines.join(',');
 
   const [creation] = await db.insert(consultation).values({
       id: consultationId,     
@@ -106,9 +106,9 @@ export async function updateConsultation({
    consultationId
   }: UpdateConsultation) {
   // Convert arrays to comma-separated strings
-  const laboratoriesString = data.laboratories.join(', ');
-  const radiologiesString = data.radiologies.join(', ');
-  const medicinesString = data.medicines.join(', ');
+  const laboratoriesString = data.laboratories.join(',');
+  const radiologiesString = data.radiologies.join(',');
+  const medicinesString = data.medicines.join(',');
 
   const [update] = await db.update(consultation).set({
       diagnosis: data.diagnosis,

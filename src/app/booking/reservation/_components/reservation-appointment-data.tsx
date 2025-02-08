@@ -28,7 +28,7 @@ export default function ReservationAppointmentData({ data: { appointment, doctor
                             </div>
                             <div className="flex items-center space-x-2">
                                 <Clock className="h-5 w-5 text-muted-foreground" />
-                                <span>Time: {appointment.startTime.toLocaleTimeString()} - {appointment.endTime.toLocaleTimeString()}</span>
+                                <span>Time: {appointment.startTime.toLocaleTimeString()} - {appointment.endTime?.toLocaleTimeString()}</span>
                             </div>
                             <div className="flex items-center space-x-2">
                                 <UserIcon className="h-5 w-5 text-muted-foreground" />

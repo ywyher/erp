@@ -96,6 +96,7 @@ export const FormFieldWrapper: React.FC<FormFieldWrapperProps> = ({
                             {type === 'multi-select' && (
                                 <MultipleSelector
                                     {...field}
+                                    disabled={disabled}
                                     defaultOptions={options as { value: string; label: string }[]}
                                     placeholder={`${options.length == 0 ? `Select ${name} you like...` : ""}`}
                                     onChange={(selectedOptions) => {

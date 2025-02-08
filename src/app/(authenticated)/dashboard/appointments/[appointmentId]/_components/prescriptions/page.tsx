@@ -20,6 +20,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
 import { Button } from "@/components/ui/button"
+import { toast } from "sonner"
 
 type Prescriptions = {
   appointmentId: Appointment['id'];
@@ -77,8 +78,6 @@ export default function Prescriptions({ appointmentId, doctorId, patientId, oper
       prescriptions: prescriptions
     });
   };
-  
-  
 
   return (
     <div className="flex flex-col h-[calc(100vh-64px)]">

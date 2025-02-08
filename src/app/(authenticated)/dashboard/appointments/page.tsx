@@ -43,7 +43,7 @@ const listAppointments = async (userId: User['id'], role: User['role']) => {
         id: appointment.id,
         date: format(appointment.startTime, 'EEEE, d MMMM'), // Example format
         startTime: format(appointment.startTime, 'HH:mm'),
-        endTime: format(appointment.endTime, 'HH:mm'),
+        endTime: appointment.endTime ? format(appointment.endTime, 'HH:mm') : 'None',
         status: appointment.status,
         patientId: appointment.patientId,
         doctorId: appointment.doctorId,

@@ -1,10 +1,12 @@
 'use server'
 
+import { operationDataSchema } from "@/app/(authenticated)/dashboard/operations/types"
 import db from "@/lib/db"
-import { Doctor, Operation, operation, Schedule, User } from "@/lib/db/schema"
+import { Doctor, Operation, operation, operationData, Schedule, User } from "@/lib/db/schema"
 import { generateId } from "@/lib/funcs"
 import { eq } from "drizzle-orm"
 import { revalidatePath } from "next/cache"
+import { z } from "zod"
 
 export async function createOperation({
     doctorId,
@@ -76,5 +78,28 @@ export async function updateOperationEndTime({ operationId, date }: { operationI
         operationId: updatedOperation.id,
         message: 'End time updated!!',
         error: null,
+    }
+}
+
+
+export async function createOperationData({ data, operationId }: { data: z.infer<typeof operationDataSchema>, operationId: Operation['id'] }) {
+
+    const operationDataId = generateId();
+
+    const [createdOperationData] = await db.insert(operationData).values({
+        id: operationDataId,
+        one: data.one,
+        two: data.two,
+        three: data.three,
+        operationId: operationId,
+    }).returning({ id: operationData.id })
+
+    if(createdOperationData.id) return {
+        error: "Failed to create operation data entry!!"
+    }
+
+    return {
+        message: "Operation data inserted!",
+        error: null
     }
 }

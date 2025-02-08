@@ -27,17 +27,22 @@ const getUserData = async (operationId: string) => {
         where: (prescription, { eq }) => eq(prescription.consultationId, consultation[0].id)
     }) : [];
 
-    const user = await db.query.user.findFirst({
+    const patient = await db.query.user.findFirst({
         where: (user, { eq }) => eq(user.id, operation.patientId)
     })
 
-    const medicalFiles = await db.select().from(medicalFile)
-        .where(and(eq(medicalFile.patientId, operation.patientId), eq(medicalFile.appointmentId, operationId)))
 
-    if (!user) return;
+    let medicalFiles
+
+    if(operation.appointmentId) {
+        medicalFiles = await db.select().from(medicalFile)
+            .where(and(eq(medicalFile.patientId, operation.patientId), eq(medicalFile.appointmentId, operation.appointmentId)))
+    }
+
+    if (!patient) return;
 
     return {
-        user,
+        patient,
         doctorId: operation.doctorId,
         medicalFiles: medicalFiles || null,
         consultation: consultation && consultation.length > 0 ? consultation[0] : undefined,
@@ -46,8 +51,8 @@ const getUserData = async (operationId: string) => {
 }
 
 export default async function Operation({ params: { operationId } }: { params: { operationId: string } }) {
-    const { user, medicalFiles, doctorId, consultation, prescriptions } = await getUserData(operationId) as {
-        user: User;
+    const { patient, medicalFiles, doctorId, consultation, prescriptions } = await getUserData(operationId) as {
+        patient: User;
         doctorId: Doctor['id'];
         medicalFiles: MedicalFile[];
         consultation?: Consultation;
@@ -56,7 +61,7 @@ export default async function Operation({ params: { operationId } }: { params: {
 
     return (
         <OperationTabs
-            user={user}
+            patient={patient}
             medicalFiles={medicalFiles}
             operationId={operationId}
             doctorId={doctorId}

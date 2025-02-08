@@ -21,9 +21,8 @@ export default function OperationActions({ operationId, status, role }: {
 
     const handleStart = async () => {
         await updateOperationStatus({ operationId, status: 'ongoing' })
-        router.push(`/dashboard/appointments/${operationId}`)
+        router.push(`/dashboard/operations/${operationId}`)
     }
-
 
     return (
         <DropdownMenu open={open} onOpenChange={setOpen}>

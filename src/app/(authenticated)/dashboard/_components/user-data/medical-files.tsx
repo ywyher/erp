@@ -21,7 +21,7 @@ export default function UserMedicalFiles({ files }: { files: MedicalFile[] }) {
 
   return (
     <Tabs defaultValue={tabs[0].value}>
-      <TabsList className={`grid w-full grid-cols-${tabs.length}`}>
+      <TabsList className={``}>
         {tabs.map((tab) => (
           <TabsTrigger key={tab.value} value={tab.value}>
             {tab.label}
