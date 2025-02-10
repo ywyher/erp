@@ -7,6 +7,8 @@ import { generateId } from "@/lib/funcs"
 import { eq } from "drizzle-orm"
 import { revalidatePath } from "next/cache"
 import { z } from "zod"
+import mammoth from 'mammoth';
+import fs from "fs/promises";
 
 export async function createOperation({
     doctorId,
@@ -14,21 +16,21 @@ export async function createOperation({
     createdBy,
     date,
     status,
-    receptionistId,
+    creatorId,
 }: {
     doctorId: Doctor['id'],
     patientId: User['id'],
     createdBy: Operation['createdBy'],
     status: Operation['status']
     date: Date;
-    receptionistId?: string
+    creatorId: User['id']
 }) {
 
     const createdOperation = await db.insert(operation).values({
         id: generateId(),
         patientId: patientId,
         doctorId: doctorId,
-        receptionistId: receptionistId ? receptionistId : null,
+        creatorId: creatorId,
         startTime: date,
         status: status,
         type: 'surgical',
@@ -82,20 +84,30 @@ export async function updateOperationEndTime({ operationId, date }: { operationI
 }
 
 
-export async function createOperationData({ data, operationId }: { data: z.infer<typeof operationDataSchema>, operationId: Operation['id'] }) {
+export async function createOperationData({ data, operationId }: { data: any, operationId: Operation['id'] }) {
 
     const operationDataId = generateId();
 
     const [createdOperationData] = await db.insert(operationData).values({
         id: operationDataId,
-        one: data.one,
-        two: data.two,
-        three: data.three,
+        data,
         operationId: operationId,
     }).returning()
 
     if(!createdOperationData.id) return {
         error: "Failed to create operation data entry!!"
+    }
+
+    const updatedOperationData = await updateOperationStatus({ operationId: operationId, status: 'completed' })
+
+    if(updatedOperationData.error) return {
+        error: updatedOperationData.error
+    }
+
+    const updatedOperationEndTime = await updateOperationEndTime({ operationId, date: new Date() })
+
+    if(updatedOperationEndTime.error) return {
+        error: updatedOperationEndTime.error
     }
 
     return {
@@ -105,12 +117,11 @@ export async function createOperationData({ data, operationId }: { data: z.infer
     }
 }
 
-
-export async function updateOperationData({ data, operationDataId }: { data: Partial<z.infer<typeof operationDataSchema>>, operationDataId: OperationData['id'] }) {
+export async function updateOperationData({ data, operationDataId }: { data: any, operationDataId: OperationData['id'] }) {
     const [updatedOperationData] = await db
         .update(operationData)
         .set({
-            ...data
+            data
         })
         .where(eq(operationData.id, operationDataId))
         .returning();
@@ -121,9 +132,36 @@ export async function updateOperationData({ data, operationDataId }: { data: Par
         };
     }
 
+    revalidatePath(`/dashboard/operations/${updatedOperationData.operationId}`)
     return {
         data: updatedOperationData as OperationData,
         message: "Operation data updated successfully!",
         error: null
     };
 }
+
+export async function extractPlaceholders(filePath: string): Promise<string[]> {
+    try {
+      const fileBuffer = await fs.readFile(filePath);
+      
+      const result = await mammoth.extractRawText({ buffer: fileBuffer });
+      const text = result.value; // Extract the raw text
+  
+      // Use regex to find all placeholders (words inside {})
+      const placeholderRegex = /\{([^}]+)\}/g;
+      const matches = text.match(placeholderRegex);
+  
+      if (!matches) {
+        return []; // No placeholders found
+      }
+  
+      // Extract the placeholder names (remove the {})
+      const placeholders = matches.map((match) => match.slice(1, -1));
+  
+      // Return unique placeholders
+      return [...new Set(placeholders)];
+    } catch (error) {
+      console.error('Error reading the .docx file:', error);
+      throw error;
+    }
+  }

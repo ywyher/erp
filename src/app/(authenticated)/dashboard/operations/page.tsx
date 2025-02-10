@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { DataTable } from "@/components/ui/data-table";
 import { getSession } from "@/lib/auth-client";
 import db from "@/lib/db"
-import { appointment, doctor, operation, receptionist, User } from "@/lib/db/schema"
+import { appointment, doctor, operation, receptionist, user, User } from "@/lib/db/schema"
 import { format } from "date-fns";
 import { eq } from "drizzle-orm";
 import { headers } from "next/headers";
@@ -31,11 +31,11 @@ const listAppointments = async (userId: User['id'], role: User['role']) => {
     }
 
     if (role == 'receptionist') {
-        const [receptionistData] = await db.select().from(receptionist)
-            .where(eq(receptionist.userId, userId))
+        const [receptionistData] = await db.select().from(user)
+            .where(eq(user.id, userId))
 
         operations = await db.select().from(operation)
-            .where(eq(operation.receptionistId, receptionistData.id))
+            .where(eq(operation.creatorId, receptionistData.id))
     }
 
     if (!operations) throw new Error("Couldn't get appointmnets")

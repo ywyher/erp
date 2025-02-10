@@ -49,7 +49,7 @@ export default function OperationActions({ operationId, status, role }: {
                             setPopOpen={setOpen}
                         />
                     )}
-                    {role == 'doctor' && status == 'completed' && (
+                    {status == 'completed' && (
                         <Link href={`/dashboard/operations/${operationId}`}>
                             <Button className="w-full">
                                 Details/Edit

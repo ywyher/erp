@@ -6,24 +6,12 @@ import { eq } from "drizzle-orm";
 import { headers } from "next/headers"
 import { redirect } from "next/navigation";
 
-const getUserWorkId = async (data: User, role: 'doctor' | 'receptionist') => {
-    if (!data) throw new Error('Unauthorized');
+const getDocotorId = async (userId: User['id']) => {
+    const [doctorData] = await db.select().from(doctor)
+        .where(eq(doctor.userId, userId))
+        .limit(1)
 
-    let userData
-    if (role == 'doctor') {
-        userData = await db.select().from(doctor)
-            .where(eq(doctor.userId, data.id))
-            .limit(1)
-    }
-    if (role == 'receptionist') {
-        userData = await db.select().from(receptionist)
-            .where(eq(receptionist.userId, data.id))
-            .limit(1)
-    }
-
-    if (!userData) throw new Error('Unauthorized');
-
-    return userData[0].id;
+    return doctorData.id;
 }
 
 const getUserSchedules = async (userId: User['id']) => {
@@ -46,12 +34,21 @@ export default async function CreateAppointmentPage() {
 
     if (!data.user) return;
 
-    const workId = await getUserWorkId(data.user, data.user.role)
     const schedules = await getUserSchedules(data.user.id) as Schedule[];
+
+    let doctorId;
+    if(data.user.role == 'doctor') {
+        doctorId = await getDocotorId(data.user.id)
+    }
 
     return (
         <div className='w-full'>
-            <CreateAppointment schedules={schedules} workId={workId} role={data?.user.role} />
+            <CreateAppointment
+             id={data.user.id}
+             schedules={schedules}
+             role={data?.user.role}
+             doctorWorkId={data.user.role == 'doctor' ? doctorId : undefined}
+            />
         </div>
     )
 }

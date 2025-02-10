@@ -2,7 +2,7 @@
 
 import AdminSidebarMainGroup from "@/app/(authenticated)/dashboard/_components/sidebar/admin/groups/main";
 import { MenuItem } from "@/app/(authenticated)/dashboard/types";
-import { ConciergeBell, Home, Lock, LogOut, Settings, Stethoscope, User2 } from "lucide-react";
+import { CalendarCheck, ConciergeBell, Home, Lock, LogOut, Settings, Stethoscope, User2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 export default function AdminDashboard() {
@@ -61,6 +61,22 @@ export default function AdminDashboard() {
             title: "Receptionists",
             url: "/dashboard/receptionists",
             icon: ConciergeBell,
+            actions: {
+                hasActions: false,
+            }
+        },
+        {
+            title: "Appointments",
+            url: "/dashboard/appointments",
+            icon: CalendarCheck,
+            actions: {
+                hasActions: false,
+            }
+        },
+        {
+            title: "Operations",
+            url: "/dashboard/operations",
+            icon: CalendarCheck,
             actions: {
                 hasActions: false,
             }

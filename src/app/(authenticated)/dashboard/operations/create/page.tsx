@@ -1,29 +1,17 @@
 import CreateOperation from "@/app/(authenticated)/dashboard/operations/create/_components/create-operation";
 import { getSession, User } from "@/lib/auth-client"
 import db from "@/lib/db";
-import { doctor, receptionist } from "@/lib/db/schema";
+import { doctor } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
 import { headers } from "next/headers"
 import { redirect } from "next/navigation";
 
-const getWorkId = async (data: User, role: 'doctor' | 'receptionist') => {
-    if (!data) throw new Error('Unauthorized');
+const getDocotorId = async (userId: User['id']) => {
+    const [doctorData] = await db.select().from(doctor)
+        .where(eq(doctor.userId, userId))
+        .limit(1)
 
-    let userData
-    if (role == 'doctor') {
-        userData = await db.select().from(doctor)
-            .where(eq(doctor.userId, data.id))
-            .limit(1)
-    }
-    if (role == 'receptionist') {
-        userData = await db.select().from(receptionist)
-            .where(eq(receptionist.userId, data.id))
-            .limit(1)
-    }
-
-    if (!userData) throw new Error('Unauthorized');
-
-    return userData[0].id;
+    return doctorData.id;
 }
 
 export default async function CreateOperationPage() {
@@ -33,15 +21,22 @@ export default async function CreateOperationPage() {
         }
     })
 
-    if (!data || (data.user.role != 'doctor' && data.user.role != 'receptionist')) return redirect('/dashboard')
+    if (!data || (data.user.role != 'doctor' && data.user.role != 'receptionist' && data.user.role != 'admin')) return redirect('/dashboard')
 
     if (!data.user) return;
 
-    const workId = await getWorkId(data.user, data.user.role)
+    let doctorId;
+    if(data.user.role == 'doctor') {
+        doctorId = await getDocotorId(data.user.id)
+    }
 
     return (
         <div className='w-full'>
-            <CreateOperation workId={workId} role={data?.user.role} />
+            <CreateOperation 
+             id={data.user.id}
+             doctorWorkId={data.user.role == 'doctor' ? doctorId : undefined}
+             role={data.user.role}
+            />
         </div>
     )
 }

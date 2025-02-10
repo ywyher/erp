@@ -8,13 +8,13 @@ import { statusEnum } from "@/lib/db/schema/enums";
 
 // Appointment table
 
-export const createdByEnum = pgEnum('createdBy', ['user', 'receptionist', 'doctor'])
+export const createdByEnum = pgEnum('createdBy', ['user', 'receptionist', 'doctor', 'admin'])
 
 export const appointment = pgTable('appointment', {
   id: text('id').primaryKey().notNull(),
   patientId: text('patientId').references(() => user.id, { onDelete: 'cascade' }).notNull(),
   doctorId: text('doctorId').references(() => doctor.id, { onDelete: 'cascade' }).notNull(),
-  receptionistId: text('receptionistId').references(() => receptionist.id, { onDelete: 'cascade' }),
+  creatorId: text('creatorId').references(() => user.id, { onDelete: 'cascade' }),
   startTime: timestamp('startTime').notNull(),
   endTime: timestamp('endTime'),
   status: statusEnum('status').notNull().default('pending'),
@@ -31,10 +31,6 @@ export const appointmentRelations = relations(appointment, ({ one, many }) => ({
   doctor: one(doctor, {
     fields: [appointment.doctorId],
     references: [doctor.id],
-  }),
-  receptionist: one(receptionist, {
-    fields: [appointment.receptionistId],
-    references: [receptionist.id],
   }),
   consultation: one(consultation, {
     fields: [appointment.id], // appointment.id should match consultation.appointmentId

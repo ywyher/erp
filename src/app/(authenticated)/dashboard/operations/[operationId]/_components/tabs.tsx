@@ -12,9 +12,9 @@ import type {
   OperationData as TOperationData,
   Prescription,
   User,
-  OperationData,
 } from "@/lib/db/schema"
-import { useEffect, useState } from "react"
+import { generateDocument } from "@/lib/document"
+import { useEffect, useState, useCallback } from "react"
 
 type OperationTabs = {
   patient: User
@@ -35,16 +35,68 @@ export default function OperationTabs({
   prescriptions,
   operationData,
 }: OperationTabs) {
-  const [localOperationData, setLocalOperationData] = useState<TOperationData>()
-  const [activeTab, setActiveTab] = useState<'patient-data' | 'operation-data' | 'document-viewer'>('patient-data')
+  const [localOperationData, setLocalOperationData] = useState<TOperationData | undefined>(operationData)
+  const [activeTab, setActiveTab] = useState<"patient-data" | "operation-data" | "document-viewer">("operation-data")
+  const [pdfUrl, setPdfUrl] = useState<string | undefined>(undefined)
+  const [docxUrl, setDocxUrl] = useState<string | undefined>(undefined)
+  const [isGenerating, setIsGenerating] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const [needsRegeneration, setNeedsRegeneration] = useState(false)
 
   useEffect(() => {
     if (operationData && operationData.id) {
-      console.log(operationData)
       setLocalOperationData(operationData)
-      setActiveTab("document-viewer")
+      // setActiveTab("document-viewer")
     }
   }, [operationData])
+
+  const generateDocuments = useCallback(async () => {
+    if (!localOperationData) return
+
+    try {
+      setIsGenerating(true)
+      setError(null)
+
+      // Generate DOCX Blob
+      const { blob } = await generateDocument({ data: localOperationData.data })
+      const docxFile = new File([blob], "document.docx", {
+        type: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+      })
+      setDocxUrl(URL.createObjectURL(blob))
+
+      // Convert DOCX to PDF via API
+      const formData = new FormData()
+      formData.append("file", docxFile)
+
+      const response = await fetch("/api/convert", {
+        method: "POST",
+        body: formData,
+      })
+
+      if (!response.ok) throw new Error("Failed to convert DOCX to PDF")
+
+      // Create Object URL for PDF display
+      const pdfBlob = await response.blob()
+      setPdfUrl(URL.createObjectURL(pdfBlob))
+      setNeedsRegeneration(false)
+    } catch (error) {
+      console.error("Error generating and converting document:", error)
+      setError("An error occurred while generating the document. Please try again.")
+    } finally {
+      setIsGenerating(false)
+    }
+  }, [localOperationData])
+
+  useEffect(() => {
+    if (localOperationData && (needsRegeneration || (!pdfUrl && !docxUrl && !isGenerating))) {
+      generateDocuments()
+    }
+  }, [localOperationData, pdfUrl, docxUrl, isGenerating, needsRegeneration, generateDocuments])
+
+  const handleSetLocalOperationData = (newData: TOperationData) => {
+    setLocalOperationData(newData)
+    setNeedsRegeneration(true)
+  }
 
   return (
     <>
@@ -61,17 +113,16 @@ export default function OperationTabs({
           <OperationDataComponent
             operationId={operationId}
             operationData={operationData}
-            setLocalOperationData={setLocalOperationData}
+            setLocalOperationData={handleSetLocalOperationData}
             setActiveTab={setActiveTab}
           />
         </TabsContent>
         {localOperationData && (
           <TabsContent value="document-viewer">
-            <DocumentViewer operationData={localOperationData as OperationData} />
+            <DocumentViewer pdfUrl={pdfUrl} docxUrl={docxUrl} isGenerating={isGenerating} error={error} />
           </TabsContent>
         )}
       </Tabs>
     </>
   )
 }
-

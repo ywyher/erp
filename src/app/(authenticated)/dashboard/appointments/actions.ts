@@ -15,21 +15,21 @@ export async function createAppointment({
     createdBy,
     date,
     status = 'pending',
-    receptionistId,
+    creatorId,
 }: {
     doctorId: string,
     patientId: string,
     createdBy: Appointment['createdBy'],
     status: Appointment['status'],
     date: Date;
-    receptionistId?: string
+    creatorId: User['id']
 }) {
 
     const createdAppointment = await db.insert(appointment).values({
         id: generateId(),
         patientId: patientId,
         doctorId: doctorId,
-        receptionistId: receptionistId ? receptionistId : null,
+        creatorId: creatorId,
         startTime: date,
         status: status,
         createdBy: createdBy,

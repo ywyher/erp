@@ -3,7 +3,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
-import type { Schedule, User } from "@/lib/db/schema"
+import type { Doctor, Schedule, User } from "@/lib/db/schema"
 import DoctorsList from "@/components/doctors/doctors-list"
 import { useDoctorIdStore, useDateStore } from "@/components/doctors/store"
 import { createAppointment } from "@/app/(authenticated)/dashboard/appointments/actions"
@@ -15,9 +15,10 @@ import CustomDate from "@/components/custom-date"
 
 export default function CreateAppointment({
   schedules,
-  workId,
+  id,
   role,
-}: { schedules: Schedule[]; workId: string; role: "doctor" | "receptionist" }) {
+  doctorWorkId,
+}: { schedules: Schedule[]; doctorWorkId?: Doctor["id"]; id: string; role: "doctor" | "receptionist" | 'admin' }) {
   const router = useRouter()
 
   const [isCreateUser, setIsCreateUser] = useState<boolean>(false)
@@ -38,7 +39,7 @@ export default function CreateAppointment({
           createdBy: role,
           date,
           status: role == "doctor" ? "ongoing" : "pending",
-          receptionistId: role == "receptionist" ? workId : undefined,
+          creatorId: id,
         })
 
         if (result?.success) {
@@ -62,21 +63,25 @@ export default function CreateAppointment({
     }
 
     handleCreateAppointment()
-  }, [ doctorId, date, patientId, workId, role, router, setDate ]), 
+  }, [ doctorId, date, patientId, id, role, router, setDate ]), 
   
   // Added setDate to dependencies
     // Set the date for the doctor role and open dialog
     useEffect(() => {
-      if (role === "doctor" && patientId) {
-        setDoctorId(workId)
+      if (role === "doctor" && patientId && doctorWorkId) {
+        setDoctorId(doctorWorkId)
         setOpen(true)
       }
-    }, [patientId, role, workId, setDoctorId])
+    }, [patientId, role, doctorWorkId, setDoctorId])
 
   return (
     <div className="p-2">
-      <ExistingUser setSelectedUserId={setPatientId} setIsCreateUser={setIsCreateUser} />
-      {isCreateUser && <NewUser setCreatedUserId={setPatientId} setIsCreateUser={setIsCreateUser} />}
+      {!patientId && (
+        <>
+          <ExistingUser setSelectedUserId={setPatientId} setIsCreateUser={setIsCreateUser} />
+          {isCreateUser && <NewUser setCreatedUserId={setPatientId} setIsCreateUser={setIsCreateUser} />}
+        </>
+      )}
       {patientId && role === "doctor" && (
         <Dialog open={open} onOpenChange={setOpen}>
           <DialogContent>

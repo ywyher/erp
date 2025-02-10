@@ -2,6 +2,7 @@
 
 import Header from "@/components/header"
 import Seeder from "@/components/seeder"
+import { Button } from "@/components/ui/button"
 import { getSession } from "@/lib/auth-client"
 import { getUserRegistrationType } from "@/lib/db/queries"
 import { useQuery } from "@tanstack/react-query"

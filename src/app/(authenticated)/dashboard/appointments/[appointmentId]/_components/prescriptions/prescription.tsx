@@ -72,7 +72,7 @@ export default function Prescription({ appointmentId, content, context }: Prescr
           className="w-full p-2 border rounded-lg resize-none min-h-[150px]"
           value={value}
           onChange={(e) => setValue(e.target.value)}
-          onBlur={handleSubmit} // Handle submission when the textarea loses focus
+          onBlur={handleSubmit}
         />
       </div>
     </div>

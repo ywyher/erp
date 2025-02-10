@@ -52,7 +52,7 @@ export default function AppointmentActions({ appointmentId, status, role }: {
                             setPopOpen={setOpen}
                         />
                     )}
-                    {role == 'doctor' && status == 'completed' && (
+                    {status == 'completed' && (
                         <Link href={`/dashboard/appointments/${appointmentId}`}>
                             <Button className="w-full">
                                 Details/Edit

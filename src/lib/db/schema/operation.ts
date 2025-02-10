@@ -1,4 +1,4 @@
-import { pgEnum, pgTable, text, timestamp } from "drizzle-orm/pg-core";
+import { jsonb, pgEnum, pgTable, text, timestamp } from "drizzle-orm/pg-core";
 import { doctor, receptionist, user } from "./roles";
 import { relations } from "drizzle-orm";
 import { appointment, createdByEnum } from "./appointment";
@@ -11,8 +11,8 @@ export const operation = pgTable('operation', {
   id: text('id').primaryKey(),
   patientId: text('patientId').references(() => user.id, { onDelete: 'cascade' }).notNull(),
   doctorId: text('doctorId').references(() => doctor.id, { onDelete: 'cascade' }).notNull(),
-  receptionistId: text('receptionistId').references(() => receptionist.id, { onDelete: 'cascade' }),
   appointmentId: text('appointmentId').references(() => appointment.id, { onDelete: 'cascade' }),
+  creatorId: text('creatorId').references(() => user.id, { onDelete: 'cascade' }),
   startTime: timestamp('startTime').notNull(),
   endTime: timestamp('endTime'),
   status: statusEnum('status').notNull().default('pending'),
@@ -31,10 +31,6 @@ export const operationRelation = relations(operation, ({ one }) => ({
     fields: [operation.doctorId],
     references: [doctor.id],
   }),
-  receptionist: one(receptionist, {
-    fields: [operation.receptionistId],
-    references: [receptionist.id],
-  }),
   appointment: one(appointment, {
     fields: [operation.appointmentId],
     references: [appointment.id],
@@ -47,9 +43,7 @@ export const operationRelation = relations(operation, ({ one }) => ({
 
 export const operationData = pgTable('operation_data', {
   id: text('id').primaryKey(),
-  one: text('one'),
-  two: text('two'),
-  three: text('three'),
+  data: jsonb('data').default('{}').notNull().$type<Record<string, string>>(),
   operationId: text('operationId').references(() => operation.id, { onDelete: 'cascade' }).notNull().unique(),
 })
 

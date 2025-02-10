@@ -31,40 +31,41 @@ async function loadFile(url: string): Promise<string> {
   })
 }
 
-export const generateDocument = async ({ data, download = false }: { data: OperationData, download?: boolean }) => {
-  console.log(data)
-  const localDocxPath = "/input.docx" // Path relative to public folder
+export const generateDocument = async ({ data, download = false }: { data: Record<string, string>, download?: boolean }) => {
+  const localDocxPath = "/input.docx"; // Path relative to public folder
 
   try {
-    const content = await loadFile(localDocxPath)
-    const zip = new PizZip(content)
+    const content = await loadFile(localDocxPath);
+    const zip = new PizZip(content);
     const doc = new Docxtemplater(zip, {
       linebreaks: true,
       paragraphLoop: true,
-    })
+    });
 
-    // render the document (replace all occurrences of {first_name} by John, {last_name} by Doe, ...)
-    doc.render({
-      one: data.one,
-      two: data.two,
-      three: data.three,
-    })
+    // Dynamically map the data to the placeholders
+    const renderData: Record<string, string> = {};
+    for (const key in data) {
+      renderData[key] = data[key];
+    }
+
+    // Render the document with the dynamic data
+    doc.render(renderData);
 
     const blob = doc.getZip().generate({
       type: "blob",
       mimeType: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-    })
+    });
 
     // Output the document using Data-URI
-    if(download) {
-      saveAs(blob, "output.docx")
+    if (download) {
+      saveAs(blob, "output.docx");
     }
 
     return {
-      blob
-    }
+      blob,
+    };
   } catch (error) {
-    console.error("Error generating document:", error)
-    throw error
+    console.error("Error generating document:", error);
+    throw error;
   }
-}
+};

@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
-import type { User } from "@/lib/db/schema"
+import type { Doctor, User } from "@/lib/db/schema"
 import DoctorsList from "@/components/doctors/doctors-list"
 import { useDoctorIdStore, useDateStore } from "@/components/doctors/store"
 import { createOperation } from "@/app/(authenticated)/dashboard/operations/actions"
@@ -12,7 +12,11 @@ import NewUser from "@/app/(authenticated)/dashboard/_components/new-user"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import CustomDate from "@/components/custom-date"
 
-export default function CreateOperation({ workId, role }: { workId: string; role: "doctor" | "receptionist" }) {
+export default function CreateOperation({
+  id,
+  doctorWorkId,
+  role,
+}: { id: string; doctorWorkId?: Doctor["id"]; role: "doctor" | "receptionist" | "admin" }) {
   const router = useRouter()
 
   const [isCreateUser, setIsCreateUser] = useState<boolean>(false)
@@ -33,7 +37,7 @@ export default function CreateOperation({ workId, role }: { workId: string; role
           createdBy: role,
           date,
           status: role == "doctor" ? "ongoing" : "pending",
-          receptionistId: role == "receptionist" ? workId : undefined,
+          creatorId: id,
         })
 
         if (result?.success) {
@@ -53,31 +57,39 @@ export default function CreateOperation({ workId, role }: { workId: string; role
     }
 
     handleCreateOperation()
-  }, [doctorId, date, patientId, role, workId, router, setDate, setDoctorId])
+  }, [doctorId, date, patientId, role, id, router, setDate, setDoctorId])
 
   // Set the date for the doctor role and open dialog
   useEffect(() => {
-    if (role === "doctor" && patientId) {
-      setDoctorId(workId)
+    if (role === "doctor" && patientId && doctorWorkId) {
+      setDoctorId(doctorWorkId)
       setOpen(true)
     }
-  }, [patientId, role, workId, setDoctorId])
+  }, [patientId, role, doctorWorkId, setDoctorId])
 
   return (
     <div className="p-2">
-      <ExistingUser setSelectedUserId={setPatientId} setIsCreateUser={setIsCreateUser} />
-      {isCreateUser && <NewUser setCreatedUserId={setPatientId} setIsCreateUser={setIsCreateUser} />}
-      {patientId && role === "doctor" && (
-        <Dialog open={open} onOpenChange={setOpen}>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Select Date</DialogTitle>
-            </DialogHeader>
-            <CustomDate onClick={(e) => setDate(e)} />
-          </DialogContent>
-        </Dialog>
+      {!patientId && (
+        <>
+          <ExistingUser setSelectedUserId={setPatientId} setIsCreateUser={setIsCreateUser} />
+          {isCreateUser && <NewUser setCreatedUserId={setPatientId} setIsCreateUser={setIsCreateUser} />}
+        </>
       )}
-      {patientId && role === "receptionist" && <DoctorsList book={true} customSchedule={true} />}
+      {patientId && role === "doctor" && (
+        <>
+          <ExistingUser setSelectedUserId={setPatientId} setIsCreateUser={setIsCreateUser} />
+          {isCreateUser && <NewUser setCreatedUserId={setPatientId} setIsCreateUser={setIsCreateUser} />}
+          <Dialog open={open} onOpenChange={setOpen}>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Select Date</DialogTitle>
+              </DialogHeader>
+              <CustomDate onClick={(e) => setDate(e)} />
+            </DialogContent>
+          </Dialog>
+        </>
+      )}
+      {patientId && role !== "doctor" && <DoctorsList book={true} customSchedule={true} />}
     </div>
   )
 }

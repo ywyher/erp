@@ -1,11 +1,58 @@
-import { Button } from "@/components/ui/button";
-import { OperationData } from "@/lib/db/schema";
-import { generateDocument } from "@/lib/document";
+"use client"
 
-export default function DocumentViewer({ operationData }: { operationData: OperationData }) {
+import { useRouter } from "next/navigation"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardFooter } from "@/components/ui/card"
+import { Loader2, Download, FileText } from "lucide-react"
+
+interface DocumentViewerProps {
+  pdfUrl: string | undefined
+  docxUrl: string | undefined
+  isGenerating: boolean
+  error: string | null
+}
+
+export default function DocumentViewer({ pdfUrl, docxUrl, isGenerating, error }: DocumentViewerProps) {
+  const router = useRouter()
+
   return (
-    <>
-      <Button onClick={() => generateDocument({ data: operationData })}>Test</Button>
-    </>
+    <div className="flex flex-col justify-between h-[calc(100vh-40px)]">
+      <Card className="w-full max-w-4xl mx-auto">
+        <CardContent className="p-6">
+          {isGenerating ? (
+            <div className="flex flex-col items-center justify-center h-[60vh]">
+              <Loader2 className="h-8 w-8 animate-spin text-primary" />
+              <p className="mt-4 text-muted-foreground">Generating document...</p>
+            </div>
+          ) : error ? (
+            <div className="flex flex-col items-center justify-center h-[60vh] text-destructive">
+              <FileText className="h-8 w-8 mb-4" />
+              <p>{error}</p>
+            </div>
+          ) : pdfUrl ? (
+            <iframe src={pdfUrl} className="w-full h-[60vh] border rounded-md" />
+          ) : null}
+        </CardContent>
+        <CardFooter className="flex justify-end space-x-4 bg-muted/50 py-4 px-6">
+          <Button variant="outline" asChild disabled={!docxUrl || isGenerating}>
+            <a href={docxUrl ?? "#"} download="document.docx">
+              <Download className="mr-2 h-4 w-4" /> Download DOCX
+            </a>
+          </Button>
+          <Button asChild disabled={!pdfUrl || isGenerating}>
+            <a href={pdfUrl ?? "#"} download="document.pdf">
+              <Download className="mr-2 h-4 w-4" /> Download PDF
+            </a>
+          </Button>
+        </CardFooter>
+      </Card>
+
+      {/* End Operation Button */}
+      <div className="w-full border-t p-4 flex items-end">
+        <Button className="w-full" onClick={() => router.push("/dashboard/operations")}>
+          End Operation
+        </Button>
+      </div>
+    </div>
   )
 }

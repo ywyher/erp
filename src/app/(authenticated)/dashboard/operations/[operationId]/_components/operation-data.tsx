@@ -1,17 +1,27 @@
 'use client'
 
-import { createOperationData, updateOperationData } from "@/app/(authenticated)/dashboard/operations/actions"
+import { createOperationData, extractPlaceholders, updateOperationData } from "@/app/(authenticated)/dashboard/operations/actions"
 import { operationDataSchema } from "@/app/(authenticated)/dashboard/operations/types"
 import { FormFieldWrapper } from "@/components/formFieldWrapper"
 import LoadingBtn from "@/components/loading-btn"
-import { Form } from "@/components/ui/form"
+import {
+  Form,
+  FormItem,
+  FormLabel,
+  FormControl,
+  FormDescription,
+  FormMessage,
+  FormField
+} from "@/components/ui/form"
 import { Operation, OperationData as TOperationData } from "@/lib/db/schema"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useRouter } from "next/navigation"
-import { Dispatch, SetStateAction, useState } from "react"
+import { Dispatch, SetStateAction, useEffect, useState } from "react"
 import { useForm } from "react-hook-form"
 import { toast } from "sonner"
 import { z } from "zod"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Skeleton } from "@/components/ui/skeleton"
 
 export default function OperationData({ 
     operationId,
@@ -21,17 +31,26 @@ export default function OperationData({
   }: { 
     operationId: Operation['id'], 
     operationData?: TOperationData
-    setLocalOperationData: Dispatch<SetStateAction<TOperationData | undefined>>
+    setLocalOperationData: (newData: TOperationData) => void
     setActiveTab: Dispatch<SetStateAction<'operation-data' | 'patient-data' | 'document-viewer'>>
    }) {
   const [isLoading, setIsLoading] = useState<boolean>(false)
   const [task] = useState<'create' | 'update'>(operationData && operationData.id ? 'update' : 'create')
+  const [placeholders, setPlaceholders] = useState<string[]>()
 
-  const form = useForm<z.infer<typeof operationDataSchema>>({
-    resolver: zodResolver(operationDataSchema),
+  useEffect(() => { 
+    (async () => {
+      const filePath = '/home/ywyh/Developments/Projects/erp/public/input.docx'
+      const result = await extractPlaceholders(filePath);
+      setPlaceholders(result)
+    })();
+  }, [])
+
+  const form = useForm({
+    defaultValues: task === 'update' && operationData?.data ? operationData.data : {}
   })
 
-  const handleOperationData = async (data: z.infer<typeof operationDataSchema>) => {
+  const handleOperationData = async (data: any) => {
     setIsLoading(true)
 
     let result;
@@ -52,29 +71,39 @@ export default function OperationData({
     toast.message(result.message)
     setIsLoading(false)
   }
-  
+
   return (
-    <Form {...form}>
-      <form onSubmit={form.handleSubmit(handleOperationData)} className="flex flex-col gap-2">
-        <FormFieldWrapper 
-         form={form}
-         defaultValue={operationData?.id && operationData.one}
-         name="one" label="One"
-        />
-        <FormFieldWrapper 
-         form={form}
-         defaultValue={operationData?.id && operationData.two}
-         name="two" label="Two"
-        />
-        <FormFieldWrapper 
-         form={form}
-         defaultValue={operationData?.id && operationData.three}
-         name="three" label="Three"
-        />
-        <LoadingBtn isLoading={isLoading}>
-          Submit
-        </LoadingBtn>
-      </form>
-    </Form>
+    <Card className="w-full max-w-4xl mx-auto">
+      <CardHeader>
+        <CardTitle>{task === 'create' ? 'Create' : 'Update'} Operation Data</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(handleOperationData)} className="space-y-6">
+            {placeholders && placeholders.length > 0 ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {placeholders.map((placeholder, index) => (
+                  <FormFieldWrapper 
+                    key={index}
+                    form={form} 
+                    name={placeholder} 
+                    label={placeholder.replaceAll('_', ' ')}
+                  />
+                ))}
+              </div>
+            ) : (
+              <div className="space-y-2">
+                <Skeleton className="h-4 w-full" />
+                <Skeleton className="h-4 w-3/4" />
+                <Skeleton className="h-4 w-1/2" />
+              </div>
+            )}
+            <LoadingBtn isLoading={isLoading} className="w-full">
+              {task === 'create' ? 'Create' : 'Update'} Operation Data
+            </LoadingBtn>
+          </form>
+        </Form>
+      </CardContent>
+    </Card>
   )
 }
