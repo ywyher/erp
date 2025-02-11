@@ -44,6 +44,7 @@ export const operationRelation = relations(operation, ({ one }) => ({
 export const operationData = pgTable('operation_data', {
   id: text('id').primaryKey(),
   data: jsonb('data').default('{}').notNull().$type<Record<string, string>>(),
+  documentName: text('documentName').notNull(),
   operationId: text('operationId').references(() => operation.id, { onDelete: 'cascade' }).notNull().unique(),
 })
 

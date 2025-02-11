@@ -5,15 +5,7 @@ import { headers } from 'next/headers';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { getSession } from '@/lib/auth-client';
 import crypto from 'crypto'
-
-const s3 = new S3Client({
-    region: 'auto',
-    endpoint: `https://${process.env.S3_ACCOUNT_ID}.r2.cloudflarestorage.com`,
-    credentials: {
-        accessKeyId: process.env.S3_ACCESS_KEY_ID!,
-        secretAccessKey: process.env.S3_SECRET_ACCESS_KEY!,
-    },
-});
+import { s3 } from '@/lib/utils';
 
 const generateFileName = (bytes = 32) => crypto.randomBytes(bytes).toString('hex');
 
@@ -29,6 +21,7 @@ export async function getPreSignedUrl({
     size: number,
     checksum: string
 }) {
+
     const requestHeaders = await headers();
 
     const { data } = await getSession({

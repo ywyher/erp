@@ -20,6 +20,8 @@ type OperationTabs = {
   patient: User
   operationId: Operation["id"]
   doctorId: Doctor["id"]
+  editable: boolean
+  operationDocument: string
   medicalFiles?: MedicalFile[]
   consultation?: Consultation
   prescriptions?: Prescription[]
@@ -34,9 +36,11 @@ export default function OperationTabs({
   consultation,
   prescriptions,
   operationData,
+  operationDocument,
+  editable,
 }: OperationTabs) {
   const [localOperationData, setLocalOperationData] = useState<TOperationData | undefined>(operationData)
-  const [activeTab, setActiveTab] = useState<"patient-data" | "operation-data" | "document-viewer">("operation-data")
+  const [activeTab, setActiveTab] = useState<"patient-data" | "operation-data" | "document-viewer">("patient-data")
   const [pdfUrl, setPdfUrl] = useState<string | undefined>(undefined)
   const [docxUrl, setDocxUrl] = useState<string | undefined>(undefined)
   const [isGenerating, setIsGenerating] = useState(false)
@@ -115,6 +119,8 @@ export default function OperationTabs({
             operationData={operationData}
             setLocalOperationData={handleSetLocalOperationData}
             setActiveTab={setActiveTab}
+            operationDocument={operationDocument}
+            editable={editable}
           />
         </TabsContent>
         {localOperationData && (

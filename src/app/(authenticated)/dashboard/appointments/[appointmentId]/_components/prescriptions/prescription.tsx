@@ -2,26 +2,31 @@
 
 import { useConsultationStore } from "@/app/(authenticated)/dashboard/appointments/[appointmentId]/store";
 import { PrescriptionTypes } from "@/app/(authenticated)/dashboard/appointments/[appointmentId]/types";
-import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Appointment } from "@/lib/db/schema";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { toast } from "sonner";
 
 type PrescriptionProps = { 
     appointmentId: Appointment['id'],
     content: string[],
-    context: PrescriptionTypes
+    context: PrescriptionTypes,
+    editable: boolean
 };
 
-export default function Prescription({ appointmentId, content, context }: PrescriptionProps) {
+export default function Prescription({
+   appointmentId,
+   content,
+   context,
+   editable
+  }: PrescriptionProps) {
   const {
     setLaboratory,
     setMedicine,
     setRadiology,
     laboratory,
     radiology,
-    medicine
+    medicine,
   } = useConsultationStore(appointmentId);
 
   // Get the existing prescription value from the store based on the context
@@ -72,7 +77,12 @@ export default function Prescription({ appointmentId, content, context }: Prescr
           className="w-full p-2 border rounded-lg resize-none min-h-[150px]"
           value={value}
           onChange={(e) => setValue(e.target.value)}
-          onBlur={handleSubmit}
+          disabled={!editable}
+          onBlur={() => {
+            if(editable) {
+              handleSubmit()
+            }
+          }}
         />
       </div>
     </div>

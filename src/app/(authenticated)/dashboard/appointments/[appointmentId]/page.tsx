@@ -1,8 +1,10 @@
 import AppointmentTabs from "@/app/(authenticated)/dashboard/appointments/[appointmentId]/_components/tabs"
+import { getSession } from "@/lib/auth-client"
 import db from "@/lib/db"
 import { Consultation, Doctor, MedicalFile, Prescription, medicalFile as TMedicalFile, User } from "@/lib/db/schema"
 import { medicalFile } from "@/lib/db/schema/medical-file"
 import { and, eq } from "drizzle-orm"
+import { headers } from "next/headers"
 import { redirect } from "next/navigation"
 
 const getUserData = async (appointmentId: string) => {
@@ -54,6 +56,16 @@ export default async function Appointment({ params: { appointmentId } }: { param
          prescriptions?: Prescription[];
     };
 
+    const { data } = await getSession({
+        fetchOptions: {
+            headers: await headers(),
+        },
+    });
+    
+    if(!data || !data.user) {
+        return new Error("Couldn't retrieve data")
+    }
+    
     return (
         <AppointmentTabs 
             user={user}
@@ -63,6 +75,7 @@ export default async function Appointment({ params: { appointmentId } }: { param
             operation={operation}
             consultation={consultation}
             prescriptions={prescriptions}
+            editable={data.user.role == 'doctor' ? true : false}
         />
     )
 }

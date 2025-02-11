@@ -1,11 +1,14 @@
 import OperationTabs from "@/app/(authenticated)/dashboard/operations/[operationId]/_components/tabs"
+import { getSession } from "@/lib/auth-client"
 import db from "@/lib/db"
+import { getOperationDocument } from "@/lib/db/queries"
 import { consultation as consultationTable ,Consultation, Doctor, MedicalFile, Prescription, medicalFile as TMedicalFile, User, operationData, OperationData } from "@/lib/db/schema"
 import { medicalFile } from "@/lib/db/schema/medical-file"
 import { and, eq } from "drizzle-orm"
+import { headers } from "next/headers"
 import { redirect } from "next/navigation"
 
-const getUserData = async (operationId: string) => {
+const getPatientData = async (operationId: string) => {
     const operation = await db.query.operation.findFirst({
         columns: {
             id: true,
@@ -62,7 +65,7 @@ export default async function Operation({ params: { operationId } }: { params: {
          consultation,
          prescriptions,
          operationData,
-        } = await getUserData(operationId) as {
+        } = await getPatientData(operationId) as {
             patient: User;
             doctorId: Doctor['id'];
             medicalFiles: MedicalFile[];
@@ -70,6 +73,25 @@ export default async function Operation({ params: { operationId } }: { params: {
             prescriptions?: Prescription[]
             operationData?: OperationData
         }
+
+    const { data } = await getSession({
+        fetchOptions: {
+            headers: await headers(),
+        },
+    });
+    
+    if(!data || !data.user) {
+        return new Error("Couldn't retrieve data")
+    }
+
+    let operationDocument;
+    if(!operationData?.documentName) {
+        operationDocument = await getOperationDocument();
+    }else {
+        operationDocument = operationData?.documentName
+    }
+
+    if(!operationDocument) return new Error("couldnt get operation document")
 
     return (
         <OperationTabs
@@ -80,6 +102,8 @@ export default async function Operation({ params: { operationId } }: { params: {
             consultation={consultation}
             prescriptions={prescriptions}
             operationData={operationData}
+            operationDocument={operationDocument}
+            editable={data.user.role == 'doctor' ? true : false}
         />
     )
 }

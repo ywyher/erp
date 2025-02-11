@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { DataTable } from "@/components/ui/data-table";
 import { getSession } from "@/lib/auth-client";
 import db from "@/lib/db"
-import { appointment, doctor, receptionist, User } from "@/lib/db/schema"
+import { appointment, doctor, receptionist, user, User } from "@/lib/db/schema"
 import { format } from "date-fns";
 import { eq } from "drizzle-orm";
 import { headers } from "next/headers";
@@ -30,11 +30,11 @@ const listAppointments = async (userId: User['id'], role: User['role']) => {
     }
 
     if (role == 'receptionist') {
-        const [receptionistData] = await db.select().from(receptionist)
-            .where(eq(receptionist.userId, userId))
+        const [receptionistData] = await db.select().from(user)
+            .where(eq(user.id, userId))
 
         appointments = await db.select().from(appointment)
-            .where(eq(appointment.receptionistId, receptionistData.id))
+            .where(eq(appointment.creatorId, receptionistData.id))
     }
 
     if (!appointments) throw new Error("Couldn't get appointmnets")
@@ -69,14 +69,14 @@ export default async function Appointments() {
     return (
         <div className="w-[100%]">
             {appointments && (
-                <>
+                <div className="flex flex-col gap-3">
                     <DataTable columns={appointmentTableColumns} data={appointments} filter={null} />
                     <Button>
                         <Link href="/dashboard/appointments/create">
                             Create Appointment
                         </Link>
                     </Button>
-                </>
+                </div>
             )}
         </div>
     )

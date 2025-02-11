@@ -1,17 +1,17 @@
 import { headers } from "next/headers";
 import { getSession } from "@/lib/auth-client";
 import { redirect } from "next/navigation";
-import { Operation } from "@/lib/db/schema";
-import { getOperationStatus } from "@/app/(authenticated)/dashboard/operations/actions";
+import { Appointment } from "@/lib/db/schema";
+import { getAppointmentStatus } from "@/app/(authenticated)/dashboard/appointments/[appointmentId]/actions";
 
 export default async function Layout({
   children,
   params,
 }: {
   children: React.ReactNode;
-  params: { operationId: Operation["id"] };
+  params: { appointmentId: Appointment["id"] };
 }) {
-  const { operationId } = params;
+  const { appointmentId } = params;
 
   const reqHeaders = await headers();
 
@@ -28,18 +28,18 @@ export default async function Layout({
     return;
   }
 
-  // Validate operation status
-  const status = await getOperationStatus(operationId);
+  // Validate appointment status
+  const status = await getAppointmentStatus(appointmentId);
 
   if (!status) {
-    console.error("Could not get operation status");
-    redirect("/dashboard/operations"); // Redirect if operation status is invalid
+    console.error("Could not get appointment status");
+    redirect("/dashboard/appointment"); // Redirect if appointment status is invalid
     return;
   }
 
-  // Check if the operation is completed or if the user is a doctor
+  // Check if the appointment is completed or if the user is a doctor
   if (status !== "completed" && session.data.user.role !== "doctor") {
-    redirect("/dashboard/operations");
+    redirect("/dashboard/appointment");
     return;
   }
 

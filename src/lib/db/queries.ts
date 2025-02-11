@@ -4,12 +4,13 @@ import { Roles } from "@/app/types";
 import { auth } from "@/lib/auth";
 import { signIn, User } from "@/lib/auth-client";
 import db from "@/lib/db";
-import { account, appointment, Doctor, doctor, receptionist, Recseptionist, Schedule, schedule, session, Tables, user } from "@/lib/db/schema";
+import { account, appointment, Doctor, doctor, receptionist, Recseptionist, Schedule, schedule, session, settings, Tables, user } from "@/lib/db/schema";
 import { deleteFile } from "@/lib/s3";
 import { and, ConsoleLogWriter, eq, like, or, sql } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { headers } from "next/headers";
 import { medicalFile } from "./schema/medical-file";
+import { getFileUrl } from "@/lib/funcs";
 
 const tableMap = {
     user: user,
@@ -294,4 +295,11 @@ export async function getWorkerUserId(workerId: string, table: 'doctor' | 'recep
 
         return userData.id;
     }
+}
+
+export const getOperationDocument = async () => { 
+    const [operationDocument] = await db.select().from(settings)
+    .where(eq(settings.key, 'operation-document-url'))
+
+    return operationDocument.value;
 }

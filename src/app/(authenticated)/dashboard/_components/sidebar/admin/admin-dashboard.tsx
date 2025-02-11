@@ -34,6 +34,14 @@ export default function AdminDashboard() {
             },
         },
         {
+            title: "Settings",
+            url: "/dashboard/settings",
+            icon: Settings ,
+            actions: {
+                hasActions: false,
+            }
+        },
+        {
             title: "Admin",
             url: "/dashboard/admins",
             icon: Lock,

@@ -25,14 +25,18 @@ import { Skeleton } from "@/components/ui/skeleton"
 
 export default function OperationData({ 
     operationId,
-    operationData,
     setLocalOperationData,
-    setActiveTab
+    setActiveTab,
+    editable,
+    operationDocument,
+    operationData,
   }: { 
     operationId: Operation['id'], 
-    operationData?: TOperationData
     setLocalOperationData: (newData: TOperationData) => void
     setActiveTab: Dispatch<SetStateAction<'operation-data' | 'patient-data' | 'document-viewer'>>
+    editable: boolean
+    operationDocument: string
+    operationData?: TOperationData
    }) {
   const [isLoading, setIsLoading] = useState<boolean>(false)
   const [task] = useState<'create' | 'update'>(operationData && operationData.id ? 'update' : 'create')
@@ -40,8 +44,7 @@ export default function OperationData({
 
   useEffect(() => { 
     (async () => {
-      const filePath = '/home/ywyh/Developments/Projects/erp/public/input.docx'
-      const result = await extractPlaceholders(filePath);
+      const result = await extractPlaceholders(operationDocument);
       setPlaceholders(result)
     })();
   }, [])
@@ -88,6 +91,7 @@ export default function OperationData({
                     form={form} 
                     name={placeholder} 
                     label={placeholder.replaceAll('_', ' ')}
+                    disabled={!editable}
                   />
                 ))}
               </div>
@@ -98,9 +102,11 @@ export default function OperationData({
                 <Skeleton className="h-4 w-1/2" />
               </div>
             )}
-            <LoadingBtn isLoading={isLoading} className="w-full">
-              {task === 'create' ? 'Create' : 'Update'} Operation Data
-            </LoadingBtn>
+            {editable && (
+              <LoadingBtn isLoading={isLoading} className="w-full">
+                {task === 'create' ? 'Create' : 'Update'} Operation Data
+              </LoadingBtn>
+            )}
           </form>
         </Form>
       </CardContent>

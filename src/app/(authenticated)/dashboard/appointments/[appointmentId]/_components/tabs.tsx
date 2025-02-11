@@ -17,6 +17,7 @@ type AppointmentTabs = {
   operation: 'update' | 'create'
   consultation?: TConsultation
   prescriptions?: Prescription[]
+  editable: boolean
 }
 
 export default function AppointmentTabs({ 
@@ -26,7 +27,8 @@ export default function AppointmentTabs({
    doctorId,
    operation,
    consultation,
-   prescriptions
+   prescriptions,
+   editable
    }: AppointmentTabs) {
   const { selectedPrescriptions } = useConsultationStore(appointmentId); // Invoke the Zustand store function
   const [activeTab, setActiveTab] = useState<"user" | "prescriptions" | "consultation">("user")
@@ -74,12 +76,6 @@ export default function AppointmentTabs({
     }
   }, [operation, consultation, prescriptions, setDiagnosis, setHistory, setLaboratories, setRadiologies, setMedicines, setSelectedPrescriptions, setLaboratory, setRadiology, setMedicine]);
 
-  useEffect(() => {
-    if(selectedPrescriptions.length > 0) {
-      setActiveTab('prescriptions')
-    }
-  }, [selectedPrescriptions])
-
   return (
     <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as typeof activeTab)} className="w-full">
       <TabsList>
@@ -106,6 +102,8 @@ export default function AppointmentTabs({
          operation={operation}
          consultationId={consultation?.id}
          prescriptions={prescriptions}
+         setActiveTab={setActiveTab}
+         editable={editable}
         />
       </TabsContent>
       {selectedPrescriptions.length > 0 && (
@@ -117,6 +115,7 @@ export default function AppointmentTabs({
             operation={operation}
             consultationId={consultation?.id}
             prescriptions={prescriptions}
+            editable={editable}
           />
         </TabsContent>
       )}

@@ -21,6 +21,8 @@ export function useFileUpload() {
       body: JSON.stringify({ type, size, checksum }),
     })
 
+    console.log(response)
+
     if (!response.ok) {
       throw new Error('Failed to get pre-signed URL')
     }

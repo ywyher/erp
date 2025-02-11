@@ -92,6 +92,4 @@ export const receptionistRelation = relations(receptionist, ({ one, many }) => (
     fields: [receptionist.userId],
     references: [user.id]
   }),
-  appointments: many(appointment),
-  operations: many(operation)
 }));

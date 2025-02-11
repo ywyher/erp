@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardFooter } from "@/components/ui/card"
 import { Loader2, Download, FileText } from "lucide-react"
+import { toast } from "sonner"
 
 interface DocumentViewerProps {
   pdfUrl: string | undefined
@@ -49,8 +50,13 @@ export default function DocumentViewer({ pdfUrl, docxUrl, isGenerating, error }:
 
       {/* End Operation Button */}
       <div className="w-full border-t p-4 flex items-end">
-        <Button className="w-full" onClick={() => router.push("/dashboard/operations")}>
-          End Operation
+        <Button className="w-full" onClick={() => {
+          toast.loading('Loading...', {
+            duration: 3
+          })
+          router.push("/dashboard/operations")
+        }}>
+          Done
         </Button>
       </div>
     </div>

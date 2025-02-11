@@ -168,3 +168,13 @@ export const parseTimeStringToDate = (timeString: string): Date => {
     now.setHours(hours, minutes, 0, 0);
     return now;
 };
+
+// Helper function to convert a readable stream to a Buffer
+export async function streamToBuffer(stream: NodeJS.ReadableStream): Promise<Buffer> {
+    return new Promise((resolve, reject) => {
+        const chunks: Buffer[] = [];
+        stream.on('data', (chunk) => chunks.push(chunk));
+        stream.on('end', () => resolve(Buffer.concat(chunks)));
+        stream.on('error', reject);
+    });
+}

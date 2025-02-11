@@ -66,7 +66,7 @@ export default function CreateOperation({
       setOpen(true)
     }
   }, [patientId, role, doctorWorkId, setDoctorId])
-
+  
   return (
     <div className="p-2">
       {!patientId && (
@@ -79,7 +79,10 @@ export default function CreateOperation({
         <>
           <ExistingUser setSelectedUserId={setPatientId} setIsCreateUser={setIsCreateUser} />
           {isCreateUser && <NewUser setCreatedUserId={setPatientId} setIsCreateUser={setIsCreateUser} />}
-          <Dialog open={open} onOpenChange={setOpen}>
+          <Dialog open={open} onOpenChange={() => {
+            setOpen(false)
+            setPatientId(null)
+          }}>
             <DialogContent>
               <DialogHeader>
                 <DialogTitle>Select Date</DialogTitle>

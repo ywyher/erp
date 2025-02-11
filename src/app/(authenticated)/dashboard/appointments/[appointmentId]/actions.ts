@@ -3,10 +3,11 @@
 import { PrescriptionTypes } from "@/app/(authenticated)/dashboard/appointments/[appointmentId]/types";
 import { consultationSchema } from "@/app/(authenticated)/dashboard/appointments/types";
 import db from "@/lib/db";
-import { Appointment, Consultation, Doctor, prescription, User } from "@/lib/db/schema";
+import { appointment, Appointment, Consultation, Doctor, prescription, User } from "@/lib/db/schema";
 import { consultation } from "@/lib/db/schema/consultation";
 import { generateId } from "@/lib/funcs";
 import { eq } from "drizzle-orm";
+import { redirect } from "next/navigation";
 import { z } from "zod";
 
 type CreateConsultation = {
@@ -154,3 +155,15 @@ export async function updatePrescription({
     error: null
   }
 }
+
+ export const getAppointmentStatus = async (appointmentId: Appointment['id']) => {
+    const [query] = await db.select().from(appointment)
+      .where(eq(appointment.id, appointmentId))
+  
+    if(!query) {
+        redirect('/dashboard/appointments')
+        return;
+    }
+
+    return query.status;
+  }

@@ -69,14 +69,14 @@ export default async function Operations() {
     return (
         <div className="w-[100%]">
             {operations && (
-                <>
+                <div className="flex flex-col gap-3">
                     <DataTable columns={operationTableColumns} data={operations} filter={null} />
                     <Button>
                         <Link href="/dashboard/operations/create">
                             Create Operation
                         </Link>
                     </Button>
-                </>
+                </div>
             )}
         </div>
     )

@@ -5,7 +5,8 @@ import { schedule } from './schedule'
 import { medicalFile } from './medical-file'
 import { consultation } from './consultation'
 import { prescription } from './prescription'
-import { operation, operationData } from '@/lib/db/schema/operation'
+import { operation, operationData } from './operation'
+import { settings } from './settings'
 export * from './enums'
 export * from './roles'
 export * from './auth'
@@ -15,7 +16,9 @@ export * from './schedule'
 export * from './consultation'
 export * from './prescription'
 export * from './operation'
+export * from './settings'
 
+export type Settings = InferSelectModel<typeof settings>;
 export type OperationData = InferSelectModel<typeof operationData>;
 export type Operation = InferSelectModel<typeof operation>;
 export type Appointment = InferSelectModel<typeof appointment>;

@@ -13,7 +13,7 @@ import LoadingBtn from "@/components/loading-btn"
 import { Form, FormItem, FormLabel, FormControl, FormDescription, FormMessage, FormField } from "@/components/ui/form"
 import type { Appointment, Consultation, Doctor, Prescription, User } from "@/lib/db/schema"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { useEffect, useState } from "react"
+import { Dispatch, SetStateAction, useEffect, useState } from "react"
 import { useForm } from "react-hook-form"
 import type { z } from "zod"
 import {
@@ -35,7 +35,9 @@ export default function Consultation({
   patientId,
   consultationId,
   prescriptions,
-  operation
+  operation,
+  setActiveTab,
+  editable
 }: {
   appointmentId: Appointment["id"]
   doctorId: Doctor["id"]
@@ -43,6 +45,8 @@ export default function Consultation({
   consultationId?: Consultation['id']
   prescriptions?: Prescription[]
   operation: 'update' | 'create'
+  setActiveTab: Dispatch<SetStateAction<"user" | "prescriptions" | "consultation">>
+  editable: boolean
 }) {
   const [isLoading, setIsLoading] = useState<boolean>(false)
   const [showAlert, setShowAlert] = useState<boolean>(false)
@@ -136,6 +140,8 @@ export default function Consultation({
       consultationId: consultationId || '',
       prescriptions: prescriptions || []
     });
+
+    setActiveTab('prescriptions')
     setShowAlert(false); // Close the alert dialog
   }
 
@@ -150,14 +156,26 @@ export default function Consultation({
       <Form {...form}>
         <form onSubmit={form.handleSubmit(handleConsultation)} className="flex flex-col gap-4">
           <div className="flex flex-col gap-2">
-            <FormFieldWrapper form={form} name="history" label="History" type="textarea" />
-            <FormFieldWrapper form={form} name="diagnosis" label="Diagnosis" />
+            <FormFieldWrapper 
+             form={form}
+             name="history" 
+             label="History"
+             type="textarea" 
+             disabled={!editable}
+            />
+            <FormFieldWrapper 
+             form={form}
+             name="diagnosis" 
+             label="Diagnosis"
+             disabled={!editable}
+            />
             <FormFieldWrapper
               form={form}
               name="laboratories"
               label="Laboratories"
               type="multi-select"
               options={laboratoriesConst}
+              disabled={!editable}
             />
             <FormFieldWrapper
               form={form}
@@ -165,6 +183,7 @@ export default function Consultation({
               label="Radiologies"
               type="multi-select"
               options={radiologiesConst}
+              disabled={!editable}
             />
             <FormFieldWrapper
               form={form}
@@ -172,27 +191,32 @@ export default function Consultation({
               label="Medicines"
               type="multi-select"
               options={medicinesConst}
+              disabled={!editable}
             />
           </div>
-          <LoadingBtn isLoading={isLoading}>Submit Consultation</LoadingBtn>
+          {editable && (
+            <LoadingBtn isLoading={isLoading}>Submit Consultation</LoadingBtn>
+          )}
         </form>
       </Form>
 
       {/* Alert Dialog for Ending Session */}
-      <AlertDialog open={showAlert} onOpenChange={setShowAlert}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Are you sure you want to end the session?</AlertDialogTitle>
-            <AlertDialogDescription>
-              This will save the consultation and end the session. You cannot undo this action.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel onClick={() => setShowAlert(false)}>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={handleFinishSession}>End Session</AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      {editable && (
+        <AlertDialog open={showAlert} onOpenChange={setShowAlert}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Are you sure you want to end the session?</AlertDialogTitle>
+              <AlertDialogDescription>
+                This will save the consultation and end the session. You cannot undo this action.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel onClick={() => setShowAlert(false)}>Cancel</AlertDialogCancel>
+              <AlertDialogAction onClick={handleFinishSession}>End Session</AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+      )}
     </>
   )
 }

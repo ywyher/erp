@@ -29,9 +29,18 @@ type Prescriptions = {
   operation: 'update' | 'create'
   consultationId?: Consultation['id']
   prescriptions?: TPrescription[]
+  editable: boolean
 }
 
-export default function Prescriptions({ appointmentId, doctorId, patientId, operation, consultationId, prescriptions }: Prescriptions) {
+export default function Prescriptions({ 
+   appointmentId,
+   doctorId,
+   patientId,
+   operation,
+   consultationId,
+   prescriptions,
+   editable
+  }: Prescriptions) {
   const router = useRouter()
 
   const [isLoading, setIsLoading] = useState<boolean>(false)
@@ -98,33 +107,38 @@ export default function Prescriptions({ appointmentId, doctorId, patientId, oper
                 appointmentId={appointmentId}
                 context={key as "laboratory" | "medicine" | "radiology"}
                 content={data}
+                editable={editable}
               />
             </TabsContent>
           ))}
         </Tabs>
       </div>
-      <div className="p-4 bg-background border-t">
-        <AlertDialog>
-          <AlertDialogTrigger asChild>
-            <Button className="w-full">End session</Button>
-          </AlertDialogTrigger>
-          <AlertDialogContent>
-            <AlertDialogHeader>
-              <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-              <AlertDialogDescription>
-                This action cannot be undone. This will permanently delete your
-                account and remove your data from our servers.
-              </AlertDialogDescription>
-            </AlertDialogHeader>
-            <AlertDialogFooter>
-              <AlertDialogCancel>Cancel</AlertDialogCancel>
-              <AlertDialogAction  onClick={handleFinishClick}>
-                  Proceed
-              </AlertDialogAction>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialog>
-      </div>
+      {editable ? (
+        <div className="p-4 bg-background border-t">
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <Button className="w-full">End session</Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  This action cannot be undone. This will permanently delete your
+                  account and remove your data from our servers.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                <AlertDialogAction  onClick={handleFinishClick}>
+                    Proceed
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+        </div>
+      ): (
+        <Button className="w-full" onClick={() => router.push('/dashboard/appointments')}>Done</Button>
+      )}
     </div>
   )
 }
