@@ -1,6 +1,8 @@
 import UserMedicalFiles from "@/app/(authenticated)/dashboard/_components/user-data/medical-files"
 import UserData from "@/app/(authenticated)/dashboard/_components/user-data/user-data"
 import ConsultationData from "@/app/(authenticated)/dashboard/operations/[operationId]/_components/consultation-data"
+import PrescriptionTabs from "@/app/(authenticated)/dashboard/operations/[operationId]/_components/prescription-tabs"
+import Prescription from "@/components/prescription"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Consultation, MedicalFile, User } from "@/lib/db/schema"
 
@@ -20,8 +22,12 @@ export default function PatientData({
     <Tabs defaultValue="personal">
       <TabsList>
         <TabsTrigger value="personal">Patient's Personal data</TabsTrigger>
-        <TabsTrigger value="consulation">Consulation</TabsTrigger>
-        <TabsTrigger value="prescriptions">Prescriptions</TabsTrigger>
+        {consultation && (
+          <TabsTrigger value="consultation">Consultation</TabsTrigger>
+        )}
+        {consultation && (
+          <TabsTrigger value="prescriptions">Prescriptions</TabsTrigger>
+        )}
       </TabsList>
       <TabsContent value="personal">
         <UserData user={patient} />
@@ -29,16 +35,18 @@ export default function PatientData({
           <UserMedicalFiles files={medicalFiles} />
         )}
       </TabsContent>
-      <TabsContent value="consulation">
-        {consultation && (
-          <ConsultationData consultation={consultation} />
-        )}
-      </TabsContent>
-      <TabsContent value="prescriptions">
-        {consultation && (
-          <ConsultationData consultation={consultation} />
-        )}
-      </TabsContent>
+      {consultation && (
+        <TabsContent value="consultation">
+            <ConsultationData consultation={consultation} />
+        </TabsContent>
+      )}
+      {consultation && (
+        <TabsContent value="prescriptions">
+            <PrescriptionTabs
+              consultation={consultation}
+            />
+        </TabsContent>
+      )}
     </Tabs>
   )
 }

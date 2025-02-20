@@ -6,3 +6,5 @@ add the ability for the patient to add personal data like whiehg height and so o
 
 make the apppointments/operations details seeable by everyone but only editable by doctor
 and if the appointment/operation status aint complete dont allow them to see it but the doctor
+
+refactor redirecting

@@ -5,26 +5,32 @@ import {
     DropdownMenu,
     DropdownMenuContent,
     DropdownMenuItem,
+    DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { getSession, signOut } from "@/lib/auth-client";
 
 import {
-    SidebarFooter,
+    SidebarFooter as CSidebarFooter,
     SidebarMenu,
     SidebarMenuButton,
     SidebarMenuItem,
+    useSidebar,
 } from "@/components/ui/sidebar";
 import { ChevronUp, LogOut, Settings } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import Pfp from "@/components/pfp";
 import { useState } from "react";
+import { Separator } from "@/components/ui/separator";
+import { Button } from "@/components/ui/button";
 
-export function DashboardSidebarFooter() {
-    const queryClient = useQueryClient();
+export default function SidebarFooter() {
     const router = useRouter();
     const [isOpen, setIsOpen] = useState(false);
+    const {
+        state,
+    } = useSidebar()
 
     const { data: user, isLoading } = useQuery({
         queryKey: ['session', 'dashboardSidebarFooter'],
@@ -39,24 +45,39 @@ export function DashboardSidebarFooter() {
     return (
         <>
             {user && (
-                <SidebarFooter>
+                <CSidebarFooter>
                     <SidebarMenu>
                         <SidebarMenuItem>
                             <DropdownMenu onOpenChange={setIsOpen}>
-                                <DropdownMenuTrigger asChild>
-                                    <SidebarMenuButton>
-                                        <Pfp image={user.image || ''} />
-                                        <span className="capitalize">{user.name}</span>
-                                        <ChevronUp
-                                            className={`ml-auto transition-transform duration-200 ${isOpen ? 'rotate-180' : ''
-                                                }`}
-                                        />
-                                    </SidebarMenuButton>
-                                </DropdownMenuTrigger>
+                                    {state == 'expanded' ? (
+                                        <DropdownMenuTrigger asChild>
+                                            <SidebarMenuButton>
+                                                <Pfp image={user.image || ''} />
+                                                <span className="capitalize">{user.name}</span>
+                                                <ChevronUp
+                                                    className={`ml-auto transition-transform duration-200 ${isOpen ? 'rotate-180' : ''
+                                                        }`}
+                                                />
+                                            </SidebarMenuButton> 
+                                        </DropdownMenuTrigger>
+                                    ): (
+                                        <DropdownMenuTrigger className="
+                                            items-center rounded-lg transition
+                                            hover:bg-white hover:bg-opacity-10
+                                        ">
+                                            <Pfp image={user.image || ''} />
+                                        </DropdownMenuTrigger>
+                                    )}
                                 <DropdownMenuContent
                                     side="top"
                                     className="w-[--radix-popper-anchor-width]"
                                 >
+                                    <DropdownMenuItem
+                                        className='text-center'
+                                    >
+                                        {user.name} ({user.username})
+                                    </DropdownMenuItem>
+                                    <DropdownMenuSeparator />
                                     <DropdownMenuItem
                                         className="cursor-pointer"
                                         onClick={() => router.push('/settings')}
@@ -75,7 +96,7 @@ export function DashboardSidebarFooter() {
                             </DropdownMenu>
                         </SidebarMenuItem>
                     </SidebarMenu>
-                </SidebarFooter>
+                </CSidebarFooter>
             )}
         </>
     );

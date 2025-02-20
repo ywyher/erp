@@ -32,7 +32,7 @@ export default function OperationDocumentUrl({
   currentUrl: string
 }) {
   const [isLoading, setIsLoading] = useState(false)
-  const { handleUpload, progresses } = useFileUpload()
+  const { handleUpload, progresses, setProgresses, setIsUploading } = useFileUpload()
   const [showAlert, setShowAlert] = useState(false)
 
   const form = useForm<Schema>({
@@ -84,6 +84,9 @@ export default function OperationDocumentUrl({
     }
 
     toast.message(result.message)
+    setProgresses({})
+    setIsUploading(false)
+    form.reset()
     setIsLoading(false)
     setShowAlert(false)
   }

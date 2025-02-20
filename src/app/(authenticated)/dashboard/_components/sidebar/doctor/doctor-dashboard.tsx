@@ -1,6 +1,6 @@
 'use client'
 
-import DoctorDashboardMainGroup from "@/app/(authenticated)/dashboard/_components/sidebar/doctor/groups/main";
+import SidebarGroup from "@/app/(authenticated)/dashboard/_components/sidebar/sidebar-group";
 import { MenuItem } from "@/app/(authenticated)/dashboard/types";
 import { CalendarCheck, Home, Lock, LogOut, Settings, Stethoscope, User2 } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -13,47 +13,22 @@ export default function DoctorDashboard() {
             title: "Home",
             url: "/dashboard",
             icon: Home,
-            actions: {
-                hasActions: true,
-                items: [
-                    {
-                        label: "Settings",
-                        onClick: () => {
-                            router.push("/settings");
-                        },
-                        icon: Settings,
-                    },
-                    {
-                        label: "Logout",
-                        onClick: () => {
-                            router.push("/logout");
-                        },
-                        icon: LogOut,
-                    },
-                ],
-            },
         },
         {
             title: "Appointments",
             url: "/dashboard/appointments",
             icon: CalendarCheck,
-            actions: {
-                hasActions: false,
-            }
         },
         {
             title: "Operations",
             url: "/dashboard/operations",
             icon: CalendarCheck,
-            actions: {
-                hasActions: false,
-            }
         },
     ];
 
     return (
         <>
-            <DoctorDashboardMainGroup items={mainGroupItems} />
+            <SidebarGroup items={mainGroupItems} label="Main" />
         </>
     )
 }

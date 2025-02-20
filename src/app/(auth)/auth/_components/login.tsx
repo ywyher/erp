@@ -4,19 +4,20 @@ import { forgetPassword, signIn } from "@/lib/auth-client"; //import the auth cl
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Form } from "@/components/ui/form"
 import { useForm } from "react-hook-form";
-import { redirect } from "next/navigation";
 import { loginSchema } from "@/app/(auth)/types";
 import { useState } from "react";
 import LoadingBtn from "@/components/loading-btn";
-import { useVerifyStore } from "@/app/(auth)/store";
+import { useAuthStore } from "@/app/(auth)/store";
 import { z } from "zod";
 import { FormFieldWrapper } from "@/components/formFieldWrapper";
 import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 export default function Login() {
     const [isLoading, setIsLoading] = useState(false);
-    const value = useVerifyStore((state) => state.value)
-    const context = useVerifyStore((state) => state.context)
+    const router = useRouter();
+    const value = useAuthStore((state) => state.value)
+    const context = useAuthStore((state) => state.context)
 
     if (!value) return <>Loading...</>
 
@@ -27,13 +28,13 @@ export default function Login() {
                 email: value || data.value,
                 password: data.password,
             }, {
-                onSuccess: () => {
+                onSuccess: async (e) => {
                     setIsLoading(false)
-                    redirect("/")
+                    router.push("/")
                 },
                 onError: (ctx) => {
-                    toast.error(ctx.error.message);
                     setIsLoading(false)
+                    toast.error(ctx.error.message);
                 },
             });
         } else if (context == 'phoneNumber') {
@@ -41,9 +42,9 @@ export default function Login() {
                 phoneNumber: value || data.value,
                 password: data.password,
             }, {
-                onSuccess: () => {
+                onSuccess: async (e) => {
                     setIsLoading(false)
-                    redirect("/")
+                    router.push("/")
                 },
                 onError: (ctx) => {
                     toast.error(ctx.error.message);

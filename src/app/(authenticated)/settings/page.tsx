@@ -10,7 +10,6 @@ import { getUserProvider } from "@/lib/db/queries"
 import VerifyAlert from "@/components/verify-alert"
 import UpdatePassword from "@/components/update-password"
 
-
 export default function Settings() {
     const { data: user, isLoading } = useQuery({
         queryKey: ['session', 'settings'],

@@ -1,6 +1,6 @@
 "use client"
 
-import type { medicalFile } from "@/lib/db/schema"
+import type { MedicalFile } from "@/lib/db/schema"
 import { getFileUrl } from "@/lib/funcs"
 import { useEffect, useState } from "react"
 
@@ -10,7 +10,7 @@ type Pdf = {
   alt: string
 }
 
-export default function Pdfs({ files }: { files: medicalFile[] }) {
+export default function Pdfs({ files }: { files: MedicalFile[] }) {
   const [pdfs, setPdfs] = useState<Pdf[]>()
 
   useEffect(() => {

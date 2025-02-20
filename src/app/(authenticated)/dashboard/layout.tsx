@@ -1,8 +1,8 @@
 import { cookies, headers } from "next/headers";
-import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar"
-import DashboardSidebar from "@/app/(authenticated)/dashboard/_components/sidebar/dashboard-sidebar"
+import { SidebarProvider } from "@/components/ui/sidebar"
+import Sidebar from "@/app/(authenticated)/dashboard/_components/sidebar/sidebar"
 import { getSession } from "@/lib/auth-client";
-import { Roles } from "@/app/types";
+import { User } from "@/lib/db/schema";
 
 export default async function Layout({ children }: { children: React.ReactNode }) {
   const cookieStore = await cookies()
@@ -17,7 +17,7 @@ export default async function Layout({ children }: { children: React.ReactNode }
 
   return (
     <SidebarProvider defaultOpen={defaultOpen}>
-      <DashboardSidebar userRole={data?.user.role as Roles} />
+      <Sidebar userRole={data?.user.role as User['role']} />
       {children}
     </SidebarProvider>
   )

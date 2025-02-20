@@ -2,7 +2,8 @@ import { createConsultation, createPrescription, updateConsultation, updatePresc
 import { updateAppointmentEndTime, updateAppointmentStatus } from "@/app/(authenticated)/dashboard/appointments/actions"
 import { toast } from "sonner"
 import { redirect, useRouter } from "next/navigation"
-import { Prescription } from "@/lib/db/schema"
+import { Operation, Prescription, User } from "@/lib/db/schema"
+import { createOperation } from "@/app/(authenticated)/dashboard/operations/actions"
 
 type HandleFinishParams = {
   history: string
@@ -16,11 +17,14 @@ type HandleFinishParams = {
   appointmentId: string
   doctorId: string
   patientId: string
+  isCreateOperation: boolean
+  operationDate: Date | null
   reset: () => void
   setIsLoading: (loading: boolean) => void
+  creatorId?: User['id']
 }
 
-export const handleFinish = async ({
+export const handleFinishConsultation = async ({
   history,
   diagnosis,
   laboratories,
@@ -36,7 +40,10 @@ export const handleFinish = async ({
   setIsLoading,
   operation,
   consultationId,
-  prescriptions
+  prescriptions,
+  isCreateOperation,
+  operationDate,
+  creatorId
 }: HandleFinishParams & { operation: 'create' | 'update', consultationId?: string, prescriptions?: Prescription[] }) => {
   if (!history || !diagnosis) return;
 
@@ -159,6 +166,25 @@ export const handleFinish = async ({
   if (updatedEndTime.error) {
     toast.error(updatedEndTime.error);
     setIsLoading(false);
+    return;
+  }
+
+  let createdOperation;
+
+  if(operation == 'create' && isCreateOperation == true && operationDate != null && creatorId) {
+    createdOperation = await createOperation({ 
+      createdBy: 'doctor',
+      creatorId: creatorId,
+      doctorId: doctorId,
+      patientId: patientId,
+      date: operationDate,
+      status: 'pending',
+      appointmentId: appointmentId
+    })
+  }
+
+  if(createdOperation && createdOperation.error) {
+    toast.error(createdOperation.error)
     return;
   }
 

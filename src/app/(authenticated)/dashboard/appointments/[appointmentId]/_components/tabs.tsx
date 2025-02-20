@@ -10,7 +10,7 @@ import Prescriptions from "@/app/(authenticated)/dashboard/appointments/[appoint
 import UserData from "@/app/(authenticated)/dashboard/_components/user-data/user-data"
 
 type AppointmentTabs = {
-  user: User
+  patient: User
   medicalFiles: MedicalFile[]
   appointmentId: Appointment["id"]
   doctorId: Doctor["id"]
@@ -18,17 +18,19 @@ type AppointmentTabs = {
   consultation?: TConsultation
   prescriptions?: Prescription[]
   editable: boolean
+  creatorId: User['id']
 }
 
 export default function AppointmentTabs({ 
-   user,
+   patient,
    medicalFiles,
    appointmentId,
    doctorId,
    operation,
    consultation,
    prescriptions,
-   editable
+   editable,
+   creatorId
    }: AppointmentTabs) {
   const { selectedPrescriptions } = useConsultationStore(appointmentId); // Invoke the Zustand store function
   const [activeTab, setActiveTab] = useState<"user" | "prescriptions" | "consultation">("user")
@@ -92,18 +94,19 @@ export default function AppointmentTabs({
         )}
       </TabsList>
       <TabsContent value="user" className="flex flex-col gap-3">
-        <UserData user={user} />
+        <UserData user={patient} />
         <UserMedicalFiles files={medicalFiles} />
       </TabsContent>
       <TabsContent value="consultation">
         <Consultation
          appointmentId={appointmentId}
-         doctorId={doctorId} patientId={user.id}
+         doctorId={doctorId} patientId={patient.id}
          operation={operation}
          consultationId={consultation?.id}
          prescriptions={prescriptions}
          setActiveTab={setActiveTab}
          editable={editable}
+         creatorId={creatorId}
         />
       </TabsContent>
       {selectedPrescriptions.length > 0 && (
@@ -111,11 +114,12 @@ export default function AppointmentTabs({
           <Prescriptions 
             appointmentId={appointmentId} 
             doctorId={doctorId}
-            patientId={user.id}
+            patientId={patient.id}
             operation={operation}
             consultationId={consultation?.id}
             prescriptions={prescriptions}
             editable={editable}
+            creatorId={creatorId}
           />
         </TabsContent>
       )}

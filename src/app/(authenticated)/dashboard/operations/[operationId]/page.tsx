@@ -87,6 +87,10 @@ export default async function Operation({ params: { operationId } }: { params: {
     let operationDocument;
     if(!operationData?.documentName) {
         operationDocument = await getOperationDocument();
+
+        if(!operationDocument) {
+            redirect('/dashboard/operations')
+        }
     }else {
         operationDocument = operationData?.documentName
     }

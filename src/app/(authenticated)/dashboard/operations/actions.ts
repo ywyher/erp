@@ -1,7 +1,7 @@
 'use server'
 
 import db from "@/lib/db"
-import { Doctor, Operation, operation, OperationData, operationData, Schedule, User } from "@/lib/db/schema"
+import { Appointment, Doctor, Operation, operation, OperationData, operationData, Schedule, User } from "@/lib/db/schema"
 import { generateId, streamToBuffer } from "@/lib/funcs"
 import { eq } from "drizzle-orm"
 import { revalidatePath } from "next/cache"
@@ -20,6 +20,7 @@ export async function createOperation({
     date,
     status,
     creatorId,
+    appointmentId
 }: {
     doctorId: Doctor['id'],
     patientId: User['id'],
@@ -27,28 +28,34 @@ export async function createOperation({
     status: Operation['status']
     date: Date;
     creatorId: User['id']
+    appointmentId?: Appointment['id']
 }) {
 
-    const createdOperation = await db.insert(operation).values({
+    const [createdOperation] = await db.insert(operation).values({
         id: generateId(),
         patientId: patientId,
         doctorId: doctorId,
         creatorId: creatorId,
+        appointmentId: appointmentId ? appointmentId : null,
         startTime: date,
         status: status,
         type: 'surgical',
         createdBy: createdBy,
         createdAt: new Date(),
         updatedAt: new Date(),
-    }).returning()
+    }).returning({ id: operation.id })
+
+    if(!createdOperation.id) return {
+        error: "Couldn't create operation!"
+    }
 
 
     if (createdOperation) {
         revalidatePath('/dashboard/operations')
         return {
-            success: true,
+            error: null,
             message: 'Operation Created Successfuly',
-            operationId: createdOperation[0].id,
+            operationId: createdOperation.id,
         }
     }
 }

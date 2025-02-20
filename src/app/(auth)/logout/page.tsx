@@ -21,15 +21,16 @@ export default function Logout() {
         if (!user) {
             router.push('/')
         } else {
-            performLogout();
+            handleLogout();
         }
     }, [router, user]);
 
-    const performLogout = async () => {
+    const handleLogout = async () => {
         if (!user) return
         await signOut();
-        await queryClient.invalidateQueries({ queryKey: ['session'] });
-        return router.push("/auth");
+        queryClient.invalidateQueries({ queryKey: ['session'] });
+        router.push("/");
+        return;
     }
 
     return (

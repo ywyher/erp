@@ -2,20 +2,17 @@ import { nationalIdRegex, phoneNumberRegex } from "@/app/types";
 import { LucideIcon } from 'lucide-react'; // Assuming you're using Lucide for the icons
 import { z } from "zod";
 
-type MenuItemActions = {
-    hasActions: boolean;
-    items?: {
-        label: string;
-        onClick: () => void;
-        icon?: LucideIcon;
-    }[];
+type MenuItemAction = {
+    label: string;
+    onClick: () => void;
+    icon?: LucideIcon;
 };
 
 export type MenuItem = {
     title: string;
     url: string;
     icon: React.ComponentType;
-    actions: MenuItemActions;
+    actions?: MenuItemAction[];
 };
 
 

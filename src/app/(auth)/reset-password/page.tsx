@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/form"
 import { Button } from "@/components/ui/button";
 import { useForm } from "react-hook-form";
-import { redirect } from "next/navigation";
+import { redirect, useRouter } from "next/navigation";
 import AuthLayout from "@/app/(auth)/auth/_components/auth-layout";
 import { Input } from "@/components/ui/input";
 import { useState } from "react";
@@ -21,6 +21,10 @@ import { toast } from "sonner";
 
 export default function ResetPassword() {
     const [isLoading, setIsLoading] = useState(false)
+
+    const router = useRouter()
+    const token = new URLSearchParams(window.location.search).get("token");
+
 
     const form = useForm<TPasswordSchema>({
         resolver: zodResolver(passwordSchema),
@@ -32,8 +36,16 @@ export default function ResetPassword() {
 
     const onResetPassword = async (formData: TPasswordSchema) => {
         setIsLoading(true)
+        if (!token) {
+            // Handle the error
+            toast.error(`Invlid Token Redirecting...`)
+            router.replace(`/auth`)
+            setIsLoading(false)
+            return;
+        }
         const { error } = await resetPassword({
             newPassword: formData.password,
+            token,
         });
 
         if (error) {
@@ -104,7 +116,6 @@ export default function ResetPassword() {
                         </Button>
                     </form>
                 </Form>
-                <p className="text-sm text-gray-400">Emails may take up to 5 minutes to arrive. If you did not receive an email or your code did not work, please try again. If you encounter any issues, please visit our <span className="text-blue-500 hover:cursor-pointer hover:text-blue-400">support</span> page.</p>
             </div>
         </AuthLayout>
     )

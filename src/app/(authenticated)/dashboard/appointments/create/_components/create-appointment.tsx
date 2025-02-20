@@ -1,6 +1,5 @@
 "use client"
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+
 import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import type { Doctor, Schedule, User } from "@/lib/db/schema"
@@ -12,6 +11,7 @@ import ExistingUser from "@/app/(authenticated)/dashboard/_components/existing-u
 import NewUser from "@/app/(authenticated)/dashboard/_components/new-user"
 import { ScheduleDisplay } from "@/components/schedule-display"
 import CustomDate from "@/components/custom-date"
+import DataSelector from "@/components/date-selector"
 
 export default function CreateAppointment({
   schedules,
@@ -22,7 +22,7 @@ export default function CreateAppointment({
   const router = useRouter()
 
   const [isCreateUser, setIsCreateUser] = useState<boolean>(false)
-  const [patientId, setPatientId] = useState<User["id"] | null>("mMOh4tppw-RSdnx-wGwjU")
+  const [patientId, setPatientId] = useState<User["id"] | null>("")
   const [open, setOpen] = useState<boolean>(false)
 
   const { setDate, date } = useDateStore()
@@ -83,25 +83,12 @@ export default function CreateAppointment({
         </>
       )}
       {patientId && role === "doctor" && (
-        <Dialog open={open} onOpenChange={setOpen}>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Schedules</DialogTitle>
-            </DialogHeader>
-            <Tabs defaultValue="custom">
-              <TabsList>
-                <TabsTrigger value="offical">Official</TabsTrigger>
-                <TabsTrigger value="custom">Custom</TabsTrigger>
-              </TabsList>
-              <TabsContent value="offical">
-                <ScheduleDisplay onClick={(e) => setDate(e)} dialog={false} schedules={schedules} />
-              </TabsContent>
-              <TabsContent value="custom">
-                <CustomDate onClick={(e) => setDate(e)} />
-              </TabsContent>
-            </Tabs>
-          </DialogContent>
-        </Dialog>
+        <DataSelector
+          open={open}
+          onOpenChange={setOpen}
+          setDate={setDate}
+          schedules={schedules}
+        />
       )}
       {patientId && role === "receptionist" && <DoctorsList book={true} customSchedule={true} />}
     </div>

@@ -1,27 +1,51 @@
-import { create } from 'zustand'
+import { create } from 'zustand';
+import { persist, createJSONStorage } from 'zustand/middleware';
 
-type VerifyStore = {
-    value: string | null,
-    context: 'email' | 'phoneNumber' | null,
-    password: string | null,
-    operation: 'register' | 'verify',
-    redirectTo: string,
-    setContext: (context: 'email' | 'phoneNumber') => void,
-    setValue: (value: string) => void
-    setPassword: (password: string) => void
-    setOperation: (operation: 'register' | 'verify') => void
-    setRedirectTo: (redirectTo: string) => void
-}
+type AuthStore = {
+  value: string | null;
+  context: 'email' | 'phoneNumber' | null;
+  password: string | null;
+  operation: 'register' | 'verify' | null;
+  redirectTo: string | null;
+  otpExists: boolean | null;
+  setContext: (context: 'email' | 'phoneNumber') => void;
+  setValue: (value: string) => void;
+  setPassword: (password: string) => void;
+  setOperation: (operation: 'register' | 'verify' | null) => void;
+  setRedirectTo: (redirectTo: string | null) => void;
+  setOtpExists: (otpExists: boolean | null) => void;
+  reset: () => void;
+};
 
-export const useVerifyStore = create<VerifyStore>((set) => ({
-    value: null,
-    context: null,
-    password: null,
-    operation: 'register',
-    redirectTo: '',
-    setContext: (context: VerifyStore['context']) => set((state) => ({ context: context })),
-    setValue: (value: VerifyStore['value']) => set((state) => ({ value: value })),
-    setPassword: (password: VerifyStore['password']) => set((state) => ({ password: password })),
-    setOperation: (operation: VerifyStore['operation']) => set((state) => ({ operation: operation })),
-    setRedirectTo: (redirectTo: VerifyStore['redirectTo']) => set((state) => ({ redirectTo: redirectTo }))
-}))
+export const useAuthStore = create<AuthStore>()(
+  persist(
+    (set) => ({
+      value: null,
+      context: null,
+      password: null,
+      operation: 'register',
+      redirectTo: '',
+      otpExists: null,
+      setContext: (context) => set({ context }),
+      setValue: (value) => set({ value }),
+      setPassword: (password) => set({ password }),
+      setOperation: (operation) => set({ operation }),
+      setRedirectTo: (redirectTo) => set({ redirectTo }),
+      setOtpExists: (otpExists) => set({ otpExists }),
+      reset: () => {
+        set({
+          value: null,
+          context: null,
+          password: null,
+          operation: null,
+          redirectTo: null,
+          otpExists: null,
+        });
+      },
+    }),
+    {
+      name: 'auth-store', // Name of the storage key
+      storage: createJSONStorage(() => sessionStorage), // Use sessionStorage
+    }
+  )
+);

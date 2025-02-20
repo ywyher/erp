@@ -44,7 +44,7 @@ export default function AppointmentActions({ appointmentId, status, role }: {
                             Start
                         </Button>
                     )}
-                    {status == 'pending' && (
+                    {status == 'pending' || status == 'ongoing' && (
                         <Delete
                             id={appointmentId}
                             table="appointment"

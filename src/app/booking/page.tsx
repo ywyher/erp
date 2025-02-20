@@ -1,11 +1,13 @@
 'use client'
 
+import { useAuthStore } from "@/app/(auth)/store";
 import { createAppointment } from "@/app/(authenticated)/dashboard/appointments/actions";
 import DoctorsList from "@/components/doctors/doctors-list";
 import { useAppointmentReservationStore, useDoctorIdStore, useDateStore } from "@/components/doctors/store";
 import Header from "@/components/header";
-import { getSession } from "@/lib/auth-client";
-
+import { emailOtp, getSession, phoneNumber } from "@/lib/auth-client";
+import { User } from "@/lib/db/schema";
+import { checkVerificationNeeded } from "@/lib/funcs";
 import { useQuery } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
@@ -13,12 +15,15 @@ import { toast } from "sonner";
 
 export default function Booking() {
     const router = useRouter()
+    const setValue = useAuthStore((state) => state.setValue);
+    const setContext = useAuthStore((state) => state.setContext);
+    const setOperation = useAuthStore((state) => state.setOperation);
 
     const { data: user } = useQuery({
         queryKey: ['session', 'booking'],
         queryFn: async () => {
             const { data } = await getSession()
-            return data?.user || null
+            return data?.user as User || null
         }
     })
 
@@ -35,12 +40,25 @@ export default function Booking() {
                     router.push('/auth')
                     return;
                 }
+
+                const verificationNeeded = checkVerificationNeeded(user);
+        
+                if(verificationNeeded) {
+                    // Store the verification type & value and redirect to /verify
+                    setValue(verificationNeeded.value);
+                    setContext(verificationNeeded.type);
+                    setOperation("verify");
+                    router.replace("/verify");
+                    return;
+                }
+                
                 const createdAppointment = await createAppointment({
                     patientId: user.id,
                     doctorId: doctorId,
                     createdBy: 'user',
                     status: 'pending',
                     date,
+                    creatorId: user.id,
                 })
 
                 if (createdAppointment?.success) {

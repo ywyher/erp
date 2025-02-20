@@ -2,20 +2,25 @@
 
 import { emailOtp, getSession, phoneNumber } from "@/lib/auth-client"
 import { useQuery } from "@tanstack/react-query"
-import { redirect } from "next/navigation"
+import { redirect, useRouter } from "next/navigation"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { Button } from "@/components/ui/button"
-import { Mail, Phone } from 'lucide-react'
-import { useVerifyStore } from "@/app/(auth)/store"
+import { Mail, Phone, Router } from 'lucide-react'
+import { useAuthStore } from "@/app/(auth)/store"
 import { isFakeEmail } from "@/lib/funcs"
+import LoadingBtn from "@/components/loading-btn"
+import { useState } from "react"
 
 export default function VerifyAlert() {
-    const setValue = useVerifyStore((state) => state.setValue)
-    const setContext = useVerifyStore((state) => state.setContext)
-    const setOperation = useVerifyStore((state) => state.setOperation)
-    const setRedirectTo = useVerifyStore((state) => state.setRedirectTo)
+    const router = useRouter();
+    const setValue = useAuthStore((state) => state.setValue)
+    const setContext = useAuthStore((state) => state.setContext)
+    const setOperation = useAuthStore((state) => state.setOperation)
+    const setRedirectTo = useAuthStore((state) => state.setRedirectTo)
 
-    const { data: user, isLoading } = useQuery({
+    const [isLoading, setIsLoading] = useState<boolean>(false);
+
+    const { data: user, isPending } = useQuery({
         queryKey: ['session', 'verifyAlert'],
         queryFn: async () => {
             const { data } = await getSession()
@@ -23,79 +28,66 @@ export default function VerifyAlert() {
         }
     })
 
-    if (!user || isLoading) return <div className="flex justify-center items-center h-24">Loading...</div>
+    if (!user || isPending) return <div className="flex justify-center items-center h-24">Loading...</div>
 
     const onSendOtp = async (context: 'email' | 'phoneNumber') => {
-        if (context === 'email') {
-            if (!user.email) return;
-            await emailOtp.sendVerificationOtp({
-                email: user.email,
-                type: "email-verification"
-            }, {
-                onSuccess: async () => {
-                    setValue(user.email)
-                    setContext('email')
-                    setOperation('verify')
-                    redirect('/verify')
-                },
-                onError: (ctx) => {
-                    console.error(ctx.error.message)
-                }
-            })
-        } else if (context === 'phoneNumber') {
-            if (!user.phoneNumber) return;
-            await phoneNumber.sendOtp({
-                phoneNumber: user.phoneNumber
-            }, {
-                onSuccess: async () => {
-                    setValue(user.phoneNumber || '')
-                    setContext('phoneNumber')
-                    setOperation('verify')
-                    redirect('/verify')
-                },
-                onError: (ctx) => {
-                    console.error(ctx.error.message)
-                },
-            })
+        if(context == 'email') {
+            if(!user.email) return;
+            setValue(user.email)
+        }else if (context == 'phoneNumber') {
+            if(!user.phoneNumber) return;
+            setValue(user.phoneNumber)
         }
+        setContext(context);
+        setOperation("verify");
+        router.replace("/verify");
+        return;
     }
 
     return (
-        <div className="space-y-4 w-full max-w-4xl mx-auto py-2 px-4">
+        <>
             {!user.emailVerified && !isFakeEmail(user.email) && (
-                <Alert variant="destructive" className="py-2">
-                    <Mail className="h-4 w-4" />
-                    <AlertTitle>Verify your email</AlertTitle>
-                    <AlertDescription>
-                        Please verify your email address to ensure account security.
-                        <Button
-                            variant="outline"
-                            size="sm"
-                            className="ml-2 h-7 text-xs"
-                            onClick={() => onSendOtp('email')}
-                        >
-                            Send Verification Email
-                        </Button>
-                    </AlertDescription>
-                </Alert>
+               <div className="space-y-4 w-full max-w-4xl mx-auto py-2 px-4">
+                    <Alert variant="destructive" className="py-2">
+                        <Mail className="h-4 w-4" />
+                        <AlertTitle>Verify your email</AlertTitle>
+                        <AlertDescription>
+                            Please verify your email address to ensure account security.
+                            <LoadingBtn
+                                isLoading={isLoading}
+                                variant="outline"
+                                size="sm"
+                                className="ml-2 h-7 text-xs"
+                                onClick={() => onSendOtp('email')}
+                            >
+                                Send Verification Email
+                            </LoadingBtn>
+                        </AlertDescription>
+                    </Alert>
+                </div>
             )}
             {!user.phoneNumberVerified && user.phoneNumber && (
-                <Alert variant="destructive" className="py-2">
-                    <Phone className="h-4 w-4" />
-                    <AlertTitle>Verify your phone number</AlertTitle>
-                    <AlertDescription>
-                        Adding a verified phone number helps secure your account.
-                        <Button
-                            variant="outline"
-                            size="sm"
-                            className="ml-2 h-7 text-xs"
-                            onClick={() => onSendOtp('phoneNumber')}
-                        >
-                            Send Verification SMS
-                        </Button>
-                    </AlertDescription>
-                </Alert>
+                <div className="space-y-4 md:w-[70%] lg:w-[60%] xl:w-[50%] 2xl:w-[40%] mx-auto py-2">
+                    <Alert variant="destructive" className="py-2">
+                        <Phone className="h-4 w-4" />
+                        <AlertTitle>Verify your phone number</AlertTitle>
+                        <div className="grid grid-cols-3 items-center">
+                            <AlertDescription className="col-span-2">
+                                Adding a verified phone number helps secure your account.
+                            </AlertDescription>
+                            <LoadingBtn
+                                isLoading={isLoading}
+                                variant="outline"
+                                size="sm"
+                                className="ml-2 h-7 text-xs col-span-1"
+                                onClick={() => onSendOtp('phoneNumber')}
+                            >
+                                Send Verification SMS
+                            </LoadingBtn>
+                        </div>
+                    </Alert>
+                </div>
             )}
-        </div>
+        </>
     )
 }

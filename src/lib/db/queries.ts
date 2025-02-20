@@ -301,5 +301,5 @@ export const getOperationDocument = async () => {
     const [operationDocument] = await db.select().from(settings)
     .where(eq(settings.key, 'operation-document-url'))
 
-    return operationDocument.value;
+    return operationDocument?.value;
 }

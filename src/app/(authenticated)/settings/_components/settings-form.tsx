@@ -94,6 +94,7 @@ export default function SettingsForm() {
 
         if (result && result.error) {
             toast.error(result.error)
+            setIsLoading(false)
             return;
         }
 
@@ -132,7 +133,7 @@ export default function SettingsForm() {
                     name='phoneNumber'
                     label={`
                             PhoneNumber
-                            ${user.phoneNumber && user.phoneNumberVerified ? '(verified)' : '(Unverified)'}
+                            ${user.phoneNumber && user.phoneNumberVerified ? `(verified)` : '(Unverified)'}
                         `}
                     optional={registeredWith != 'phoneNumber' && isFakeEmail(user.phoneNumber) ? true : false}
                     disabled={user.phoneNumberVerified ? true : false}
@@ -142,7 +143,7 @@ export default function SettingsForm() {
                     name='nationalId'
                     label="National Id"
                 />
-                <LoadingBtn isLoading={isLoading}>
+                <LoadingBtn className="mt-2" isLoading={isLoading}>
                     Update
                 </LoadingBtn>
             </form>

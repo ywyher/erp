@@ -4,10 +4,10 @@ import { useForm } from "react-hook-form"
 import { Form } from "@/components/ui/form"
 import { registerSchema } from "@/app/(auth)/types"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { useVerifyStore } from "@/app/(auth)/store"
+import { useAuthStore } from "@/app/(auth)/store"
 import LoadingBtn from "@/components/loading-btn"
 import { useState } from "react"
-import { redirect } from "next/navigation"
+import { redirect, useRouter } from "next/navigation"
 import { emailOtp, phoneNumber, signUp } from "@/lib/auth-client"
 import { useQueryClient } from "@tanstack/react-query"
 import { generateFakeField } from "@/lib/funcs"
@@ -17,10 +17,12 @@ import { toast } from "sonner"
 
 export default function Register() {
     const [isLoading, setIsLoading] = useState(false)
-    const value = useVerifyStore((state) => state.value)
-    const context = useVerifyStore((state) => state.context)
-    const setOperation = useVerifyStore((state) => state.setOperation)
-    const setPassword = useVerifyStore((state) => state.setPassword)
+    const value = useAuthStore((state) => state.value)
+    const context = useAuthStore((state) => state.context)
+    const setOperation = useAuthStore((state) => state.setOperation)
+    const setPassword = useAuthStore((state) => state.setPassword)
+
+    const router = useRouter()
     const queryClient = useQueryClient()
 
     const form = useForm<z.infer<typeof registerSchema>>({
@@ -46,20 +48,11 @@ export default function Register() {
                 password: data.password,
             }, {
                 onSuccess: async () => {
-                    await emailOtp.sendVerificationOtp({
-                        email: value,
-                        type: "email-verification"
-                    }, {
-                        onSuccess: async () => {
-                            await queryClient.invalidateQueries({ queryKey: ['session'] })
-                            setOperation('register')
-                            setPassword(data.password)
-                            redirect("/verify")
-                        },
-                        onError: (ctx) => {
-                            console.error(ctx.error.message)
-                        }
-                    })
+                    // Store the verification type & value and redirect to /verify
+                    setOperation("register");
+                    setPassword(data.password);
+                    router.push("/verify");
+                    return; 
                 },
                 onError: (ctx) => {
                     toast.error(ctx.error.message)
@@ -72,7 +65,7 @@ export default function Register() {
                 onSuccess: async () => {
                     setOperation('register')
                     setPassword(data.password)
-                    redirect("/verify")
+                    router.push("/verify")
                 },
                 onError: (ctx) => {
                     console.error(ctx.error.message)
@@ -84,10 +77,12 @@ export default function Register() {
     return (
         <div className="flex flex-col gap-2">
             <Form {...form}>
-                <form onSubmit={form.handleSubmit(handleRegister)} className="space-y-2">
-                    <FormFieldWrapper disabled={true} form={form} name='field' label={context || ""} placeholder="Email Or Phone number" />
-                    <FormFieldWrapper form={form} name='password' label='Password' />
-                    <FormFieldWrapper form={form} name='confirmPassword' label='Confirm Password' />
+                <form onSubmit={form.handleSubmit(handleRegister)} className="flex flex-col gap-2">
+                    <div className="flex flex-col gap-2">
+                        <FormFieldWrapper disabled={true} form={form} name='field' label={context || ""} placeholder="Email Or Phone number" />
+                        <FormFieldWrapper form={form} name='password' label='Password' />
+                        <FormFieldWrapper form={form} name='confirmPassword' label='Confirm Password' />
+                    </div>
                     <div className="mt-2">
                         <LoadingBtn isLoading={isLoading}>
                             Register

@@ -7,17 +7,17 @@ import { useQuery, useQueryClient } from "@tanstack/react-query"
 import UploadPfp from "@/components/uploadPfp"
 import OnboardingForm from "@/app/(auth)/onboarding/_components/onboarding-form"
 import Header from "@/components/header"
-import { useToast } from "@/hooks/use-toast"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useImageStore } from "@/app/store"
 import { z } from "zod"
 import { userSchema } from "@/app/types"
 import { getUserRegistrationType } from "@/lib/db/queries"
-import { excludeField, normalizeData } from "@/lib/funcs"
+import { checkVerificationNeeded, excludeField, normalizeData } from "@/lib/funcs"
 import { updateOnboarding } from "@/app/(auth)/actions"
 import { toast } from "sonner"
 import { updateUser } from "@/lib/db/mutations"
+import { User } from "@/lib/db/schema"
 
 export default function Onboarding() {
     const router = useRouter();
@@ -30,12 +30,16 @@ export default function Onboarding() {
         queryKey: ['session', 'onboarding'],
         queryFn: async () => {
             const { data } = await getSession();
-            return data?.user || null
+            return data?.user as User || null
         }
     })
 
     useEffect(() => {
-        if (!user) return;
+        if(isPending) return;
+        if (!user) {
+            router.replace('/')
+            return;
+        };
 
         const handleRules = async () => {
             try {
@@ -43,12 +47,10 @@ export default function Onboarding() {
                     router.replace("/")
                     return
                 }
-                const registeredWith = await getUserRegistrationType(user.id)
-                if (registeredWith === 'phoneNumber' && !user.phoneNumberVerified) {
-                    router.replace('/')
-                    return
-                }
-                if (registeredWith === 'email' && !user.emailVerified) {
+
+                const verificationNeeded = checkVerificationNeeded(user);
+
+                if(verificationNeeded?.value) {
                     router.replace('/')
                     return
                 }
@@ -59,7 +61,7 @@ export default function Onboarding() {
 
         handleRules()
         setContext(user.emailVerified ? 'email' : 'phoneNumber');
-    }, [user, router]);
+    }, [user, router, isPending]);
 
     const form = useForm<z.infer<typeof userSchema>>({
         resolver: zodResolver(userSchema),
@@ -108,8 +110,8 @@ export default function Onboarding() {
         <div>
             <Header />
             {user && (
-                <div className="flex flex-col gap-5 w-full p-6 mx-auto border-x border-b border-zinc-800 sm:p-8 md:w-[70%] lg:w-[60%] xl:w-[50%] 2xl:w-[40%]">
-                    <p className="text-lg font-medium text-white sm:text-2xl">Set Profile Settings</p>
+                <div className="flex flex-col gap-5 w-full p-6 mx-auto border-x border-b border-zinc-800 sm:p-8 md:w-[70%] lg:w-[50%] xl:w-[50%] 2xl:w-[40%]">
+                    <p className="text-lg font-medium text-white sm:text-2xl">Setup your profile</p>
                     <UploadPfp />
                     <OnboardingForm
                         form={form}

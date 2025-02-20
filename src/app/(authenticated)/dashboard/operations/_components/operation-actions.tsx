@@ -41,7 +41,7 @@ export default function OperationActions({ operationId, status, role }: {
                             Start
                         </Button>
                     )}
-                    {status == 'pending' && (
+                    {status == 'pending' || status == 'ongoing' && (
                         <Delete
                             id={operationId}
                             table="operation"

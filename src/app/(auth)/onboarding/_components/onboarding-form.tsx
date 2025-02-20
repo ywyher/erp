@@ -63,7 +63,7 @@ export default function OnboardingForm({
                     name="nationalId"
                     label="National Id"
                 />
-                <LoadingBtn isLoading={isLoading}>
+                <LoadingBtn className='mt-2' isLoading={isLoading}>
                     Save
                 </LoadingBtn>
             </form>

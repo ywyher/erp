@@ -4,11 +4,14 @@ import { useConsultationStore } from "@/app/(authenticated)/dashboard/appointmen
 import { PrescriptionTypes } from "@/app/(authenticated)/dashboard/appointments/[appointmentId]/types";
 import { Textarea } from "@/components/ui/textarea";
 import { Appointment } from "@/lib/db/schema";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { toast } from "sonner";
+import { useReactToPrint } from "react-to-print";
+import { Button } from "@/components/ui/button";
+import { Printer } from "lucide-react";
 
 type PrescriptionProps = { 
-    appointmentId: Appointment['id'],
+    appointmentId?: Appointment['id'],
     content: string[],
     context: PrescriptionTypes,
     editable: boolean
@@ -19,22 +22,20 @@ export default function Prescription({
    content,
    context,
    editable
-  }: PrescriptionProps) {
-  const {
-    setLaboratory,
-    setMedicine,
-    setRadiology,
-    laboratory,
-    radiology,
-    medicine,
-  } = useConsultationStore(appointmentId);
+}: PrescriptionProps) {
+  
+  const consultationStore = appointmentId ? useConsultationStore(appointmentId) : null;
+  
+  const contentRef = useRef<HTMLDivElement>(null);
+  const handlePrint = useReactToPrint({ contentRef });
 
-  // Get the existing prescription value from the store based on the context
-  const existingPrescription = 
-    context === "laboratory" ? laboratory :
-    context === "radiology" ? radiology :
-    context === "medicine" ? medicine :
-    null;
+  // Get the existing prescription value from the store based on the context if appointmentId exists
+  const existingPrescription = appointmentId ? (
+    context === "laboratory" ? consultationStore?.laboratory :
+    context === "radiology" ? consultationStore?.radiology :
+    context === "medicine" ? consultationStore?.medicine :
+    null
+  ) : null;
 
   // Normalize content: Capitalize first letter & replace underscores
   const normalizeText = (text: string) => 
@@ -43,7 +44,7 @@ export default function Prescription({
       .map(word => word.charAt(0).toUpperCase() + word.slice(1))
       .join(' ');
 
-  // Initialize the state with the existing prescription value if it exists, otherwise use the content prop
+  // Initialize the state with the existing prescription value if available, otherwise use the content prop
   const [value, setValue] = useState<string>(
     existingPrescription || content.map(normalizeText).join('\n')
   );
@@ -53,15 +54,17 @@ export default function Prescription({
       toast.error("Prescription can't be empty");
       return;
     }
+    if (!appointmentId) return;
+
     switch (context) {
       case "laboratory":
-        setLaboratory(value);
+        consultationStore?.setLaboratory(value);
         break;
       case "radiology":
-        setRadiology(value);
+        consultationStore?.setRadiology(value);
         break;
       case "medicine":
-        setMedicine(value);
+        consultationStore?.setMedicine(value);
         break;
       default:
         break;
@@ -71,16 +74,22 @@ export default function Prescription({
 
   return (
     <div className="w-full">
-      <label className="block mb-2 font-semibold capitalize">{context} Prescription</label>
-      <div className="flex flex-col gap-2">
+      <div className="flex justify-between items-center mb-2">
+        <label className="font-semibold capitalize">{context} Prescription</label>
+        <Button variant="outline" size="sm" onClick={() => handlePrint()}>
+          <Printer className="h-4 w-4" />
+          Print
+        </Button>
+      </div>
+      <div ref={contentRef} className="flex flex-col gap-2">
         <Textarea
           className="w-full p-2 border rounded-lg resize-none min-h-[150px]"
           value={value}
           onChange={(e) => setValue(e.target.value)}
           disabled={!editable}
           onBlur={() => {
-            if(editable) {
-              handleSubmit()
+            if (editable) {
+              handleSubmit();
             }
           }}
         />

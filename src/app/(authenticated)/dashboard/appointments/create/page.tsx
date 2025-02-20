@@ -30,7 +30,7 @@ export default async function CreateAppointmentPage() {
         }
     })
 
-    if (!data || (data.user.role != 'doctor' && data.user.role != 'receptionist')) return redirect('/dashboard')
+    if (!data || (data.user.role != 'doctor' && data.user.role != 'receptionist' && data.user.role != 'admin')) return redirect('/dashboard')
 
     if (!data.user) return;
 

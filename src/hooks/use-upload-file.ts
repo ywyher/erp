@@ -72,5 +72,5 @@ export function useFileUpload() {
     }
   }
 
-  return { handleUpload, progresses, isUploading }
+  return { handleUpload, progresses, isUploading, setProgresses, setIsUploading }
 }

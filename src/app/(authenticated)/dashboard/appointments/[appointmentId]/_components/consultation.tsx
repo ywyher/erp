@@ -1,6 +1,6 @@
 "use client"
 
-import { handleFinish } from "@/app/(authenticated)/dashboard/appointments/[appointmentId]/handleFinish"
+import { handleFinishConsultation } from "@/app/(authenticated)/dashboard/appointments/[appointmentId]/handleFinishConsultation"
 import { useConsultationStore } from "@/app/(authenticated)/dashboard/appointments/[appointmentId]/store"
 import { consultationSchema } from "@/app/(authenticated)/dashboard/appointments/types"
 import {
@@ -28,6 +28,8 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
 import { Button } from "@/components/ui/button"
+import DateSelector from "@/components/date-selector"
+import { toast } from "sonner"
 
 export default function Consultation({
   appointmentId,
@@ -37,7 +39,8 @@ export default function Consultation({
   prescriptions,
   operation,
   setActiveTab,
-  editable
+  editable,
+  creatorId
 }: {
   appointmentId: Appointment["id"]
   doctorId: Doctor["id"]
@@ -47,9 +50,12 @@ export default function Consultation({
   operation: 'update' | 'create'
   setActiveTab: Dispatch<SetStateAction<"user" | "prescriptions" | "consultation">>
   editable: boolean
+  creatorId: User['id']
 }) {
   const [isLoading, setIsLoading] = useState<boolean>(false)
   const [showAlert, setShowAlert] = useState<boolean>(false)
+  const [dataSelectorDialogOpen, setDataSelectorDialogOpen] = useState<boolean>(false)
+  const [operationDate, setOperationDate] = useState<Date | null>(null)
 
   const {
     history,
@@ -113,16 +119,19 @@ export default function Consultation({
     
     setSelectedPrescriptions(newSelectedPrescriptions)
     setIsLoading(false)
+    toast.message('Consultation data saved!')
 
     // Show alert if no prescriptions are selected
     if (newSelectedPrescriptions.length === 0) {
       setShowAlert(true); // Show the alert dialog
+    }else {
+      setActiveTab('prescriptions')
     }
   }
 
-  const handleFinishSession = async () => {
+  const handleFinish = async () => {
     const data = form.getValues();
-    await handleFinish({
+    await handleFinishConsultation({
       history: data.history,
       diagnosis: data.diagnosis,
       laboratories: data.laboratories,
@@ -138,10 +147,13 @@ export default function Consultation({
       setIsLoading,
       operation,
       consultationId: consultationId || '',
-      prescriptions: prescriptions || []
-    });
+      prescriptions: prescriptions || [],
 
-    setActiveTab('prescriptions')
+      // Creation of the operation
+      isCreateOperation: operationDate ? true : false,
+      operationDate: operationDate,
+      creatorId
+    });
     setShowAlert(false); // Close the alert dialog
   }
 
@@ -150,6 +162,12 @@ export default function Consultation({
     form.setValue("radiologies", radiologies);
     form.setValue("medicines", medicines);
   }, [laboratories, radiologies, medicines]);
+
+  useEffect(() => {
+    if(operationDate) {
+      handleFinish()
+    }
+  }, [operationDate])
 
   return (
     <>
@@ -195,27 +213,55 @@ export default function Consultation({
             />
           </div>
           {editable && (
-            <LoadingBtn isLoading={isLoading}>Submit Consultation</LoadingBtn>
+            <LoadingBtn isLoading={isLoading}>Save Consultation</LoadingBtn>
           )}
         </form>
       </Form>
 
       {/* Alert Dialog for Ending Session */}
       {editable && (
-        <AlertDialog open={showAlert} onOpenChange={setShowAlert}>
-          <AlertDialogContent>
-            <AlertDialogHeader>
-              <AlertDialogTitle>Are you sure you want to end the session?</AlertDialogTitle>
-              <AlertDialogDescription>
-                This will save the consultation and end the session. You cannot undo this action.
-              </AlertDialogDescription>
-            </AlertDialogHeader>
-            <AlertDialogFooter>
-              <AlertDialogCancel onClick={() => setShowAlert(false)}>Cancel</AlertDialogCancel>
-              <AlertDialogAction onClick={handleFinishSession}>End Session</AlertDialogAction>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialog>
+        <>
+          <AlertDialog open={showAlert} onOpenChange={setShowAlert}>
+            <AlertDialogContent>
+              <AlertDialogHeader >
+                {operation == 'create' ? (
+                  <AlertDialogTitle>Do you want to reserve a operation for this appointment ?</AlertDialogTitle>
+                ): (
+                  <AlertDialogTitle>Are you sure!</AlertDialogTitle>
+                )}
+                <AlertDialogDescription>
+                  This will save the consultation and end the session. You cannot undo this action.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>
+                  Cancel
+                </AlertDialogCancel>
+                {operation == 'create' && (
+                  <AlertDialogAction asChild onClick={handleFinish}>
+                      <Button variant='secondary'>No</Button>
+                  </AlertDialogAction>
+                )}
+                <AlertDialogAction asChild onClick={() => {
+                  if(operation == 'update') {
+                    handleFinish()
+                  }
+                }}>
+                  {operation == 'create' ? (
+                    <Button onClick={() => setDataSelectorDialogOpen(true)}>Yes</Button>
+                  ): (
+                    <Button>End Session</Button>
+                  )}
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+          <DateSelector 
+            onOpenChange={(open) => setDataSelectorDialogOpen(open)}
+            open={dataSelectorDialogOpen}
+            setDate={setOperationDate}
+          />
+        </>
       )}
     </>
   )

@@ -16,44 +16,6 @@ export const computeSHA256 = async (file: File) => {
     return hashHex
 }
 
-export async function uploadToS3({
-    file,
-}: {
-    file: File;
-}) {
-    const checksum = await computeSHA256(file);
-
-    const presignedUrl = await getPreSignedUrl({
-        type: file.type,
-        size: file.size,
-        checksum: checksum,
-    });
-
-    if (presignedUrl.failure) {
-        return { error: "Not authenticated", file: file.name };
-    }
-
-    const { url, fileName } = presignedUrl.success;
-
-    if (!url || !fileName) {
-        return { error: "Failed to get pre-signed URL", file: file.name };
-    }
-
-    try {
-        await fetch(url, {
-            method: "PUT",
-            headers: {
-                "Content-Type": file.type,
-            },
-            body: file,
-        });
-
-        return { name: fileName, size: file.size, type: file.type };
-    } catch (error) {
-        return { error: "Failed to upload", file: file.name };
-    }
-}
-
 export async function uploadPfp({
     fileName,
     userId,
@@ -63,7 +25,6 @@ export async function uploadPfp({
     userId: string,
     oldFileName?: string
 }) {
-
     // Check if `oldFileName` exists and is not an external provider URL
     if (oldFileName && !oldFileName.startsWith('http')) {
         await deleteFile(oldFileName);

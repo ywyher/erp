@@ -11,6 +11,7 @@ import ExistingUser from "@/app/(authenticated)/dashboard/_components/existing-u
 import NewUser from "@/app/(authenticated)/dashboard/_components/new-user"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import CustomDate from "@/components/custom-date"
+import DataSelector from "@/components/date-selector"
 
 export default function CreateOperation({
   id,
@@ -40,13 +41,13 @@ export default function CreateOperation({
           creatorId: id,
         })
 
-        if (result?.success) {
+        if (result && result.message) {
           toast(result.message)
           setDoctorId(null)
           setDate(null)
           router.push(`/dashboard/operations/${result.operationId}`)
         } else {
-          toast.error(result?.message)
+          toast.error(result.message)
           setDoctorId(null)
           setDate(null)
           return
@@ -79,17 +80,14 @@ export default function CreateOperation({
         <>
           <ExistingUser setSelectedUserId={setPatientId} setIsCreateUser={setIsCreateUser} />
           {isCreateUser && <NewUser setCreatedUserId={setPatientId} setIsCreateUser={setIsCreateUser} />}
-          <Dialog open={open} onOpenChange={() => {
-            setOpen(false)
-            setPatientId(null)
-          }}>
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>Select Date</DialogTitle>
-              </DialogHeader>
-              <CustomDate onClick={(e) => setDate(e)} />
-            </DialogContent>
-          </Dialog>
+          <DataSelector 
+            onOpenChange={() => {
+              setOpen(false)
+              setPatientId(null)
+            }}
+            open={open}
+            setDate={setDate}
+          />
         </>
       )}
       {patientId && role !== "doctor" && <DoctorsList book={true} customSchedule={true} />}

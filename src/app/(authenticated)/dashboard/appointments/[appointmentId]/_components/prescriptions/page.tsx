@@ -3,11 +3,10 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { useConsultationStore } from "@/app/(authenticated)/dashboard/appointments/[appointmentId]/store"
 import { Consultation, Doctor, Prescription as TPrescription, User, type Appointment } from "@/lib/db/schema"
-import Prescription from "@/app/(authenticated)/dashboard/appointments/[appointmentId]/_components/prescriptions/prescription"
-import { useState } from "react"
+import Prescription from "@/components/prescription"
+import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
-import LoadingBtn from "@/components/loading-btn"
-import { handleFinish } from "@/app/(authenticated)/dashboard/appointments/[appointmentId]/handleFinish"
+import { handleFinishConsultation } from "@/app/(authenticated)/dashboard/appointments/[appointmentId]/handleFinishConsultation"
 import {
   AlertDialog,
   AlertDialogAction,
@@ -20,7 +19,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
 import { Button } from "@/components/ui/button"
-import { toast } from "sonner"
+import DateSelector from "@/components/date-selector"
 
 type Prescriptions = {
   appointmentId: Appointment['id'];
@@ -30,6 +29,7 @@ type Prescriptions = {
   consultationId?: Consultation['id']
   prescriptions?: TPrescription[]
   editable: boolean
+  creatorId: User['id']
 }
 
 export default function Prescriptions({ 
@@ -39,9 +39,12 @@ export default function Prescriptions({
    operation,
    consultationId,
    prescriptions,
-   editable
+   editable,
+   creatorId,
   }: Prescriptions) {
   const router = useRouter()
+  const [dataSelectorDialogOpen, setDataSelectorDialogOpen] = useState<boolean>(false)
+  const [operationDate, setOperationDate] = useState<Date | null>(null)
 
   const [isLoading, setIsLoading] = useState<boolean>(false)
   const {
@@ -66,9 +69,9 @@ export default function Prescriptions({
 
   if (tabs.length === 0) return null
 
-  const handleFinishClick = async () => {
+  const handleFinish = async () => {
     if(!history || !diagnosis) return;
-    await handleFinish({
+    await handleFinishConsultation({
       history,
       diagnosis,
       laboratories,
@@ -84,9 +87,20 @@ export default function Prescriptions({
       setIsLoading,
       operation,
       consultationId: consultationId,
-      prescriptions: prescriptions
+      prescriptions: prescriptions,
+
+      // Creation of the operation
+      isCreateOperation: operationDate ? true : false,
+      operationDate: operationDate,
+      creatorId
     });
   };
+
+  useEffect(() => {
+    if(operationDate) {
+      handleFinish()
+    }
+  }, [operationDate])
 
   return (
     <div className="flex flex-col h-[calc(100vh-64px)]">
@@ -121,20 +135,44 @@ export default function Prescriptions({
             </AlertDialogTrigger>
             <AlertDialogContent>
               <AlertDialogHeader>
-                <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                {operation == 'create' ? (
+                  <AlertDialogTitle>Do you want to reserve a operation for this appointment ?</AlertDialogTitle>
+                ): (
+                  <AlertDialogTitle>Are you sure!</AlertDialogTitle>
+                )}
                 <AlertDialogDescription>
                   This action cannot be undone. This will permanently delete your
                   account and remove your data from our servers.
                 </AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter>
-                <AlertDialogCancel>Cancel</AlertDialogCancel>
-                <AlertDialogAction  onClick={handleFinishClick}>
-                    Proceed
+                <AlertDialogCancel>
+                  Cancel
+                </AlertDialogCancel>
+                {operation == 'create' && (
+                  <AlertDialogAction asChild onClick={handleFinish}>
+                      <Button variant='secondary'>No</Button>
+                  </AlertDialogAction>
+                )}
+                <AlertDialogAction asChild onClick={() => {
+                  if(operation == 'update') {
+                    handleFinish()
+                  }
+                }}>
+                  {operation == 'create' ? (
+                    <Button onClick={() => setDataSelectorDialogOpen(true)}>Yes</Button>
+                  ): (
+                    <Button>End Session</Button>
+                  )}
                 </AlertDialogAction>
               </AlertDialogFooter>
             </AlertDialogContent>
           </AlertDialog>
+          <DateSelector 
+            onOpenChange={(open) => setDataSelectorDialogOpen(open)}
+            open={dataSelectorDialogOpen}
+            setDate={setOperationDate}
+          />
         </div>
       ): (
         <Button className="w-full" onClick={() => router.push('/dashboard/appointments')}>Done</Button>

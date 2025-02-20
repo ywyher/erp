@@ -7,7 +7,7 @@ import { authSchema } from "@/app/(auth)/types"
 import { zodResolver } from "@hookform/resolvers/zod"
 import LoadingBtn from "@/components/loading-btn"
 import { checkFieldType, normalizeData } from "@/lib/funcs"
-import { useVerifyStore } from "@/app/(auth)/store"
+import { useAuthStore } from "@/app/(auth)/store"
 import { signIn } from "@/lib/auth-client"
 import { Dispatch, useState } from "react"
 import { checkFieldAvailability } from "@/lib/db/queries"
@@ -18,8 +18,8 @@ import { toast } from "sonner"
 export default function Check({ setPort }: { setPort: Dispatch<React.SetStateAction<'check' | 'register' | 'login'>> }) {
     const [isLoading, setIsLoading] = useState(false)
 
-    const setValue = useVerifyStore((state) => state.setValue)
-    const setContext = useVerifyStore((state) => state.setContext)
+    const setValue = useAuthStore((state) => state.setValue)
+    const setContext = useAuthStore((state) => state.setContext)
 
     const form = useForm<z.infer<typeof authSchema>>({
         resolver: zodResolver(authSchema),
@@ -111,14 +111,16 @@ export default function Check({ setPort }: { setPort: Dispatch<React.SetStateAct
                     <span className="w-full border-t border-zinc-700" />
                 </div>
                 <div className="relative flex justify-center text-xs uppercase">
-                    <span className="bg-black px-2 text-zinc-400">Or</span>
+                    <span className="px-2 text-zinc-400">Or</span>
                 </div>
             </div>
             <Form {...form}>
                 <form onSubmit={form.handleSubmit(handleCheck)} className="space-y-4">
-                    <FormFieldWrapper form={form} name='field' placeholder="Email Or Phone number" />
+                    <div>
+                        <FormFieldWrapper form={form} label="Email or Phone number" name='field' placeholder="Email Or Phone number" />
+                    </div>
                     <LoadingBtn isLoading={isLoading}>
-                        Authenticate
+                        Submit
                     </LoadingBtn>
                 </form>
             </Form>

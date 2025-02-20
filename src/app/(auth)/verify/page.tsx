@@ -2,32 +2,101 @@
 
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form";
-import { redirect } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { verifyOtpSchema } from "@/app/(auth)/types";
 import { emailOtp, phoneNumber, signUp } from "@/lib/auth-client";
 import { useEffect, useState } from "react";
 import VerifyForm from "@/app/(auth)/verify/_components/verify-form";
-import { useVerifyStore } from "@/app/(auth)/store";
+import { useAuthStore } from "@/app/(auth)/store";
 import { updatePhoneNumberVerified } from "@/app/(auth)/actions";
 import { useQueryClient } from "@tanstack/react-query";
 import { generateFakeField } from "@/lib/funcs";
 import { z } from "zod";
 
 import { toast } from "sonner";
+import { Button } from "@/components/ui/button";
+import AuthLayout from "@/app/(auth)/auth/_components/auth-layout";
+import Seeder from "@/components/seeder";
 
 export default function Verify() {
     const [isLoading, setIsLoading] = useState(false)
-    const value = useVerifyStore((state) => state.value)
-    const context = useVerifyStore((state) => state.context)
-    const operation = useVerifyStore((state) => state.operation)
-    const password = useVerifyStore((state) => state.password)
-    const redirectTo = useVerifyStore((state) => state.redirectTo)
+    const [isHydrated, setIsHydrated] = useState(false);
+
     const queryClient = useQueryClient()
+    const router = useRouter();
+
+    // Zustand store
+    const {
+        value,
+        context,
+        operation,
+        password,
+        redirectTo,
+        otpExists,
+        setOtpExists,
+        reset,
+    } = useAuthStore((state) => state);
+
+    // Detect when Zustand store has hydrated
+    useEffect(() => {
+        setIsHydrated(true);
+    }, []);
+
 
     useEffect(() => {
-        if (!value || !context) redirect('/auth')
-        if (operation == 'register' && !password) redirect('/auth')
-    }, [value, context])
+        console.log(otpExists)
+    }, [otpExists])
+    
+    useEffect(() => {
+        if (!isHydrated) return; // Prevent running before hydration
+        
+        if (!value || !context) {
+            router.replace('/')
+            return;
+        }
+        if (operation == 'register' && !password) {
+            router.replace('/')
+            return;
+        }
+
+        const sendOtp = async () => {
+            try {
+                if (context === "phoneNumber") {
+                    await phoneNumber.sendOtp(
+                        { phoneNumber: value },
+                        {
+                            onSuccess: () => {
+                                setOtpExists(true)
+                                toast.success("OTP sent to phone.")
+                            },
+                            onError: (ctx) => { 
+                                toast.error(ctx.error.message)
+                            }
+                        }
+                    );
+                } else if (context === "email") {
+                    await emailOtp.sendVerificationOtp(
+                        { email: value, type: "email-verification" },
+                        {
+                            onSuccess: () => {
+                                setOtpExists(true)
+                                toast.success("OTP sent to email.")
+                            },
+                            onError: (ctx) => {
+                                toast.error(ctx.error.message)
+                            },
+                        }
+                    );
+                }
+            } catch (error) {
+                toast.error(`Error sending OTP: ${error}`);
+            }
+        };
+
+        if(!otpExists) {
+            sendOtp();
+        }
+    }, [value, context, operation, password, isHydrated]);
 
     const form = useForm<z.infer<typeof verifyOtpSchema>>({
         resolver: zodResolver(verifyOtpSchema),
@@ -43,16 +112,18 @@ export default function Verify() {
             }, {
                 onSuccess: async () => {
                     if (operation == 'register') {
-                        await queryClient.invalidateQueries({ queryKey: ['session'] })
+                        queryClient.invalidateQueries({ queryKey: ['session'] })
                         setIsLoading(false)
-                        redirect("/onboarding");
+                        reset()
+                        router.replace("/onboarding");
                     } else {
-                        await queryClient.invalidateQueries({ queryKey: ['session'] })
+                        queryClient.invalidateQueries({ queryKey: ['session'] })
                         setIsLoading(false)
+                        reset()
                         if (redirectTo) {
-                            redirect(redirectTo)
+                            router.replace(redirectTo)
                         } else {
-                            redirect('/')
+                            router.replace('/')
                         }
                     }
                 },
@@ -92,16 +163,18 @@ export default function Verify() {
 
                         if (!phoneNumberVerifiedUpdated) console.error('Phone number verified field no updated')
 
-                        await queryClient.invalidateQueries({ queryKey: ['session'] })
+                        queryClient.refetchQueries({ queryKey: ['session'] })
+                        reset()
                         setIsLoading(false)
-                        redirect("/onboarding")
+                        router.replace("/onboarding")
                     } else {
-                        await queryClient.invalidateQueries({ queryKey: ['session'] })
+                        queryClient.refetchQueries({ queryKey: ['session'] })
+                        reset()
                         setIsLoading(false)
                         if (redirectTo) {
-                            redirect(redirectTo)
+                            router.replace(redirectTo)
                         } else {
-                            redirect('/')
+                            router.replace('/')
                         }
                     }
                 },
@@ -156,13 +229,27 @@ export default function Verify() {
     if (!value || !context) return;
 
     return (
-        <VerifyForm
-            form={form}
-            onVerify={onVerify}
-            onSendOtp={onSendOtp}
-            value={value}
-            context={context}
-            isLoading={isLoading}
-        />
+        <AuthLayout>
+            <div className="w-full mb-6 flex flex-col gap-10 sm:mb-8">
+                <div className="flex flex-col gap-4">
+                    <div className="flex flex-col gap-4">
+                        <h3 className="text-2xl font-semibold text-zinc-100">Check your {context}</h3>
+                        <p className="text-teal-500">{value}</p>
+                        <p className="text-gray-400">If this account exists, you will receive an {context} with a One Time Password (OTP). Type your OTP here to log in:</p>
+                    </div>
+                    <VerifyForm
+                        form={form}
+                        onVerify={onVerify}
+                        isLoading={isLoading}
+                    />
+                </div>
+                <div className="flex flex-col gap-3">
+                    <Button variant="destructive" onClick={() => router.push('/logout')}>Logout</Button>
+                    <Button variant="outline" onClick={(() => onSendOtp())}>Didnt receive an email? Click here to resend</Button>
+                    <p className="text-sm text-gray-400">Emails may take up to 5 minutes to arrive. If you did not receive an email or your code did not work, please try again. If you encounter any issues, please visit our <span className="text-blue-500 hover:cursor-pointer hover:text-blue-400">support</span> page.</p>
+                </div>
+            </div>
+            <Seeder />
+        </AuthLayout>
     )
 }

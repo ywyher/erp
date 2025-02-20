@@ -5,6 +5,8 @@ import localFont from "next/font/local";
 import "./globals.css";
 import { ReactQueryProvider } from "@/lib/react-query";
 import { NuqsAdapter } from 'nuqs/adapters/next/app'
+import Rules from "@/app/rules";
+import Script from 'next/script';
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -30,7 +32,7 @@ export default async function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
-        <script src="//unpkg.com/react-scan/dist/auto.global.js"/>
+        <Script src="//unpkg.com/react-scan/dist/auto.global.js" strategy="afterInteractive" />
       </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
@@ -44,6 +46,7 @@ export default async function RootLayout({
                 enableSystem
                 disableTransitionOnChange
               >
+                <Rules />
                 {children}
               </ThemeProvider>
             </NuqsAdapter>

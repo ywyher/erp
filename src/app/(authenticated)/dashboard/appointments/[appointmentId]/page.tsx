@@ -27,17 +27,17 @@ const getUserData = async (appointmentId: string) => {
         where: (prescription, { eq }) => eq(prescription.consultationId, consultation.id)
     }) : [];
 
-    const user = await db.query.user.findFirst({
+    const patient = await db.query.user.findFirst({
         where: (user, { eq }) => eq(user.id, appointment.patientId)
     })
 
     const medicalFiles = await db.select().from(medicalFile)
         .where(and(eq(medicalFile.patientId, appointment.patientId), eq(medicalFile.appointmentId, appointmentId)))
 
-    if (!user) return;
+    if (!patient) return;
 
     return {
-        user,
+        patient,
         doctorId: appointment.doctorId,
         medicalFiles: medicalFiles || null,
         operation: consultation?.id ? 'update' : 'create',
@@ -47,8 +47,8 @@ const getUserData = async (appointmentId: string) => {
 }
 
 export default async function Appointment({ params: { appointmentId } }: { params: { appointmentId: string } }) {
-    const { user, medicalFiles, doctorId, operation, consultation, prescriptions } = await getUserData(appointmentId) as {
-         user: User,
+    const { patient, medicalFiles, doctorId, operation, consultation, prescriptions } = await getUserData(appointmentId) as {
+         patient: User,
          doctorId: Doctor['id'],
          medicalFiles: MedicalFile[],
          operation: 'update' | 'create';
@@ -68,7 +68,7 @@ export default async function Appointment({ params: { appointmentId } }: { param
     
     return (
         <AppointmentTabs 
-            user={user}
+            patient={patient}
             medicalFiles={medicalFiles}
             appointmentId={appointmentId}
             doctorId={doctorId}
@@ -76,6 +76,7 @@ export default async function Appointment({ params: { appointmentId } }: { param
             consultation={consultation}
             prescriptions={prescriptions}
             editable={data.user.role == 'doctor' ? true : false}
+            creatorId={data.user.id}
         />
     )
 }

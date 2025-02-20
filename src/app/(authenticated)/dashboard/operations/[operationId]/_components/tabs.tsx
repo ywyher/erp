@@ -14,6 +14,7 @@ import type {
   User,
 } from "@/lib/db/schema"
 import { generateDocument } from "@/lib/document"
+import { getFileUrl } from "@/lib/funcs"
 import { useEffect, useState, useCallback } from "react"
 
 type OperationTabs = {
@@ -62,11 +63,12 @@ export default function OperationTabs({
       setError(null)
 
       // Generate DOCX Blob
-      const { blob } = await generateDocument({ data: localOperationData.data })
-      const docxFile = new File([blob], "document.docx", {
+      const generatedDocument = await generateDocument({ data: localOperationData.data, filePath: getFileUrl(operationDocument) })
+      if(!generatedDocument) return;
+      const docxFile = new File([generatedDocument.blob], "document.docx", {
         type: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
       })
-      setDocxUrl(URL.createObjectURL(blob))
+      setDocxUrl(URL.createObjectURL(generatedDocument.blob))
 
       // Convert DOCX to PDF via API
       const formData = new FormData()
@@ -101,6 +103,7 @@ export default function OperationTabs({
     setLocalOperationData(newData)
     setNeedsRegeneration(true)
   }
+
 
   return (
     <>

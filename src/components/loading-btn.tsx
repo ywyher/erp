@@ -4,21 +4,26 @@ import { Button } from "@/components/ui/button";
 export default function LoadingBtn({
     isLoading,
     variant = 'default',
+    size = 'default',
     onClick,
     children,
-    className
+    disabled,
+    className,
 }: {
     isLoading: boolean;
-    variant?: 'default' | 'destructive';
+    size?: 'default' | 'sm' | 'lg' | 'icon',
+    variant?: 'default' | 'destructive' | 'outline' | 'secondary';
     onClick?: () => void;
     children: React.ReactNode;
+    disabled?: boolean;
     className?: string;
 }) {
     return (
         <Button
             type="submit"
-            className="w-full bg-[#E4E4E7] text-black hover:bg-white"
-            disabled={isLoading}
+            className={`w-full ${className}`}
+            disabled={disabled || isLoading}
+            size={size}
             variant={variant}
             onClick={onClick}
         >

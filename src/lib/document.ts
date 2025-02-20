@@ -2,6 +2,7 @@ import type { OperationData } from "@/lib/db/schema"
 import Docxtemplater from "docxtemplater"
 import PizZip from "pizzip"
 import { saveAs } from "file-saver"
+import path from "path"
 
 // Define a type for PizZipUtils
 type PizZipUtilsType = {
@@ -31,11 +32,20 @@ async function loadFile(url: string): Promise<string> {
   })
 }
 
-export const generateDocument = async ({ data, download = false }: { data: Record<string, string>, download?: boolean }) => {
-  const localDocxPath = "/input.docx"; // Path relative to public folder
+export const generateDocument = async ({
+   data,
+   filePath,
+   download = false,
+  }: { 
+   data: Record<string, string>,
+   filePath: string
+   download?: boolean 
+  }) => {
+
+  if(!filePath) return;
 
   try {
-    const content = await loadFile(localDocxPath);
+    const content = await loadFile(filePath);
     const zip = new PizZip(content);
     const doc = new Docxtemplater(zip, {
       linebreaks: true,

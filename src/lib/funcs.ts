@@ -1,6 +1,6 @@
 import { Schedules } from "@/app/(authenticated)/dashboard/types";
 import { phoneNumberRegex, emailRegex } from "@/app/types";
-import { Schedule } from "@/lib/db/schema";
+import { Schedule, User } from "@/lib/db/schema";
 import { nanoid } from "nanoid";
 
 export const checkFieldType = (column: string): 'email' | 'phoneNumber' | 'unknown' => {
@@ -178,3 +178,20 @@ export async function streamToBuffer(stream: NodeJS.ReadableStream): Promise<Buf
         stream.on('error', reject);
     });
 }
+
+export function checkVerificationNeeded(user: User): { 
+    type: 'email' | 'phoneNumber'; 
+    value: string; 
+  } | null {
+    if (!user) return null;
+  
+    if (user.phoneNumber && !user.phoneNumberVerified && !user.emailVerified) {
+      return { type: "phoneNumber", value: user.phoneNumber };
+    }
+  
+    if (user.email && !user.emailVerified && !user.phoneNumberVerified && !isFakeEmail(user.email)) {
+      return { type: "email", value: user.email };
+    }
+  
+    return null; // Instead of returning { type: null, value: null }
+  }
