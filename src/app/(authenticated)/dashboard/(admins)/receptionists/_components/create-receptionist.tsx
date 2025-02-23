@@ -123,8 +123,8 @@ export default function CreateReceptionist() {
                             />
                         </TabsContent>
                         <TabsContent value="password">
-                            <FormFieldWrapper form={form} name="password" label="Password" />
-                            <FormFieldWrapper form={form} name="confirmPassword" label="Confirm Password" />
+                            <FormFieldWrapper form={form} type="password" name="password" label="Password" />
+                            <FormFieldWrapper form={form} type="password" name="confirmPassword" label="Confirm Password" />
                         </TabsContent>
                     </Tabs>
                     <div className="mt-4">

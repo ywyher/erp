@@ -51,6 +51,20 @@ export default function Login() {
                     setIsLoading(false)
                 },
             })
+        }else if (context == 'username') {
+            await signIn.username({
+                username: value || data.value,
+                password: data.password,
+            }, {
+                onSuccess: async (e) => {
+                    setIsLoading(false)
+                    router.push("/")
+                },
+                onError: (ctx) => {
+                    toast.error(ctx.error.message);
+                    setIsLoading(false)
+                },
+            })
         }
     }
 
@@ -90,7 +104,7 @@ export default function Login() {
                 <form onSubmit={form.handleSubmit(login)} className="flex flex-col gap-4">
                     <div className="flex flex-col gap-2">
                         <FormFieldWrapper form={form} disabled={true} name="value" label={context || ""} />
-                        <FormFieldWrapper form={form} name="password" label='Password' />
+                        <FormFieldWrapper form={form} type="password" name="password" label='Password' />
                         <div>Forget Your Password, <span className="cursor-pointer text-blue-600 underline" onClick={() => resetPassword()}>Click Here</span></div>
                     </div>
                     <LoadingBtn isLoading={isLoading}>

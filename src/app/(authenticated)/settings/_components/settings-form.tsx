@@ -26,7 +26,6 @@ export default function SettingsForm() {
     const [registeredWith, setRegisteredWith] = useState<'both' | 'email' | 'phoneNumber' | 'none' | null>(null)
 
     const queryClient = useQueryClient()
-    const setTrigger = useImageStore((store) => store.setTrigger)
 
     const { data: user, isLoading: isPending } = useQuery({
         queryKey: ['session', 'settingsForm'],
@@ -99,7 +98,7 @@ export default function SettingsForm() {
         }
 
         toast("Settings were successfully updated.");
-        await queryClient.invalidateQueries({ queryKey: ['session'] });
+        queryClient.invalidateQueries({ queryKey: ['session'] });
         setIsLoading(false)
     };
 

@@ -3,7 +3,7 @@
 import { createUser, updateUser } from "@/lib/db/mutations"
 import { Schedules } from "@/app/(authenticated)/dashboard/types";
 import db from "@/lib/db";
-import { deleteById } from "@/lib/db/queries";
+import { deleteById } from "@/lib/db/mutations";
 import { doctor, schedule, user } from "@/lib/db/schema";
 import { generateId, transformSchedulesToRecords } from "@/lib/funcs";
 import { eq } from "drizzle-orm";

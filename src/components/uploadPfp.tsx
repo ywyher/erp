@@ -68,7 +68,7 @@ export default function UploadPfp() {
             setFile(null)
             setPreviewUrl('')
             setIsLoading(false)
-            await queryClient.invalidateQueries({ queryKey: ['session'] })
+            queryClient.invalidateQueries({ queryKey: ['session'] })
             toast('Looking good :)')
         } else {
             toast.error('Failed to update profile picture')

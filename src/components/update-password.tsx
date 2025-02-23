@@ -1,4 +1,4 @@
-'use client'
+"use client"
 
 import { changePassword } from "@/app/actions/db.actions";
 import { passwordSchema, TPasswordSchema } from "@/app/types";
@@ -42,9 +42,11 @@ export default function UpdatePassword(
     return (
         <div>
             <Form {...form}>
-                <form onSubmit={form.handleSubmit(onUpdatePassword)}>
-                    <FormFieldWrapper form={form} name='password' label="password" />
-                    <FormFieldWrapper form={form} name='confirmPassword' label="Confirm password" />
+                <form onSubmit={form.handleSubmit(onUpdatePassword)} className="flex flex-col gap-4">
+                    <div className="flex flex-col gap-1">
+                        <FormFieldWrapper form={form} type="password" name="password" label="password" />
+                        <FormFieldWrapper form={form} type="password" name="confirmPassword" label="Confirm password" />
+                    </div>
                     <LoadingBtn isLoading={isLoading}>Update</LoadingBtn>
                 </form>
             </Form>

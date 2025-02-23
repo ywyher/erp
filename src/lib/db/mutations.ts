@@ -4,11 +4,13 @@ import { z } from "zod"
 import { checkFieldAvailability } from "./queries"
 import { Roles, userSchema } from "@/app/types"
 import db from "."
-import { account, user } from "./schema"
+import { account, appointment, doctor, medicalFile, schedule, session, User, user } from "./schema"
 import { eq } from "drizzle-orm"
 import { createUserSchema } from "@/app/(authenticated)/dashboard/types"
 import { generateFakeField, generateId } from "../funcs"
 import { hashPassword } from "../password"
+import { deleteFile } from "@/lib/s3"
+import { revalidatePath } from "next/cache"
 
 export async function createUser({ data, role }: { data: z.infer<typeof createUserSchema>, role: Roles }) {
     const createPayload: Partial<z.infer<typeof createUserSchema>> = {}
@@ -159,4 +161,61 @@ export async function updateUser({ data, userId }: { data: z.infer<typeof userSc
       message: 'User updated successfully!',
       userId: updatedUser[0].id,
   }
+}
+
+// 1️⃣ Explicitly define Tables type
+type Tables = keyof typeof tableMap;
+
+// 2️⃣ Ensure tableMap is correctly typed
+const tableMap: Record<string, any> = {
+    user,
+    doctor,
+    schedule,
+    session,
+    account,
+    appointment,
+};
+
+export async function deleteById(id: string, tableName: Tables) {
+    const table = tableMap[tableName];
+
+    if (!table) {
+        throw new Error(`Invalid table name: ${tableName}`);
+    }
+
+    if (tableName === "appointment") {
+        // ✅ Handle related medical files first
+        const files = await db
+            .select({
+                id: medicalFile.id,
+                name: medicalFile.name,
+            })
+            .from(medicalFile)
+            .where(eq(medicalFile.appointmentId, id));
+
+        if (files.length > 0) {
+            await Promise.all(
+                files.map(async (file) => {
+                    try {
+                        await deleteFile(file.name);
+                    } catch (error) {
+                        console.error(`Error deleting file: ${file.name}`, error);
+                    }
+                })
+            );
+
+            // ✅ Delete medical file records
+            await db.delete(medicalFile).where(eq(medicalFile.appointmentId, id));
+        }
+    }
+
+    // ✅ Delete the main record
+    const deleted = await db.delete(table).where(eq(table.id, id)).returning();
+
+    if (deleted.length > 0) {
+        revalidatePath("/dashboard");
+        return { message: "Record deleted successfully" };
+    } else {
+        throw new Error("Failed to delete the record");
+    }
 }

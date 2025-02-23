@@ -25,23 +25,40 @@ export type Schedules = Record<string, Schedule[]>;
 
 export const createUserSchema = z
     .object({
-        name: z.string().min(2, {
-            message: "Name must be at least 2 characters.",
-        }),
-        email: z.string().optional(),
-        username: z.string().min(2, {
-            message: "Username must be at least 2 characters.",
-        }),
-        phoneNumber: z.string().optional(),
-        nationalId: z.string().min(1, {
-            message: "National id is required",
-        }),
-        password: z.string().min(3, {
-            message: 'Min is 3'
-        }),
-        confirmPassword: z.string().min(3, {
-            message: 'Min is 3'
-        }),
+        name: z
+            .string()
+            .toLowerCase()
+            .min(2, {
+                message: "Name must be at least 2 characters.",
+            }),
+        email: z
+            .string()
+            .email()
+            .toLowerCase()
+            .optional(),
+        username: z
+            .string()
+            .toLowerCase()
+            .trim()
+            .min(2, { message: "Username must be at least 2 characters." }), // Then validate
+        phoneNumber: z
+            .string()
+            .optional(),
+        nationalId: z
+            .string()
+            .min(1, {
+                message: "National id is required",
+            }),
+        password: z
+            .string()
+            .min(3, {
+                message: 'Min is 3'
+            }),
+        confirmPassword: z
+            .string()
+            .min(3, {
+                message: 'Min is 3'
+            }),
     })
     .superRefine((data, ctx) => {
         if (!data.email && !data.phoneNumber) {

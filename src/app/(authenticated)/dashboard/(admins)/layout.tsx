@@ -1,6 +1,7 @@
 import { getSession } from "@/lib/auth-client"
 import { headers } from "next/headers"
 import { redirect } from "next/navigation"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 
 export default async function Layout({ children }: { children: React.ReactNode }) {
     const reqHeaders = await headers()
@@ -11,14 +12,9 @@ export default async function Layout({ children }: { children: React.ReactNode }
         }
     })
 
-    if (data?.user.role != 'admin') {
-        console.log(data)
-        return redirect('/')
+    if (data?.user.role !== "admin") {
+        return redirect("/")
     }
 
-    return (
-        <main>
-            {children}
-        </main>
-    )
+    return children;
 }

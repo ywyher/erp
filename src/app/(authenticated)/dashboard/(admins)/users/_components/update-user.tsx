@@ -6,10 +6,8 @@ import { Form } from "@/components/ui/form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-
-import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { useQuery } from "@tanstack/react-query";
-import { isFakeEmail, normalizeData } from "@/lib/funcs";
+import { getChangedFields, isFakeEmail, normalizeData } from "@/lib/funcs";
 import { getUserById } from "@/lib/db/queries";
 import UpdatePassword from "@/components/update-password";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -22,25 +20,7 @@ import { revalidatePath } from "next/cache";
 
 import { toast } from "sonner";
 import { updateUser } from "@/lib/db/mutations";
-
-function UpdateDialog({ children, open, setOpen }: { children: React.ReactNode, open: boolean, setOpen: Dispatch<SetStateAction<boolean>> }) {
-    return (
-        <div>
-            <Button className="w-full" variant={'outline'} onClick={() => setOpen(true)}>Update</Button>
-            <Dialog open={open} onOpenChange={setOpen}>
-                <DialogContent>
-                    <DialogHeader>
-                        <DialogTitle>Update User</DialogTitle>
-                        <DialogDescription>
-                            Fill out the form below to create a new user. All fields are required.
-                        </DialogDescription>
-                    </DialogHeader>
-                    {children}
-                </DialogContent>
-            </Dialog>
-        </div>
-    );
-}
+import DialogWrapper from "@/app/(authenticated)/dashboard/_components/dialog-wrapper";
 
 export default function UpdateUser(
     {
@@ -70,27 +50,18 @@ export default function UpdateUser(
     const onCheckChangedFields = async (data: z.infer<typeof userSchema>) => {
         if (!user) return;
 
-        const normalizedSessionData = {
-            name: normalizeData(user.name),
-            email: isFakeEmail(user.email) ? '' : normalizeData(user.email),
-            username: normalizeData(user.username || ""),
-            phoneNumber: normalizeData(user.phoneNumber || ""),
-            nationalId: normalizeData(user.nationalId || ""),
+        const sessionData = {
+            name: user.name,
+            email: isFakeEmail(user.email) ? '' : user.email,
+            username: user.username || "",
+            phoneNumber: user.phoneNumber || "",
+            nationalId: user.nationalId || "",
         };
-
-        const changedFields: Partial<z.infer<typeof userSchema>> = {};
-
-        for (const key in normalizedSessionData) {
-            let formValue = normalizeData(data[key as keyof z.infer<typeof userSchema>] as string);
-            const sessionValue = normalizedSessionData[key as keyof typeof normalizedSessionData];
-
-            if (formValue !== sessionValue) {
-                changedFields[key as keyof typeof changedFields] = formValue;
-            }
-        }
-
+    
+        const changedFields = getChangedFields(sessionData, data);
+        
         if (Object.keys(changedFields).length === 0) {
-            toast.error("No changes were made thus no fields were updated.")
+            toast.error("No changes made");
             return;
         }
 
@@ -99,18 +70,23 @@ export default function UpdateUser(
 
     useEffect(() => {
         if (user) {
-            form.setValue('name', user.name || '')
-            form.setValue('username', user.username || '')
-            form.setValue('email', isFakeEmail(user.email) ? '' : user.email || '')
-            form.setValue('phoneNumber', user.phoneNumber || '')
-            form.setValue('nationalId', user.nationalId || '')
+            form.reset({
+                name: user.name || '',
+                username: user.username || '',
+                email: isFakeEmail(user.email) ? '' : user.email || '',
+                phoneNumber: user.phoneNumber || '',
+                nationalId: user.nationalId || '',
+            });
         }
-    }, [user])
+    }, [user, form.reset]);
 
     const onSubmit = async (data: z.infer<typeof userSchema>) => {
         if (!user) return;
         setIsLoading(true)
-        const result = await updateUser({ data, userId: userId })
+
+        const normalizedData = normalizeData(data, 'object') as z.infer<typeof userSchema>
+
+        const result = await updateUser({ data: normalizedData, userId: userId })
 
         if (result?.error) {
             toast.error(result.error)
@@ -120,7 +96,15 @@ export default function UpdateUser(
 
         toast(result?.message)
         await revalidate('/dashboard/users')
-        form.reset()
+        
+        form.reset({
+            name: "",
+            email: "",
+            username: "",
+            phoneNumber: "",
+            nationalId: "",
+        });
+
         setIsLoading(false)
         setOpen(false)
         setPopOpen(false)
@@ -130,7 +114,7 @@ export default function UpdateUser(
     if (!user) return <div>Loading....</div>;
 
     return (
-        <UpdateDialog open={open} setOpen={setOpen}>
+        <DialogWrapper open={open} setOpen={setOpen} label='user' operation="update">
             <Tabs defaultValue="account">
                 <TabsList>
                     <TabsTrigger value="account">Account</TabsTrigger>
@@ -180,6 +164,6 @@ export default function UpdateUser(
                     <UpdatePassword userId={userId} setOpen={setOpen} revalidatePath="/dashboard" />
                 </TabsContent>
             </Tabs>
-        </UpdateDialog>
+        </DialogWrapper>
     );
 }

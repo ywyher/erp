@@ -21,6 +21,7 @@ export default function Register() {
     const context = useAuthStore((state) => state.context)
     const setOperation = useAuthStore((state) => state.setOperation)
     const setPassword = useAuthStore((state) => state.setPassword)
+    const setOtpExists = useAuthStore((state) => state.setOtpExists)
 
     const router = useRouter()
     const queryClient = useQueryClient()
@@ -59,18 +60,9 @@ export default function Register() {
                 }
             });
         } else if (context == 'phoneNumber') {
-            await phoneNumber.sendOtp({
-                phoneNumber: value
-            }, {
-                onSuccess: async () => {
-                    setOperation('register')
-                    setPassword(data.password)
-                    router.push("/verify")
-                },
-                onError: (ctx) => {
-                    console.error(ctx.error.message)
-                },
-            })
+            setOperation('register')
+            setPassword(data.password)
+            router.push("/verify")
         }
     }
 
@@ -80,8 +72,8 @@ export default function Register() {
                 <form onSubmit={form.handleSubmit(handleRegister)} className="flex flex-col gap-2">
                     <div className="flex flex-col gap-2">
                         <FormFieldWrapper disabled={true} form={form} name='field' label={context || ""} placeholder="Email Or Phone number" />
-                        <FormFieldWrapper form={form} name='password' label='Password' />
-                        <FormFieldWrapper form={form} name='confirmPassword' label='Confirm Password' />
+                        <FormFieldWrapper form={form} type="password" name="password" label="Password" />
+                        <FormFieldWrapper form={form} type="password" name="confirmPassword" label="Confirm Password" />
                     </div>
                     <div className="mt-2">
                         <LoadingBtn isLoading={isLoading}>

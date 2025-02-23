@@ -10,6 +10,7 @@ import React from "react";
 import UserActions from "@/app/(authenticated)/dashboard/(admins)/users/_components/user-actions";
 
 const userColumns = [
+    { value: "id", header: "Id" },
     { value: "name", header: "Name" },
     { value: "username", header: "Username" },
     { value: "email", header: "Email" },

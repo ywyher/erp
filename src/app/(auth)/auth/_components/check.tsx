@@ -30,7 +30,7 @@ export default function Check({ setPort }: { setPort: Dispatch<React.SetStateAct
 
     const checkField = (field: string) => {
         const fieldType = checkFieldType(field)
-        return fieldType as 'phoneNumber' | 'email' | 'unknown'
+        return fieldType as 'phoneNumber' | 'email' | 'username' | 'unknown'
     }
 
     const handleCheck = async (data: z.infer<typeof authSchema>) => {
@@ -50,8 +50,10 @@ export default function Check({ setPort }: { setPort: Dispatch<React.SetStateAct
         if (!isAvailable) {
             if (fieldType == 'email') {
                 setContext('email')
-            } else {
+            } else if(fieldType == 'phoneNumber') {
                 setContext('phoneNumber')
+            }else {
+                setContext('username')
             }
             setValue(data.field)
             setPort('login')
@@ -65,8 +67,9 @@ export default function Check({ setPort }: { setPort: Dispatch<React.SetStateAct
             setValue(data.field)
             setContext('phoneNumber')
             setPort('register')
+        }else if (isAvailable && fieldType == 'username') {
+            toast.error('Username authentication only available as a login option...')
         }
-
 
         setIsLoading(false)
     }
@@ -117,7 +120,7 @@ export default function Check({ setPort }: { setPort: Dispatch<React.SetStateAct
             <Form {...form}>
                 <form onSubmit={form.handleSubmit(handleCheck)} className="space-y-4">
                     <div>
-                        <FormFieldWrapper form={form} label="Email or Phone number" name='field' placeholder="Email Or Phone number" />
+                        <FormFieldWrapper form={form} label="Email Or Phone number Or Username" name='field' placeholder="Email Or Phone number Or Username" />
                     </div>
                     <LoadingBtn isLoading={isLoading}>
                         Submit

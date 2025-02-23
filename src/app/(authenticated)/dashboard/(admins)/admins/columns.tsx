@@ -1,7 +1,6 @@
 "use client";
 
 import { Column, ColumnDef, Row } from "@tanstack/react-table";
-
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
 import { DataTableColumnHeader } from "@/components/ui/data-table-column-header";
@@ -10,13 +9,13 @@ import { isFakeEmail } from "@/lib/funcs";
 import React from "react";
 import AdminAction from "@/app/(authenticated)/dashboard/(admins)/admins/_components/admin-actions";
 
-const adminColumns = [
+// Define admin columns with proper types
+const adminColumns: { value: string; header: string; dialog?: boolean; isBoolean?: boolean }[] = [
+    { value: "id", header: "Id" },
     { value: "name", header: "Name" },
     { value: "username", header: "Username" },
     { value: "email", header: "Email" },
-    { value: "emailVerified", header: "Email Verified", isBoolean: true },
     { value: "phoneNumber", header: "Phone Number" },
-    { value: "phoneNumberVerified", header: "Phone Verified", isBoolean: true },
     { value: "nationalId", header: "National Id" },
 ];
 
@@ -43,7 +42,7 @@ export const adminTableColumns: ColumnDef<any>[] = [
         enableSorting: false,
         enableHiding: false,
     },
-    ...adminColumns.map(({ value, header, dialog, isBoolean }: { value: string, header: string, dialog?: boolean, isBoolean?: boolean }) => ({
+    ...adminColumns.map(({ value, header, dialog, isBoolean }) => ({
         accessorKey: value,
         header: ({ column }: { column: Column<any, any> }) => (
             <DataTableColumnHeader column={column} title={header} />
@@ -52,11 +51,11 @@ export const adminTableColumns: ColumnDef<any>[] = [
             const cellValue = row.getValue(value);
 
             if (cellValue == null || isFakeEmail(row.getValue('email'))) {
-                return <span className="text-muted-foreground">Empty</span>
+                return <span className="text-muted-foreground">Empty</span>;
             }
 
             if (isBoolean) {
-                return cellValue === true ? "Yes" : "No"
+                return cellValue === true ? "Yes" : "No";
             }
 
             return dialog ? (
@@ -82,9 +81,7 @@ export const adminTableColumns: ColumnDef<any>[] = [
         id: "actions",
         cell: ({ row }) => {
             const user = row.original;
-            return (
-                <AdminAction userId={user.id} />
-            );
+            return <AdminAction userId={user.id} />;
         },
     },
 ];

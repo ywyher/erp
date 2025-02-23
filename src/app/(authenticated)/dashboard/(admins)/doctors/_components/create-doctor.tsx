@@ -80,8 +80,8 @@ export default function CreateDoctor() {
             ...data,
             name: normalizeData(data.name),
             username: normalizeData(data.username),
-            email: normalizeData(data.email),
-            phoneNumber: normalizeData(data.phoneNumber),
+            email: normalizeData(data.email || ""),
+            phoneNumber: normalizeData(data.phoneNumber || ""),
             nationalId: normalizeData(data.nationalId),
         };
 
@@ -143,8 +143,8 @@ export default function CreateDoctor() {
                             />
                         </TabsContent>
                         <TabsContent value="password">
-                            <FormFieldWrapper form={form} name="password" label="Password" />
-                            <FormFieldWrapper form={form} name="confirmPassword" label="Confirm Password" />
+                            <FormFieldWrapper form={form} type="password" name="password" label="Password" />
+                            <FormFieldWrapper form={form} type="password" name="confirmPassword" label="Confirm Password" />
                         </TabsContent>
                     </Tabs>
                     <div className="mt-4">

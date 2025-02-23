@@ -1,40 +1,19 @@
 'use client';
 
 import { FormFieldWrapper } from "@/components/formFieldWrapper";
-import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Dispatch, SetStateAction, useState } from "react";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import LoadingBtn from "@/components/loading-btn";
-import { normalizeData } from "@/lib/funcs";
 import { createUserSchema } from "@/app/(authenticated)/dashboard/types";
 import { z } from "zod";
 import { createAdmin } from "@/app/(authenticated)/dashboard/(admins)/admins/action";
-
 import { toast } from "sonner";
+import DialogWrapper from "@/app/(authenticated)/dashboard/_components/dialog-wrapper";
+import { normalizeData } from "@/lib/funcs";
 
-function AddDialog({ children, open, setOpen }: { children: React.ReactNode, open: boolean, setOpen: Dispatch<SetStateAction<boolean>> }) {
-    return (
-        <div>
-            <Button onClick={() => setOpen(true)}>Open Create Dialog</Button>
-            <Dialog open={open} onOpenChange={setOpen}>
-                <DialogContent>
-                    <DialogHeader>
-                        <DialogTitle>Create New Admin</DialogTitle>
-                        {/* Add a DialogDescription here */}
-                        <DialogDescription>
-                            Fill out the form below to create a new user. All fields are required.
-                        </DialogDescription>
-                    </DialogHeader>
-                    {children}
-                </DialogContent>
-            </Dialog>
-        </div>
-    );
-}
 
 export default function Create() {
     const [open, setOpen] = useState<boolean>(false)
@@ -46,31 +25,43 @@ export default function Create() {
     });
 
     const onSubmit = async (data: z.infer<typeof createUserSchema>) => {
-        setIsLoading(true)
-        const result = await createAdmin(data)
-
+        setIsLoading(true);
+    
+        const normalizedData = normalizeData(data, "object") as z.infer<typeof createUserSchema>;
+    
+        const result = await createAdmin(normalizedData);
+    
         if (result?.error) {
-            toast.error(result.error)
-            setIsLoading(false)
+            toast.error(result.error);
+            setIsLoading(false);
             return;
         }
-
-        toast('Admin created Successfully', {
+    
+        toast("Done.", {
             description: result?.message,
-        })
-
-        form.reset()
-        setTab('account')
-        setIsLoading(false)
-        setOpen(false)
+        });
+    
+        form.reset({
+            name: "",
+            email: "",
+            username: "",
+            phoneNumber: "",
+            nationalId: "",
+            password: "",
+            confirmPassword: "",
+        });
+        setTab("account");
+        setIsLoading(false);
+        setOpen(false);
     };
+    
 
     const onError = () => {
         toast.error(`Please check all tabs for potential errors`)
     }
 
     return (
-        <AddDialog open={open} setOpen={setOpen}>
+        <DialogWrapper open={open} setOpen={setOpen} label="admin" operation="create">
             <Form {...form}>
                 <form onSubmit={form.handleSubmit(onSubmit, onError)}>
                     <Tabs value={tab} onValueChange={(value) => setTab(value as 'account' | 'password')}>
@@ -79,31 +70,30 @@ export default function Create() {
                             <TabsTrigger value="password">Password</TabsTrigger>
                         </TabsList>
                         <TabsContent value="account">
-                            <div className="flex flex-row gap-2">
+                            <div className="flex flex-row gap-3">
                                 <FormFieldWrapper form={form} name="name" label="Name" />
                                 <FormFieldWrapper form={form} name="username" label="Username" />
                             </div>
-                            <div className="flex flex-row gap-2">
+                            <div className="flex flex-row gap-3">
                                 <FormFieldWrapper form={form} name="email" label="Email" />
-                                <FormFieldWrapper form={form} name="phoneNumber" label="Phone Number" />
+                                <FormFieldWrapper form={form} type="number" name="phoneNumber" label="Phone Number" />
                             </div>
-                            <FormFieldWrapper form={form} name="nationalId" label="National Id" />
+                            <FormFieldWrapper form={form} type="number" name="nationalId" label="National Id" />
                         </TabsContent>
                         <TabsContent value="password">
-                            <div className="flex flex-row gap-2">
-                                <FormFieldWrapper form={form} name="password" label="Password" />
-                                <FormFieldWrapper form={form} name="confirmPassword" label="Confirm Password" />
+                            <div className="flex flex-row gap-3">
+                                <FormFieldWrapper form={form} type="password" name="password" label="Password" />
+                                <FormFieldWrapper form={form} type="password" name="confirmPassword" label="Confirm Password" />
                             </div>
                         </TabsContent>
                     </Tabs>
                     <div className="mt-4">
-
                         <LoadingBtn isLoading={isLoading}>
-                            Submit
+                            Create
                         </LoadingBtn>
                     </div>
                 </form>
             </Form>
-        </AddDialog>
+        </DialogWrapper>
     );
 }

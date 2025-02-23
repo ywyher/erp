@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/alert-dialog"
 import { Dispatch, SetStateAction, useState } from "react";
 import LoadingBtn from "@/components/loading-btn";
-import { deleteById } from "@/lib/db/queries";
+import { deleteById } from "@/lib/db/mutations";
 import { Tables } from "@/lib/db/schema";
 import { toast } from "sonner";
 
@@ -41,7 +41,7 @@ export default function Delete({ id, table, setPopOpen, label = 'delete' }: {
     return (
         <AlertDialog open={open}>
             <AlertDialogTrigger asChild>
-                <Button variant={'destructive'} className="capitalize font-bold">
+                <Button variant={'destructive'} className="font-bold capitalize">
                     {label}
                 </Button>
             </AlertDialogTrigger>

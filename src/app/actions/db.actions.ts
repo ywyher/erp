@@ -22,10 +22,10 @@ export async function changePassword(data: TPasswordSchema & { userId: string, r
     }).where(eq(account.userId, data.userId)).returning()
 
     if (updatedUserAccount) {
-        const { success } = await revokeUserSessions(data.userId)
-        if (success) {
-            if (data.revalidatePath) revalidatePath(`/${data.revalidatePath}`);
-        }
+        // const { success } = await revokeUserSessions(data.userId)
+        // if (success) {
+        //     if (data.revalidatePath) revalidatePath(`/${data.revalidatePath}`);
+        // }
         return {
             success: true,
             message: "User password updated successfully"

@@ -23,6 +23,7 @@ export type Schedule = {
 export const emailRegex = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/;
 export const phoneNumberRegex = /^(0\d{2}[\s-]?\d{7}|\d{11})$/;
 export const nationalIdRegex = /^([1-9]{1})([0-9]{2})([0-9]{2})([0-9]{2})([0-9]{2})[0-9]{3}([0-9]{1})[0-9]{1}$/;
+export const usernameRegex = /^[a-zA-Z][a-zA-Z0-9._]{2,19}$/;
 
 export const passwordSchema = z.object({
     password: z.string().min(3, {
@@ -45,17 +46,30 @@ export type TPasswordSchema = z.infer<typeof passwordSchema>;
 
 export const userSchema = z
     .object({
-        name: z.string().min(2, {
-            message: "Name must be at least 2 characters.",
-        }),
-        email: z.string().optional(),
-        username: z.string().min(2, {
-            message: "Username must be at least 2 characters.",
-        }),
-        phoneNumber: z.string().optional(),
-        nationalId: z.string().min(2, {
-            message: "National id is required",
-        })
+        name: z
+            .string()
+            .toLowerCase()
+            .min(2, {
+                message: "Name must be at least 2 characters.",
+            }),
+        email: z
+            .string()
+            .email()
+            .toLowerCase()
+            .optional(),
+        username: z
+            .string()
+            .toLowerCase()
+            .trim()
+            .min(2, { message: "Username must be at least 2 characters." }), // Then validate
+        phoneNumber: z
+            .string()
+            .optional(),
+        nationalId: z
+            .string()
+            .min(1, {
+                message: "National id is required",
+            }),
     })
     .superRefine((data, ctx) => {
         if (!data.email && !data.phoneNumber) {

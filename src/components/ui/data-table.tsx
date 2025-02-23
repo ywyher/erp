@@ -23,36 +23,36 @@ import {
     TableHeader,
     TableRow,
 } from "@/components/ui/table"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import {
-    DropdownMenu,
-    DropdownMenuCheckboxItem,
-    DropdownMenuContent,
-    DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
 import { DataTablePagination } from "@/components/ui/data-table-pagination"
-import { DataTableViewOptions } from "@/components/ui/data-table-view-options"
 import { DataTableToolbar } from "@/components/ui/data-table-toolbar"
 
-interface DataTableProps<TData, TValue> {
-    columns: ColumnDef<TData, TValue>[]
-    data: TData[]
-    filter?: 'email' | 'phoneNumber' | null
+interface DataTableProps<TData extends { id: string }, TValue> {
+    columns: ColumnDef<TData, TValue>[];
+    data: TData[];
+    bulkTableName: string;
+    filters?: string[];
+    hiddenColumns?: string[]
 }
 
-export function DataTable<TData, TValue>({
+export function DataTable<TData extends { id: string }, TValue>({
     columns,
     data,
-    filter = 'email',
+    filters = ['email'],
+    bulkTableName,
+    hiddenColumns = ['id'],
 }: DataTableProps<TData, TValue>) {
-    const [sorting, setSorting] = React.useState<SortingState>([])
-    const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
-        []
-    )
+    const [sorting, setSorting] = React.useState<SortingState>([]);
+    const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
+
     const [columnVisibility, setColumnVisibility] =
-        React.useState<VisibilityState>({})
-    const [rowSelection, setRowSelection] = React.useState({})
+    React.useState<VisibilityState>(
+      hiddenColumns ? hiddenColumns.reduce((acc, col) => {
+        acc[col] = false;
+        return acc;
+      }, {} as VisibilityState) : {}
+    );
+
+    const [rowSelection, setRowSelection] = React.useState({});
 
     const table = useReactTable({
         data,
@@ -70,30 +70,32 @@ export function DataTable<TData, TValue>({
             columnVisibility,
             rowSelection,
         },
-    })
+    });
 
     return (
         <div>
             <div className="py-4">
-                <DataTableToolbar table={table} filter={filter} />
+                <DataTableToolbar 
+                    table={table}
+                    filters={filters}
+                    bulkTableName={bulkTableName}
+                />
             </div>
             <div className="rounded-md border ">
                 <Table>
                     <TableHeader>
                         {table.getHeaderGroups().map((headerGroup) => (
                             <TableRow key={headerGroup.id}>
-                                {headerGroup.headers.map((header) => {
-                                    return (
-                                        <TableHead key={header.id}>
-                                            {header.isPlaceholder
-                                                ? null
-                                                : flexRender(
-                                                    header.column.columnDef.header,
-                                                    header.getContext()
-                                                )}
-                                        </TableHead>
-                                    )
-                                })}
+                                {headerGroup.headers.map((header) => (
+                                    <TableHead key={header.id}>
+                                        {header.isPlaceholder
+                                            ? null
+                                            : flexRender(
+                                                  header.column.columnDef.header,
+                                                  header.getContext()
+                                              )}
+                                    </TableHead>
+                                ))}
                             </TableRow>
                         ))}
                     </TableHeader>
@@ -122,6 +124,6 @@ export function DataTable<TData, TValue>({
                 </Table>
             </div>
             <DataTablePagination table={table} />
-        </div >
-    )
+        </div>
+    );
 }

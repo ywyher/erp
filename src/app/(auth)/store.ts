@@ -8,7 +8,7 @@ type AuthStore = {
   operation: 'register' | 'verify' | null;
   redirectTo: string | null;
   otpExists: boolean | null;
-  setContext: (context: 'email' | 'phoneNumber') => void;
+  setContext: (context: 'email' | 'phoneNumber' | 'username') => void;
   setValue: (value: string) => void;
   setPassword: (password: string) => void;
   setOperation: (operation: 'register' | 'verify' | null) => void;
@@ -25,7 +25,7 @@ export const useAuthStore = create<AuthStore>()(
       password: null,
       operation: 'register',
       redirectTo: '',
-      otpExists: null,
+      otpExists: false,
       setContext: (context) => set({ context }),
       setValue: (value) => set({ value }),
       setPassword: (password) => set({ password }),
@@ -39,7 +39,7 @@ export const useAuthStore = create<AuthStore>()(
           password: null,
           operation: null,
           redirectTo: null,
-          otpExists: null,
+          otpExists: false,
         });
       },
     }),

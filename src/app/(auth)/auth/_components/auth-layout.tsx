@@ -1,8 +1,10 @@
+import Header from "@/components/header"
 import Image from "next/image"
 
 export default function AuthLayout({ children }: { children: React.ReactNode }) {
     return (
         <div className="relative min-h-screen">
+            <Header />
             <div className="absolute inset-x-0 top-0 h-52 md:hidden">
                 <Image
                     src="/images/auth.jpg"

@@ -1,13 +1,15 @@
 import { Schedules } from "@/app/(authenticated)/dashboard/types";
-import { phoneNumberRegex, emailRegex } from "@/app/types";
+import { phoneNumberRegex, emailRegex, usernameRegex } from "@/app/types";
 import { Schedule, User } from "@/lib/db/schema";
 import { nanoid } from "nanoid";
 
-export const checkFieldType = (column: string): 'email' | 'phoneNumber' | 'unknown' => {
+export const checkFieldType = (column: string): 'email' | 'phoneNumber' | 'username' | 'unknown' => {
     if (emailRegex.test(column)) {
         return 'email';
     } else if (phoneNumberRegex.test(column)) {
         return 'phoneNumber';
+    }else if(usernameRegex.test(column)) {
+        return 'username'
     } else {
         return 'unknown';
     }
@@ -27,7 +29,11 @@ export function normalizeData(
         return Object.fromEntries(
             Object.entries(value as Record<string, any>).map(([key, val]) => [
                 key,
-                typeof val === "string" ? normalizeData(val) : val,
+                typeof val === "string"
+                    ? key === "name"
+                        ? val.toLowerCase() // **Lowercase, but DON'T trim the name**
+                        : normalizeData(val) // **Trim & lowercase for other fields**
+                    : val,
             ])
         );
     }
@@ -195,3 +201,31 @@ export function checkVerificationNeeded(user: User): {
   
     return null; // Instead of returning { type: null, value: null }
   }
+
+export function getChangedFields<T extends Record<string, any>>(
+    originalData: T,
+    newData: T,
+    normalize: boolean = true
+): Partial<T> {
+    const normalizedOriginal = normalize
+        ? Object.fromEntries(
+              Object.entries(originalData).map(([key, val]) => [
+                  key,
+                  typeof val === "string" ? normalizeData(val) : val,
+              ])
+          )
+        : originalData;
+
+    const normalizedNew = normalize
+        ? Object.fromEntries(
+              Object.entries(newData).map(([key, val]) => [
+                  key,
+                  typeof val === "string" ? normalizeData(val) : val,
+              ])
+          )
+        : newData;
+
+    return Object.fromEntries(
+        Object.entries(normalizedNew).filter(([key, newValue]) => newValue !== normalizedOriginal[key])
+    ) as Partial<T>;
+}

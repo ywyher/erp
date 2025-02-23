@@ -1,4 +1,6 @@
-import React from "react";
+'use client'
+
+import React, { useState } from "react";
 import { Controller } from "react-hook-form";
 import {
     FormItem,
@@ -11,6 +13,7 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectItem, SelectTrigger, SelectValue, SelectContent } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import MultipleSelector from "@/components/ui/multi-select";
+import { Eye, EyeOff } from "lucide-react";
 
 interface FormFieldWrapperProps {
     form: {
@@ -25,8 +28,9 @@ interface FormFieldWrapperProps {
     disabled?: boolean;
     optional?: boolean;
     placeholder?: string;
-    type?: "text" | "select" | 'textarea' | 'multi-select';
+    type?: "text" | "select" | 'textarea' | 'multi-select' | 'password' | 'number';
     options?: { value: string; label: string }[] | string[] | readonly string[];
+    // className?: string;
 }
 
 export const FormFieldWrapper: React.FC<FormFieldWrapperProps> = ({
@@ -39,7 +43,9 @@ export const FormFieldWrapper: React.FC<FormFieldWrapperProps> = ({
     placeholder = "",
     type = "text",
     options = [],
+    // className,
 }) => {
+    const [showPassword, setShowPassword] = useState<boolean>(false);
     const error = form.formState.errors[name]?.message;
 
     return (
@@ -48,7 +54,7 @@ export const FormFieldWrapper: React.FC<FormFieldWrapperProps> = ({
             name={name}
             defaultValue={defaultValue ? defaultValue : ""}
             render={({ field, formState }) => (
-                <FormItem>
+                <FormItem className="w-full">
                     {label && (
                         <FormLabel className="capitalize">
                             {label} {optional && <span className="text-sm text-muted">(Optional)</span>}
@@ -59,9 +65,57 @@ export const FormFieldWrapper: React.FC<FormFieldWrapperProps> = ({
                             {type === "text" && (
                                 <Input
                                     {...field}
+                                    disabled={disabled}
+                                    // onChange={(e) => {
+                                    //     const input = e.target;
+                                    //     const start = input.selectionStart; // Get current cursor position
+                                    //     let value = input.value;
+                                    
+                                    //     if (name === "name") {
+                                    //         value = value.toLowerCase(); // Lowercase without trim
+                                    //     } else {
+                                    //         value = value.trim().toLowerCase(); // Trim + lowercase for other fields
+                                    //     }
+                                    
+                                    //     field.onChange(value);
+                                    
+                                    //     // Restore cursor position
+                                    //     requestAnimationFrame(() => {
+                                    //         input.setSelectionRange(start, start);
+                                    //     });
+                                    // }}
+                                />
+                            )}
+                            {type === "number" && (
+                                <Input
+                                    {...field}
                                     placeholder={placeholder}
                                     disabled={disabled}
+                                    inputMode="numeric"
+                                    pattern="[0-9]*"
+                                    onChange={(e) => {
+                                        const value = e.target.value.replace(/\D/g, ""); // Remove non-numeric characters
+                                        field.onChange(value);
+                                    }}
                                 />
+                            )}
+                            {type === "password" && (
+                                <div className="relative w-full">
+                                    <Input
+                                        {...field}
+                                        autoComplete="new-password"
+                                        type={showPassword ? "text" : "password"}
+                                        placeholder={placeholder}
+                                        disabled={disabled}
+                                    />
+                                    <button
+                                        type="button"
+                                        className="absolute text-gray-500 right-3 top-2"
+                                        onClick={() => setShowPassword(!showPassword)}
+                                    >
+                                        {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                                    </button>
+                                </div>
                             )}
                             {type === "textarea" && (
                                 <Textarea
@@ -105,7 +159,7 @@ export const FormFieldWrapper: React.FC<FormFieldWrapperProps> = ({
                                         // Call the original onChange with the array of values
                                         field.onChange(selectedValues);
                                     }}
-                                    emptyIndicator={<p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">no results found.</p>}
+                                    emptyIndicator={<p className="text-lg leading-10 text-center text-gray-600 dark:text-gray-400">no results found.</p>}
                                     
                                     value={
                                         (field.value || []).map((value: string) => {

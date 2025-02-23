@@ -24,7 +24,6 @@ export default function Onboarding() {
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [context, setContext] = useState<'email' | 'phoneNumber' | null>(null);
     const queryClient = useQueryClient();
-    const setTrigger = useImageStore((state) => state.setTrigger)
 
     const { data: user, isLoading: isPending } = useQuery({
         queryKey: ['session', 'onboarding'],
@@ -49,7 +48,7 @@ export default function Onboarding() {
                 }
 
                 const verificationNeeded = checkVerificationNeeded(user);
-
+                
                 if(verificationNeeded?.value) {
                     router.replace('/')
                     return
@@ -96,9 +95,9 @@ export default function Onboarding() {
         const updatedOnboarding = await updateOnboarding(userId || '', false)
 
         if (success && updatedOnboarding && updatedOnboarding.success) {
+            console.log('INVALIDATEEEE')
             setIsLoading(false)
-            setTrigger(true)
-            await queryClient.invalidateQueries({ queryKey: ['session'] })
+            queryClient.invalidateQueries({ queryKey: ['session'] })
             toast(message)
             router.replace("/");
         }

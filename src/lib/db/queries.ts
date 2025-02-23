@@ -12,15 +12,6 @@ import { headers } from "next/headers";
 import { medicalFile } from "./schema/medical-file";
 import { getFileUrl } from "@/lib/funcs";
 
-const tableMap = {
-    user: user,
-    doctor: doctor,
-    schedule: schedule,
-    session: session,
-    account: account,
-    appointment: appointment,
-};
-
 export async function getUserProvider(userId: string): Promise<{ provider: 'social' | 'credential' }> {
     const result = await db.query.account.findFirst({
         where: (account, { eq }) => eq(account.userId, userId),
@@ -174,53 +165,6 @@ export async function listUsers(role: Roles, merge: boolean = false) {
 
 
     return users;
-}
-
-export async function deleteById(id: string, tableName: Tables) {
-    const table = tableMap[tableName];
-
-    if (!table) {
-        throw new Error(`Invalid table name: ${tableName}`);
-    }
-
-    if (tableName === 'appointment') {
-        // Query all files associated with the appointment
-        const files = await db
-            .select({
-                id: medicalFile.id,
-                name: medicalFile.name,
-            })
-            .from(medicalFile)
-            .where(eq(medicalFile.appointmentId, id));
-
-        if (files.length > 0) {
-            // Delete each file from S3 using your deleteFile function
-            await Promise.all(
-                files.map(async (file) => {
-                    try {
-                        await deleteFile(file.name); // Call your deleteFile function here
-                    } catch (error) {
-                        console.error(`Error deleting file: ${file.name}`, error);
-                    }
-                })
-            );
-
-            // Delete records from the medicalFile table
-            await db.delete(medicalFile).where(eq(medicalFile.appointmentId, id));
-        }
-    }
-
-    // Delete the appointment itself from the appointments table
-    const deleted = await db.delete(table).where(eq(table.id, id)).returning();
-
-    if (deleted.length > 0) {
-        revalidatePath('/dashboard');
-        return {
-            message: 'Record deleted successfully',
-        };
-    } else {
-        throw new Error('Failed to delete the record');
-    }
 }
 
 export async function searchUsers(query: string, role: Roles | 'all') {

@@ -1,40 +1,18 @@
 'use client';
 
 import { FormFieldWrapper } from "@/components/formFieldWrapper";
-import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Dispatch, SetStateAction, useState } from "react";
-import { FieldErrors, useForm } from "react-hook-form";
+import { useState } from "react";
+import { useForm } from "react-hook-form";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { createUser } from "@/lib/db/mutations"
 import LoadingBtn from "@/components/loading-btn";
 import { z } from "zod";
 import { createUserSchema } from "@/app/(authenticated)/dashboard/types";
-
 import { toast } from "sonner";
 import { revalidate } from "@/app/actions";
-
-function CreateDialog({ children, open, setOpen }: { children: React.ReactNode, open: boolean, setOpen: Dispatch<SetStateAction<boolean>> }) {
-    return (
-        <div>
-            <Button onClick={() => setOpen(true)}>Open Create Dialog</Button>
-            <Dialog open={open} onOpenChange={setOpen}>
-                <DialogContent>
-                    <DialogHeader>
-                        <DialogTitle>Create New User</DialogTitle>
-                        {/* Add a DialogDescription here */}
-                        <DialogDescription>
-                            Fill out the form below to create a new user. All fields are required.
-                        </DialogDescription>
-                    </DialogHeader>
-                    {children}
-                </DialogContent>
-            </Dialog>
-        </div>
-    );
-}
+import DialogWrapper from "@/app/(authenticated)/dashboard/_components/dialog-wrapper";
 
 export default function CreateUser() {
     const [open, setOpen] = useState<boolean>(false)
@@ -50,18 +28,26 @@ export default function CreateUser() {
         const result = await createUser({ data, role: 'user' })
 
         if (result?.error) {
-            toast.error(result.error)
+            toast.error(result?.error)
             setIsLoading(false)
             return;
         }
 
-        toast(result?.message)
+        toast.message(result?.message)
 
         await revalidate('/dashboard/users')
-        form.reset()
-        setTab('account')
-        setIsLoading(false)
-        setOpen(false)
+        form.reset({
+            name: "",
+            email: "",
+            username: "",
+            phoneNumber: "",
+            nationalId: "",
+            password: "",
+            confirmPassword: "",
+        });
+        setTab("account");
+        setIsLoading(false);
+        setOpen(false);
     };
 
     const onError = () => {
@@ -69,7 +55,7 @@ export default function CreateUser() {
     }
 
     return (
-        <CreateDialog open={open} setOpen={setOpen}>
+        <DialogWrapper open={open} setOpen={setOpen} label="user" operation="create">
             <Form {...form}>
                 <form onSubmit={form.handleSubmit(onSubmit, onError)}>
                     <Tabs value={tab} onValueChange={(value) => setTab(value as 'account' | 'password')}>
@@ -90,8 +76,8 @@ export default function CreateUser() {
                         </TabsContent>
                         <TabsContent value="password">
                             <div className="flex flex-row gap-2">
-                                <FormFieldWrapper form={form} name="password" label="Password" />
-                                <FormFieldWrapper form={form} name="confirmPassword" label="Confirm Password" />
+                                <FormFieldWrapper form={form} type="password" name="password" label="Password" />
+                                <FormFieldWrapper form={form} type="password" name="confirmPassword" label="Confirm Password" />
                             </div>
                         </TabsContent>
                     </Tabs>
@@ -102,6 +88,6 @@ export default function CreateUser() {
                     </div>
                 </form>
             </Form>
-        </CreateDialog>
+        </DialogWrapper>
     );
 }

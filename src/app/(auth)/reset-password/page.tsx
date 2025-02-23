@@ -18,6 +18,8 @@ import { useState } from "react";
 import { resetPassword } from "@/lib/auth-client";
 import { passwordSchema, TPasswordSchema } from "@/app/types";
 import { toast } from "sonner";
+import { FormFieldWrapper } from "@/components/formFieldWrapper";
+import LoadingBtn from "@/components/loading-btn";
 
 export default function ResetPassword() {
     const [isLoading, setIsLoading] = useState(false)
@@ -63,57 +65,11 @@ export default function ResetPassword() {
                 <h3 className="text-2xl font-semibold text-zinc-100">Reset Your Password </h3>
                 <Form {...form}>
                     <form className="flex flex-col gap-4" onSubmit={form.handleSubmit(onResetPassword)}>
-                        <FormField
-                            control={form.control}
-                            name="password"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>Password</FormLabel>
-                                    <FormControl>
-                                        <Input placeholder="Password" {...field} />
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
-                        <FormField
-                            control={form.control}
-                            name="confirmPassword"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>Confirm Password</FormLabel>
-                                    <FormControl>
-                                        <Input placeholder="Confirm Password" {...field} />
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
-                        <Button
-                            type="submit"
-                            className="w-full bg-[#E4E4E7] text-black hover:bg-white"
-                            disabled={isLoading}
-                        >
-                            {isLoading ? (
-                                <svg className="mr-2 h-4 w-4 animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                    <circle
-                                        className="opacity-25"
-                                        cx="12"
-                                        cy="12"
-                                        r="10"
-                                        stroke="currentColor"
-                                        strokeWidth="4"
-                                    ></circle>
-                                    <path
-                                        className="opacity-75"
-                                        fill="currentColor"
-                                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
-                                    ></path>
-                                </svg>
-                            ) : (
-                                "Reset"
-                            )}
-                        </Button>
+                        <div className="flex flex-col gap-1">
+                            <FormFieldWrapper form={form} type="password" name="password" label="password" />
+                            <FormFieldWrapper form={form} type="password" name="confirmPassword" label="Confirm password" />
+                        </div>
+                        <LoadingBtn isLoading={isLoading}>Update</LoadingBtn>
                     </form>
                 </Form>
             </div>

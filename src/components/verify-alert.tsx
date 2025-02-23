@@ -47,22 +47,24 @@ export default function VerifyAlert() {
     return (
         <>
             {!user.emailVerified && !isFakeEmail(user.email) && (
-               <div className="space-y-4 w-full max-w-4xl mx-auto py-2 px-4">
+                <div className="space-y-4 md:w-[70%] lg:w-[60%] xl:w-[50%] 2xl:w-[40%] mx-auto py-2">
                     <Alert variant="destructive" className="py-2">
                         <Mail className="h-4 w-4" />
                         <AlertTitle>Verify your email</AlertTitle>
-                        <AlertDescription>
-                            Please verify your email address to ensure account security.
+                        <div className="grid grid-cols-3 items-center">
+                            <AlertDescription className="col-span-2">
+                                Please verify your email address to ensure account security.
+                            </AlertDescription>
                             <LoadingBtn
                                 isLoading={isLoading}
                                 variant="outline"
                                 size="sm"
-                                className="ml-2 h-7 text-xs"
+                                className="ml-2 h-7 text-xs col-span-1"
                                 onClick={() => onSendOtp('email')}
                             >
                                 Send Verification Email
                             </LoadingBtn>
-                        </AlertDescription>
+                        </div>
                     </Alert>
                 </div>
             )}

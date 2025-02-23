@@ -8,7 +8,7 @@ export const client = createAuthClient({
         usernameClient(),
         emailOTPClient(),
         phoneNumberClient(),
-        inferAdditionalFields<typeof auth>()
+        inferAdditionalFields<typeof auth>(),
     ]
 })
 
