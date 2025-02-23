@@ -1,11 +1,10 @@
 'use server'
 
-import { createUser } from "@/lib/db/mutations"
+import { createUser, updateUserRole } from "@/lib/db/mutations"
 import db from "@/lib/db";
 import { user } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
-import { userSchema } from "@/app/types";
-import { createUserSchema } from "@/app/(authenticated)/dashboard/types";
+import { createUserSchema, updateUserSchema } from "@/app/types";
 import { z } from "zod";
 import { revalidatePath } from "next/cache";
 import { updateUser } from "@/lib/db/mutations";
@@ -26,31 +25,23 @@ export async function createAdmin(data: z.infer<typeof createUserSchema>) {
     }
 }
 
-export async function updateAdmin({ data, userId }: { data: z.infer<typeof userSchema>; userId: string }) {
-    const createdUser = await updateUser({ data, userId });
-
-    if (!createdUser || !createdUser.userId) {
-        return {
-            error: createdUser?.error
+export async function updateAdmin({ data, userId }: { data: z.infer<typeof updateUserSchema>; userId: string }) {
+    try {
+        const createdUser = await updateUser({ data, userId, role: 'admin' });
+    
+        if (!createdUser || !createdUser.userId) {
+            throw new Error(createdUser.error || "Failed to update admin")
         }
-    }
-
-    const updatedUserRole = await db
-        .update(user)
-        .set({
-            role: "doctor",
-        })
-        .where(eq(user.id, createdUser.userId));
-
-    if (!updatedUserRole) {
+    
+        revalidatePath("/dashboard/admins");
         return {
-            error: "Error while updating user role.",
-        };
-    }
-
-    revalidatePath("/dashboard/admins");
-    return {
-        success: true,
-        message: "Admin updated successfully"
+            error: null,
+            message: "Admin updated successfully"
+        }
+    } catch (error: any) {
+        return {
+            error: error.message,
+            message: null,
+        }
     }
 }

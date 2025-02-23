@@ -12,46 +12,39 @@ import { z } from "zod";
 import { createReceptionistSchema, updateReceptionistSchema } from "@/app/(authenticated)/dashboard/(admins)/receptionists/types";
 
 export async function createReceptionist({ userData, schedulesData }: { userData: z.infer<typeof createReceptionistSchema>, schedulesData: Schedules }) {
-    const createdUser = await createUser({ data: userData, role: 'receptionist' });
-
-    if (!createdUser || !createdUser.userId) {
+    try {
+        return await db.transaction(async (tx) => {
+            const createdUser = await createUser({ data: userData, role: 'receptionist', dbInstance: tx });
+        
+            if (("error" in createdUser && createdUser.error) || ("error" in createdUser && !createdUser.userId)) {
+                throw new Error(createdUser.error);
+            }
+        
+            const receptionistId = generateId();
+        
+            await tx.insert(receptionist).values({
+                id: receptionistId,
+                department: userData.department,
+                userId: createdUser.userId,
+            }).returning({
+                userId: receptionist.userId
+            });
+        
+            const scheduleRecords = transformSchedulesToRecords(schedulesData, createdUser.userId)
+            await tx.insert(schedule).values(scheduleRecords);
+        
+            revalidatePath("/dashboard/receptionists");
+            return {
+                error: null,
+                message: "Receptionist created successfully!",
+            };
+        })
+    } catch (error: any) {
         return {
-            error: createdUser?.error,
-        };
+            error: error.message || 'Failed to create receptionist',
+            message: null
+        }
     }
-
-    const receptionistId = generateId();
-
-    const createdReceptionist = await db.insert(receptionist).values({
-        id: receptionistId,
-        department: userData.department,
-        userId: createdUser.userId,
-    }).returning({
-        userId: receptionist.userId
-    });
-
-    if (!createdReceptionist) {
-        await deleteById(createdUser.userId, 'user')
-        return {
-            error: "Failed to create receptionist record.",
-        };
-    }
-
-    const scheduleRecords = transformSchedulesToRecords(schedulesData, createdUser.userId)
-
-    const insertedSchedules = await db.insert(schedule).values(scheduleRecords);
-
-    if (!insertedSchedules) {
-        await deleteById(createdReceptionist[0].userId, 'receptionist')
-        return {
-            error: "Failed to create schedule records.",
-        };
-    }
-
-    revalidatePath("/dashboard/receptionists");
-    return {
-        message: "Receptionist created successfully!",
-    };
 }
 
 export async function updateReceptionist(
@@ -64,22 +57,30 @@ export async function updateReceptionist(
             userId: string
         }
 ) {
-    const updatedUser = await updateUser({ data, userId })
-
-    if (!updatedUser || !updatedUser.userId) {
-        return {
-            error: updatedUser?.error,
-        };
-    }
-
-    if (data.department) {
-        await db.update(receptionist).set({
-            department: data.department
+    try {
+        return await db.transaction(async (tx) => {
+            const updatedUser = await updateUser({ data, userId, dbInstance: tx, role: 'receptionist' })
+        
+            if (!updatedUser || updatedUser.error) {
+                throw new Error(updatedUser.error)
+            }
+        
+            if (data.department) {
+                await tx.update(receptionist).set({
+                    department: data.department
+                })
+            }
+        
+            revalidatePath("/dashboard/receptionists");
+            return {
+                error: null,
+                message: "Receptionist updated successfully!",
+            };
         })
+    } catch (error: any) {
+        return {
+            error: error.message,
+            message: null
+        }
     }
-
-    revalidatePath("/dashboard/receptionists");
-    return {
-        message: "Receptionist updated successfully!",
-    };
 }

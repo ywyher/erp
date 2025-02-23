@@ -1,12 +1,10 @@
 'use server'
 
-import { userSchema } from "@/app/types"
 import db from "@/lib/db"
 import { user } from "@/lib/db/schema"
-import { deleteFile, getPreSignedUrl } from "@/lib/s3"
+import { deleteFile } from "@/lib/s3"
 import { eq } from "drizzle-orm"
 import { revalidatePath } from "next/cache"
-import { z } from "zod"
 
 export const computeSHA256 = async (file: File) => {
     const buffer = await file.arrayBuffer()

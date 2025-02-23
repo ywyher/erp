@@ -1,104 +1,85 @@
 'use client';
 
 import { FormFieldWrapper } from "@/components/formFieldWrapper";
-import { Button } from "@/components/ui/button";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Form } from "@/components/ui/form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Dispatch, SetStateAction, useEffect, useState } from "react";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { createDoctorSchema } from "@/app/(authenticated)/dashboard/(admins)/doctors/types";
-import { days as daysList, specialties } from "@/app/(authenticated)/dashboard/constants";
+import { specialties } from "@/app/(authenticated)/dashboard/constants";
 import { createDoctor } from "@/app/(authenticated)/dashboard/(admins)/doctors/actions";
 import LoadingBtn from "@/components/loading-btn";
-import MultipleSelector from "@/components/ui/multi-select";
-import { TimePicker } from "@/components/ui/datetime-picker";
 import ScheduleSelector from "@/app/(authenticated)/dashboard/_components/schedule-selector";
 import { Schedules } from "@/app/(authenticated)/dashboard/types";
 import { useRouter } from "next/navigation";
 import { normalizeData } from "@/lib/funcs";
 import { z } from "zod";
-
 import { toast } from "sonner";
-
-function CreateDialog({ children, open, setOpen }: { children: React.ReactNode, open: boolean, setOpen: Dispatch<SetStateAction<boolean>> }) {
-    return (
-        <div>
-            <Button onClick={() => setOpen(true)}>Create Doctor</Button>
-            <Dialog open={open} onOpenChange={setOpen}>
-                <DialogContent>
-                    <DialogHeader>
-                        <DialogTitle>Create New Doctor</DialogTitle>
-                        {/* Add a DialogDescription here */}
-                        <DialogDescription>
-                            Fill out the form below to create a new doctor. All fields are required.
-                        </DialogDescription>
-                    </DialogHeader>
-                    {children}
-                </DialogContent>
-            </Dialog>
-        </div>
-    );
-}
+import DialogWrapper from "@/app/(authenticated)/dashboard/_components/dialog-wrapper";
 
 export default function CreateDoctor() {
     const [isLoading, setIsLoading] = useState<boolean>(false)
-    const [schedules, setSchedules] = useState<Schedules>({}); // Updated name
-    const [selectedDays, setSelectedDays] = useState<string[]>([]); // Updated name for clarity
-    const [tab, setTab] = useState<'account' | 'schedules' | 'password'>('account')
+    const [schedules, setSchedules] = useState<Schedules>({ monday: [ { startTime: "02:00", endTime: "03:00" } ] }); // Updated name
+    const [selectedDays, setSelectedDays] = useState<string[]>(['monday']); // Updated name for clarity
     const [open, setOpen] = useState<boolean>(false)
     const router = useRouter();
 
     const form = useForm<z.infer<typeof createDoctorSchema>>({
         resolver: zodResolver(createDoctorSchema),
         defaultValues: {
+            name: 'doc',
             username: 'doc',
             email: 'doc@gmail.com',
-            nationalId: '30801201100198',
+            nationalId: '30801101100191',
             specialty: 'cardiology',
-            name: 'doc',
             password: 'doc',
-            confirmPassword: 'doc',
+            confirmPassword: 'doc'
         }
     });
 
     const onSubmit = async (data: z.infer<typeof createDoctorSchema>) => {
-        if (selectedDays.length == 0) {
-            toast.error(`Work days is required`)
+        if (!selectedDays.length) {
+            toast.error("Work days are required.");
             return;
         }
-
-        const missingSchedules = selectedDays.filter((day) => !schedules[day] || schedules[day].length === 0);
-
-        if (missingSchedules.length > 0) {
-            toast.error(`The following days are missing schedules: ${missingSchedules.join(", ")}`)
+        
+        if (selectedDays.some(day => !schedules[day]?.length)) {
+            toast.error(`The following days are missing schedules: ${selectedDays.filter(day => !schedules[day]?.length).join(", ")}`);
             return;
         }
+        
+        try {
+            setIsLoading(true);
 
-        const normalizedData = {
-            ...data,
-            name: normalizeData(data.name),
-            username: normalizeData(data.username),
-            email: normalizeData(data.email || ""),
-            phoneNumber: normalizeData(data.phoneNumber || ""),
-            nationalId: normalizeData(data.nationalId),
-        };
+            const result = await createDoctor({
+                userData: normalizeData(data, 'object'),
+                schedulesData: schedules
+            });
 
-        setIsLoading(true)
-        const result = await createDoctor({ userData: normalizedData, schedulesData: schedules })
+            if (result?.error) {
+                toast.error(result.error);
+                return;
+            }
 
-        if (result?.error) {
-            toast.error(result.error)
-            setIsLoading(false)
-            return;
+            toast.success(result?.message);
+            setSchedules({});
+            setSelectedDays([]);
+            setOpen(false);
+            form.reset({
+                name: "",
+                email: "",
+                username: "",
+                phoneNumber: "",
+                nationalId: "",
+                specialty: undefined,
+                password: "",
+                confirmPassword: "",
+            });
+            router.push('/dashboard/doctors');
+        } finally {
+            setIsLoading(false);
         }
-
-        toast(result?.message)
-        setIsLoading(false)
-        form.reset()
-        setOpen(false)
-        router.push('/dashboard/doctors')
     };
 
     const onError = () => {
@@ -106,25 +87,25 @@ export default function CreateDoctor() {
     }
 
     return (
-        <CreateDialog open={open} setOpen={setOpen}>
+        <DialogWrapper open={open} setOpen={setOpen} label="doctor" operation="create">
             <Form {...form}>
-                <form onSubmit={form.handleSubmit(onSubmit, onError)}>
+                <form onSubmit={form.handleSubmit(onSubmit, onError)} className="flex flex-col gap-4">
                     <Tabs defaultValue="account">
                         <TabsList>
                             <TabsTrigger value="account">Account</TabsTrigger>
                             <TabsTrigger value="schedules">Schedules</TabsTrigger>
                             <TabsTrigger value="password">Password</TabsTrigger>
                         </TabsList>
-                        <TabsContent value="account">
+                        <TabsContent value="account" className="flex flex-col gap-2">
                             <div className="flex flex-row gap-2">
                                 <FormFieldWrapper form={form} name="name" label="Name" />
                                 <FormFieldWrapper form={form} name="username" label="Username" />
                             </div>
                             <div className="flex flex-row gap-2">
                                 <FormFieldWrapper form={form} name="email" label="Email" />
-                                <FormFieldWrapper form={form} name="phoneNumber" label="Phone Number" />
+                                <FormFieldWrapper form={form} type="number" name="phoneNumber" label="Phone Number" />
                             </div>
-                            <FormFieldWrapper form={form} name="nationalId" label="National Id" />
+                            <FormFieldWrapper form={form} type="number" name="nationalId" label="National Id" />
                             <div className="flex flex-row gap-2">
                                 <FormFieldWrapper form={form}
                                     name="specialty"
@@ -147,13 +128,11 @@ export default function CreateDoctor() {
                             <FormFieldWrapper form={form} type="password" name="confirmPassword" label="Confirm Password" />
                         </TabsContent>
                     </Tabs>
-                    <div className="mt-4">
-                        <LoadingBtn isLoading={isLoading}>
-                            Create
-                        </LoadingBtn>
-                    </div>
+                    <LoadingBtn isLoading={isLoading}>
+                        Create
+                    </LoadingBtn>
                 </form>
             </Form>
-        </CreateDialog>
+        </DialogWrapper>
     );
 }

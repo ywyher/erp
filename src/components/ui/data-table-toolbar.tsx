@@ -1,7 +1,7 @@
 "use client"
 
 import { Table } from "@tanstack/react-table"
-import { X, Trash2, FileDown } from "lucide-react"
+import { X, Trash2, FileDown, Settings, Check } from "lucide-react"
 import { useState } from "react"
 import { utils, writeFile } from "xlsx"
 
@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { DataTableViewOptions } from "@/components/ui/data-table-view-options"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { deleteById } from "@/lib/db/mutations"
 
 interface DataTableToolbarProps<TData extends { id: string }> {
@@ -25,6 +26,7 @@ export function DataTableToolbar<TData extends { id: string }>({
   const isFiltered = table.getState().columnFilters.length > 0
   const selectedRows = table.getSelectedRowModel().rows
   const [open, setOpen] = useState(false)
+  const [activeFilter, setActiveFilter] = useState(filters[0])
 
   const handleDelete = async () => {
     for (const row of selectedRows) {
@@ -45,17 +47,30 @@ export function DataTableToolbar<TData extends { id: string }>({
   return (
     <div className="flex items-center justify-between">
       <div className="flex flex-1 items-center space-x-2">
-        {filters.map((filter) => (
-          <Input
-            key={filter}
-            placeholder={`Filter ${filter}...`}
-            value={(table.getColumn(filter)?.getFilterValue() as string) ?? ""}
-            onChange={(event) =>
-              table.getColumn(filter)?.setFilterValue(event.target.value)
-            }
-            className="h-8 w-[150px] lg:w-[250px]"
-          />
-        ))}
+        <Input
+          placeholder={`Filter Via ${activeFilter.charAt(0).toUpperCase() + activeFilter.slice(1)}...`}
+          value={(table.getColumn(activeFilter)?.getFilterValue() as string) ?? ""}
+          onChange={(event) =>
+            table.getColumn(activeFilter)?.setFilterValue(event.target.value)
+          }
+          className="h-8 w-[150px] lg:w-[250px]"
+        />
+        {filters.length > 1 && (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" className="h-8 px-2">
+                <Settings className="h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="start">
+              {filters.map((filter) => (
+                <DropdownMenuItem key={filter} onClick={() => setActiveFilter(filter)} className="capitalize">
+                  {activeFilter == filter && <Check />} {filter}
+                </DropdownMenuItem>
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
+        )}
         {isFiltered && (
           <Button
             variant="ghost"

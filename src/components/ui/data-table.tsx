@@ -123,7 +123,9 @@ export function DataTable<TData extends { id: string }, TValue>({
                     </TableBody>
                 </Table>
             </div>
-            <DataTablePagination table={table} />
+            <div className="mt-3">
+                <DataTablePagination table={table} />
+            </div>
         </div>
     );
 }

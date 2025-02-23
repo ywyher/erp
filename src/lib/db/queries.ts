@@ -4,7 +4,7 @@ import { Roles } from "@/app/types";
 import { auth } from "@/lib/auth";
 import { signIn, User } from "@/lib/auth-client";
 import db from "@/lib/db";
-import { account, appointment, Doctor, doctor, receptionist, Recseptionist, Schedule, schedule, session, settings, Tables, user } from "@/lib/db/schema";
+import { account, appointment, Doctor, doctor, receptionist, Receptionist, Schedule, schedule, session, settings, Tables, user } from "@/lib/db/schema";
 import { deleteFile } from "@/lib/s3";
 import { and, ConsoleLogWriter, eq, like, or, sql } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
@@ -27,8 +27,12 @@ export async function getUserProvider(userId: string): Promise<{ provider: 'soci
     }
 }
 
-export async function checkFieldAvailability({ field, value }: { field: 'email' | 'username' | 'phoneNumber' | 'nationalId', value: string }) {
-    const doesFieldExists = await db.query.user.findFirst({
+export async function checkFieldAvailability({ field, value, dbInstance = db }: { 
+    field: 'email' | 'username' | 'phoneNumber' | 'nationalId',
+    value: string,
+    dbInstance?: typeof db
+}) {
+    const doesFieldExists = await dbInstance.query.user.findFirst({
         where: (user, { eq }) => eq(user[field], value)
     });
 
@@ -74,7 +78,7 @@ export async function getUserById(userId: string, role: Roles) {
             .where(eq(user.id, userId))
             .groupBy(user.id, receptionist.id);
 
-        return result[0] as { user: User, receptionist: Recseptionist, schedules: Schedule[] };
+        return result[0] as { user: User, receptionist: Receptionist, schedules: Schedule[] };
     }
 
 }

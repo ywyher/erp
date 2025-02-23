@@ -6,7 +6,7 @@ import LoadingBtn from "@/components/loading-btn"
 import { useEffect } from "react"
 import { FormFieldWrapper } from "@/components/formFieldWrapper"
 import { z } from "zod"
-import { userSchema } from "@/app/types"
+import { updateUserSchema } from "@/app/types"
 
 export default function OnboardingForm({
     form,
@@ -15,8 +15,8 @@ export default function OnboardingForm({
     context,
     value
 }: {
-    form: UseFormReturn<z.infer<typeof userSchema>>,
-    onSubmit: (data: z.infer<typeof userSchema>) => Promise<void>,
+    form: UseFormReturn<z.infer<typeof updateUserSchema>>,
+    onSubmit: (data: z.infer<typeof updateUserSchema>) => Promise<void>,
     isLoading: boolean
     context: 'email' | 'phoneNumber'
     value: string

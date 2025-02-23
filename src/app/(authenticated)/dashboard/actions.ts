@@ -1,17 +1,13 @@
 'use server'
 
-import { checkFieldAvailability } from "@/lib/db/queries";
 import db from "@/lib/db";
-import { account, schedule, user } from "@/lib/db/schema";
-import { generateFakeField, generateId, transformSchedulesToRecords } from "@/lib/funcs";
-import { hashPassword } from "@/lib/password";
+import { schedule, User } from "@/lib/db/schema";
+import { transformSchedulesToRecords } from "@/lib/funcs";
 import { eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
-import { createUserSchema, Schedules } from "@/app/(authenticated)/dashboard/types";
-import { z } from "zod";
-import { Roles } from "@/app/types";
+import { Schedules } from "@/app/(authenticated)/dashboard/types";
 
-export async function updateSchedule({ schedules, userId }: { schedules: Schedules; userId: string }) {
+export async function updateSchedule({ schedules, userId }: { schedules: Schedules; userId: User['id'] }) {
     try {
         // Start a transaction
         return await db.transaction(async (tx) => {
@@ -26,11 +22,9 @@ export async function updateSchedule({ schedules, userId }: { schedules: Schedul
             // Revalidate the path to update the UI
             revalidatePath('/dashboard/schedule');
 
-            return { success: true, message: 'Schedule updated successfully' };
+            return { error: null, message: 'Schedule updated successfully' };
         });
     } catch (error) {
-        console.error('Error updating schedule:', error);
-        return { success: false, message: 'Failed to update schedule' };
+        return { error: 'Failed', message: null };
     }
 }
-

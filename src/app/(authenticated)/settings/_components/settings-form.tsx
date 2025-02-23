@@ -10,7 +10,7 @@ import { useImageStore } from "@/app/store"
 import LoadingBtn from "@/components/loading-btn"
 import { isFakeEmail, normalizeData } from "@/lib/funcs"
 import { z } from "zod"
-import { userSchema } from "@/app/types"
+import { updateUserSchema } from "@/app/types"
 import { FormFieldWrapper } from "@/components/formFieldWrapper"
 import { getUserRegistrationType } from "@/lib/db/queries"
 import { toast } from "sonner"
@@ -35,8 +35,8 @@ export default function SettingsForm() {
         }
     })
 
-    const form = useForm<z.infer<typeof userSchema>>({
-        resolver: zodResolver(userSchema),
+    const form = useForm<z.infer<typeof updateUserSchema>>({
+        resolver: zodResolver(updateUserSchema),
     })
 
     useEffect(() => {
@@ -55,7 +55,7 @@ export default function SettingsForm() {
         }
     }, [user])
 
-    const onCheckChangedFields = async (data: z.infer<typeof userSchema>) => {
+    const onCheckChangedFields = async (data: z.infer<typeof updateUserSchema>) => {
         if (!user) return;
 
         const normalizedSessionData = {
@@ -66,10 +66,10 @@ export default function SettingsForm() {
             nationalId: normalizeData(user.nationalId || "")
         };
 
-        const changedFields: Partial<z.infer<typeof userSchema>> = {};
+        const changedFields: Partial<z.infer<typeof updateUserSchema>> = {};
 
         for (const key in normalizedSessionData) {
-            let formValue = normalizeData(data[key as keyof z.infer<typeof userSchema>] as string);
+            let formValue = normalizeData(data[key as keyof z.infer<typeof updateUserSchema>] as string);
             const sessionValue = normalizedSessionData[key as keyof typeof normalizedSessionData];
 
             if (formValue !== sessionValue) {
@@ -82,14 +82,14 @@ export default function SettingsForm() {
             return;
         }
 
-        await onSubmit(changedFields as z.infer<typeof userSchema>);
+        await onSubmit(changedFields as z.infer<typeof updateUserSchema>);
     };
 
 
-    const onSubmit = async (data: z.infer<typeof userSchema>) => {
+    const onSubmit = async (data: z.infer<typeof updateUserSchema>) => {
         if (!user || !user.id) return;
         setIsLoading(true)
-        const result = await updateUser({ data, userId: user.id });
+        const result = await updateUser({ data, userId: user.id, role: 'user' });
 
         if (result && result.error) {
             toast.error(result.error)

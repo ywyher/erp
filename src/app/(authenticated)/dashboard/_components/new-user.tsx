@@ -6,12 +6,12 @@ import { Form } from "@/components/ui/form"
 import { FormFieldWrapper } from "@/components/formFieldWrapper"
 import LoadingBtn from "@/components/loading-btn"
 import { z } from "zod"
-import { userSchema } from "@/app/types"
+import { updateUserSchema } from "@/app/types"
 import { Dispatch, SetStateAction, useState } from "react"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { generateFakeField } from "@/lib/funcs"
-import { createUserSchema } from "@/app/(authenticated)/dashboard/types"
+import { createUserSchema } from "@/app/types"
 import { User } from "@/lib/db/schema"
 import { toast } from "sonner"
 import { createUser } from "@/lib/db/mutations"
@@ -23,11 +23,11 @@ export default function NewUser({ setCreatedUserId, setIsCreateUser }: {
     const [isLoading, setIsLoading] = useState<boolean>(false)
     const [open, setOpen] = useState<boolean>(true)
 
-    const form = useForm<z.infer<typeof userSchema>>({
-        resolver: zodResolver(userSchema)
+    const form = useForm<z.infer<typeof updateUserSchema>>({
+        resolver: zodResolver(updateUserSchema)
     })
 
-    const handleCreateUser = async (data: z.infer<typeof userSchema> & { password?: string }) => {
+    const handleCreateUser = async (data: z.infer<typeof updateUserSchema> & { password?: string }) => {
         setIsLoading(true)
         data.password = data.nationalId
         const createdUser = await createUser({ data: data as z.infer<typeof createUserSchema>, role: 'user' })

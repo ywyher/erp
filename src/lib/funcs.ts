@@ -76,7 +76,6 @@ export const generateId = (size?: number) => {
 };
 
 export const groupSchedules = (schedules: Schedule[]) => {
-    console.log(schedules)
     const groupedSchedules: Record<string, { startTime: string; endTime: string }[]> = {};
 
     schedules.forEach(item => {

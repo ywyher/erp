@@ -1,7 +1,7 @@
 "use client"
 
 import { changePassword } from "@/app/actions/db.actions";
-import { passwordSchema, TPasswordSchema } from "@/app/types";
+import { passwordSchema } from "@/app/types";
 import { FormFieldWrapper } from "@/components/formFieldWrapper";
 import LoadingBtn from "@/components/loading-btn";
 import { Form } from "@/components/ui/form";
@@ -9,6 +9,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Dispatch, SetStateAction, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
+import { z } from "zod";
 
 export default function UpdatePassword(
     {
@@ -24,11 +25,11 @@ export default function UpdatePassword(
 ) {
     const [isLoading, setIsLoading] = useState<boolean>(false)
 
-    const form = useForm<TPasswordSchema>({
+    const form = useForm<z.infer<typeof passwordSchema>>({
         resolver: zodResolver(passwordSchema)
     })
 
-    const onUpdatePassword = async (data: TPasswordSchema) => {
+    const onUpdatePassword = async (data: z.infer<typeof passwordSchema>) => {
         setIsLoading(true)
         const result = await changePassword({ ...data, userId, revalidatePath: revalidatePath ?? "" })
 

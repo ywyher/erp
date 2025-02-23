@@ -8,6 +8,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { isFakeEmail } from "@/lib/funcs";
 import React from "react";
 import AdminAction from "@/app/(authenticated)/dashboard/(admins)/admins/_components/admin-actions";
+import TableCell from "@/components/table-cell";
 
 // Define admin columns with proper types
 const adminColumns: { value: string; header: string; dialog?: boolean; isBoolean?: boolean }[] = [
@@ -47,35 +48,9 @@ export const adminTableColumns: ColumnDef<any>[] = [
         header: ({ column }: { column: Column<any, any> }) => (
             <DataTableColumnHeader column={column} title={header} />
         ),
-        cell: ({ row }: { row: Row<any> }) => {
-            const cellValue = row.getValue(value);
-
-            if (cellValue == null || isFakeEmail(row.getValue('email'))) {
-                return <span className="text-muted-foreground">Empty</span>;
-            }
-
-            if (isBoolean) {
-                return cellValue === true ? "Yes" : "No";
-            }
-
-            return dialog ? (
-                <Dialog>
-                    <DialogTrigger asChild>
-                        <Button variant="outline" size="sm">
-                            View
-                        </Button>
-                    </DialogTrigger>
-                    <DialogContent>
-                        <DialogHeader>
-                            <DialogTitle>{header}</DialogTitle>
-                        </DialogHeader>
-                        <div>{cellValue as string}</div>
-                    </DialogContent>
-                </Dialog>
-            ) : (
-                <span>{cellValue as string}</span>
-            );
-        },
+        cell: ({ row }: { row: Row<any> }) => (
+            <TableCell row={row} value={value} header={header} dialog={dialog} isBoolean={isBoolean} />
+        ),
     })),
     {
         id: "actions",

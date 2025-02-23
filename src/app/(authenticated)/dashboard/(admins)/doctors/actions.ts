@@ -3,8 +3,7 @@
 import { createUser, updateUser } from "@/lib/db/mutations"
 import { Schedules } from "@/app/(authenticated)/dashboard/types";
 import db from "@/lib/db";
-import { deleteById } from "@/lib/db/mutations";
-import { doctor, schedule, user } from "@/lib/db/schema";
+import { doctor, schedule, User } from "@/lib/db/schema";
 import { generateId, transformSchedulesToRecords } from "@/lib/funcs";
 import { eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
@@ -12,46 +11,40 @@ import { createDoctorSchema, updateDoctorSchema } from "@/app/(authenticated)/da
 import { z } from "zod";
 
 export async function createDoctor({ userData, schedulesData }: { userData: z.infer<typeof createDoctorSchema>, schedulesData: Schedules }) {
-    const createdUser = await createUser({ data: userData, role: 'doctor' });
+    try {
+        return await db.transaction(async (tx) => {
+            const createdUser = await createUser({ data: userData, role: 'doctor', dbInstance: tx });
 
-    if (!createdUser || !createdUser.userId) {
+            if (("error" in createdUser && createdUser.error) || ("error" in createdUser && !createdUser.userId)) {
+                throw new Error(createdUser.error);
+            }
+
+            const doctorId = generateId();
+            const createdDoctor = await tx.insert(doctor).values({
+                id: doctorId,
+                specialty: userData.specialty,
+                userId: createdUser.userId,
+            }).returning({
+                userId: doctor.userId
+            });
+
+
+            if (!createdDoctor.length) return {
+                error: "Failed to create doctor record."
+            }
+
+            const scheduleRecords = transformSchedulesToRecords(schedulesData, createdUser.userId );
+            await tx.insert(schedule).values(scheduleRecords);
+
+            revalidatePath("/dashboard/doctors");
+            return { error: null, message: "Doctor created successfully!" };
+        });
+    } catch (error: any) {
         return {
-            error: createdUser?.error,
+            error: error.message || "Something went wrong while creating the user.",
+            message: null
         };
     }
-
-    const doctorId = generateId();
-
-    const createdDoctor = await db.insert(doctor).values({
-        id: doctorId,
-        specialty: userData.specialty,
-        userId: createdUser.userId,
-    }).returning({
-        userId: doctor.userId
-    });
-
-    if (!createdDoctor) {
-        await deleteById(createdUser.userId, 'user')
-        return {
-            error: "Failed to create doctor record.",
-        };
-    }
-
-    const scheduleRecords = transformSchedulesToRecords(schedulesData, createdUser.userId)
-
-    const insertedSchedules = await db.insert(schedule).values(scheduleRecords);
-
-    if (!insertedSchedules) {
-        await deleteById(createdDoctor[0].userId, 'doctor')
-        return {
-            error: "Failed to create schedule records.",
-        };
-    }
-
-    revalidatePath("/dashboard/doctors");
-    return {
-        message: "Doctor created successfully!",
-    };
 }
 
 export async function updateDoctor(
@@ -61,25 +54,30 @@ export async function updateDoctor(
     }:
         {
             data: z.infer<typeof updateDoctorSchema>,
-            userId: string
+            userId: User['id']
         }
 ) {
-    const updatedUser = await updateUser({ data, userId })
-
-    if (!updatedUser || !updatedUser.userId) {
+    try {
+        return await db.transaction(async (tx) => {
+            const updatedUser = await updateUser({ data, userId, dbInstance: tx, role: 'doctor' });
+    
+            if (!updatedUser || !updatedUser.userId) { 
+                throw new Error(updatedUser?.error || "Failed to update user.") 
+            }
+    
+            if (data.specialty) {
+                await tx.update(doctor)
+                    .set({ specialty: data.specialty })
+                    .where(eq(doctor.userId, userId));
+            }
+    
+            revalidatePath("/dashboard/doctors");
+            return { message: "Doctor updated successfully!", error: null };
+        });
+    } catch (error: any) {
         return {
-            error: updatedUser?.error,
-        };
+            error: error.message,
+            message: null
+        }
     }
-
-    if (data.specialty) {
-        const updatedDoctor = await db.update(doctor).set({
-            specialty: data.specialty
-        })
-    }
-
-    revalidatePath("/dashboard/doctors");
-    return {
-        message: "Doctor updated successfully!",
-    };
 }

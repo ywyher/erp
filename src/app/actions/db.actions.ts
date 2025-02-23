@@ -1,14 +1,15 @@
 'use server'
 
-import { TPasswordSchema } from "@/app/types";
+import { passwordSchema } from "@/app/types";
 import db from "@/lib/db";
 import { revokeUserSessions } from "@/lib/db/queries";
-import { account } from "@/lib/db/schema";
+import { account, User } from "@/lib/db/schema";
 import { hashPassword } from "@/lib/password";
 import { eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
+import { z } from "zod";
 
-export async function changePassword(data: TPasswordSchema & { userId: string, revalidatePath?: string }) {
+export async function changePassword(data: z.infer<typeof passwordSchema> & { userId: User['id'], revalidatePath?: string }) {
     const hashedPassword = await hashPassword(data.password)
 
     if (!hashedPassword) {

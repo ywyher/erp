@@ -2,101 +2,109 @@
 
 import { z } from "zod"
 import { checkFieldAvailability } from "./queries"
-import { Roles, userSchema } from "@/app/types"
+import { updateUserSchema } from "@/app/types"
 import db from "."
 import { account, appointment, doctor, medicalFile, schedule, session, User, user } from "./schema"
 import { eq } from "drizzle-orm"
-import { createUserSchema } from "@/app/(authenticated)/dashboard/types"
+import { createUserSchema } from "@/app/types"
 import { generateFakeField, generateId } from "../funcs"
 import { hashPassword } from "../password"
 import { deleteFile } from "@/lib/s3"
 import { revalidatePath } from "next/cache"
 
-export async function createUser({ data, role }: { data: z.infer<typeof createUserSchema>, role: Roles }) {
-    const createPayload: Partial<z.infer<typeof createUserSchema>> = {}
+export async function createUser({ data, role, dbInstance = db }: { 
+    data: z.infer<typeof createUserSchema>,
+    role: User['role'],
+    dbInstance?: typeof db;
+}) {
+    const createPayload: Partial<z.infer<typeof createUserSchema>> = {};
 
-    const { error: usernameError } = await checkFieldAvailability({ field: 'username', value: data.username })
-    if (usernameError) {
-        return {
-            error: usernameError
-        }
-    }
+    // Run availability checks BEFORE starting the transaction
+    const { error: usernameError } = await checkFieldAvailability({ field: 'username', value: data.username, dbInstance });
+    if (usernameError) return { error: usernameError };
 
-    const { error: nationalIdError } = await checkFieldAvailability({ field: 'nationalId', value: data.nationalId })
-    if (nationalIdError) {
-        return {
-            error: nationalIdError
-        }
-    }
+    const { error: nationalIdError } = await checkFieldAvailability({ field: 'nationalId', value: data.nationalId, dbInstance });
+    if (nationalIdError) return { error: nationalIdError };
 
     if (data.email) {
-        const { error } = await checkFieldAvailability({ field: 'email', value: data.email })
-        if (error) {
-            return {
-                error: error
-            }
-        } else {
-            createPayload.email = data.email
-        }
+        const { error } = await checkFieldAvailability({ field: 'email', value: data.email, dbInstance });
+        if (error) return { error };
+        createPayload.email = data.email;
     } else {
-        createPayload.email = generateFakeField("email", data.phoneNumber)
+        createPayload.email = generateFakeField("email", data.phoneNumber);
     }
 
     if (data.phoneNumber) {
-        const { error } = await checkFieldAvailability({ field: 'phoneNumber', value: data.phoneNumber })
-        if (error) {
-            return {
-                error: error
-            }
-        } else {
-            createPayload.phoneNumber = data.phoneNumber
-        }
+        const { error } = await checkFieldAvailability({ field: 'phoneNumber', value: data.phoneNumber, dbInstance });
+        if (error) return { error };
+        createPayload.phoneNumber = data.phoneNumber;
     }
 
-    const userId = generateId()
-    const accountId = generateId()
+    // Start transaction only if checks pass
+    try {
+        return await dbInstance.transaction(async (tx) => {
+            const userId = generateId();
+            const accountId = generateId();
 
-    const createdUser = await db.insert(user).values({
-        id: userId,
-        name: data.name,
-        username: data.username,
-        ...createPayload,
-        nationalId: data.nationalId,
-        role: role,
-        onBoarding: false,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-    }).returning({
-        id: user.id
-    })
+            const createdUser = await tx.insert(user).values({
+                id: userId,
+                name: data.name,
+                username: data.username,
+                ...createPayload,
+                nationalId: data.nationalId,
+                role: role,
+                onBoarding: false,
+                createdAt: new Date(),
+                updatedAt: new Date(),
+            }).returning({ id: user.id });
 
-    const createdUserAccount = await db.insert(account).values({
-        id: accountId,
-        accountId: userId,
-        providerId: 'credential',
-        userId: userId,
-        accessToken: '',
-        refreshToken: '',
-        idToken: '',
-        password: await hashPassword(data.password),
-        createdAt: new Date(),
-        updatedAt: new Date(),
-    })
+            if (!createdUser || !createdUser[0]?.id) {
+                throw new Error("Failed to create user.");
+            }
 
-    if (createdUser && createdUserAccount) {
+            const createdUserAccount = await tx.insert(account).values({
+                id: accountId,
+                accountId: userId,
+                providerId: 'credential',
+                userId: userId,
+                accessToken: '',
+                refreshToken: '',
+                idToken: '',
+                password: await hashPassword(data.password),
+                createdAt: new Date(),
+                updatedAt: new Date(),
+            });
+
+            if (!createdUserAccount) {
+                throw new Error("Failed to create user account.");
+            }
+
+            return {
+                success: true,
+                message: 'User created successfully!',
+                userId: createdUser[0].id,
+                error: null
+            };
+        });
+    } catch (error: any) {
         return {
-            success: true,
-            message: 'User created successfully!',
-            userId: createdUser[0].id,
-        }
+            error: error.message || "Something went wrong while creating the user.",
+            message: null,
+            userId: null
+        };
     }
 }
 
-export async function updateUser({ data, userId }: { data: z.infer<typeof userSchema>, userId: string }) {
-  const updateUserPayload: Partial<z.infer<typeof userSchema>> = {}
+export async function updateUser({ data, userId, dbInstance = db, role }: { 
+    data: z.infer<typeof updateUserSchema>,
+    userId: User['id']
+    role: User['role']
+    dbInstance?: typeof db
+}) {
+  const updateUserPayload: Partial<z.infer<typeof updateUserSchema>> = {}
 
   if (data.username) {
-      const { isAvailable, error } = await checkFieldAvailability({ field: 'username', value: data.username })
+      const { isAvailable, error } = await checkFieldAvailability({ field: 'username', value: data.username, dbInstance })
       if (!isAvailable && error) {
           return {
               error: error
@@ -107,7 +115,7 @@ export async function updateUser({ data, userId }: { data: z.infer<typeof userSc
   }
 
   if (data.email) {
-      const { isAvailable, error } = await checkFieldAvailability({ field: 'email', value: data.email })
+      const { isAvailable, error } = await checkFieldAvailability({ field: 'email', value: data.email, dbInstance })
       if (!isAvailable &&  error) {
           return {
               error: error
@@ -118,7 +126,7 @@ export async function updateUser({ data, userId }: { data: z.infer<typeof userSc
   }
 
   if (data.phoneNumber) {
-      const { isAvailable, error } = await checkFieldAvailability({ field: 'phoneNumber', value: data.phoneNumber })
+      const { isAvailable, error } = await checkFieldAvailability({ field: 'phoneNumber', value: data.phoneNumber, dbInstance })
       if (!isAvailable &&  error) {
           return {
               error: error
@@ -129,7 +137,7 @@ export async function updateUser({ data, userId }: { data: z.infer<typeof userSc
   }
 
   if (data.nationalId) {
-      const { isAvailable, error } = await checkFieldAvailability({ field: 'nationalId', value: data.nationalId })
+      const { isAvailable, error } = await checkFieldAvailability({ field: 'nationalId', value: data.nationalId, dbInstance })
       if (!isAvailable &&  error) {
         console.log(error)
           return {
@@ -145,8 +153,9 @@ export async function updateUser({ data, userId }: { data: z.infer<typeof userSc
   }
 
 
-  const updatedUser = await db.update(user).set({
+  const updatedUser = await dbInstance.update(user).set({
       ...updateUserPayload,
+      role,
       updatedAt: new Date(),
   }).where(eq(user.id, userId)).returning()
 
@@ -161,6 +170,27 @@ export async function updateUser({ data, userId }: { data: z.infer<typeof userSc
       message: 'User updated successfully!',
       userId: updatedUser[0].id,
   }
+}
+
+export async function updateUserRole({ userId, role, dbInstance = db }: {
+    userId: User['id']
+    role: User['role'] 
+    dbInstance?: typeof db
+}) {
+    const [updatedUserRole] = await dbInstance.update(user).set({
+        role: role
+    })
+    .where(eq(user.id, userId))
+    .returning({ id: user.id })
+
+    if(!updatedUserRole.id) return {
+        error: "Failed to update user role"
+    }
+
+    return {
+        error: null,
+        message: 'User role updated!'
+    }
 }
 
 // 1️⃣ Explicitly define Tables type
@@ -184,7 +214,6 @@ export async function deleteById(id: string, tableName: Tables) {
     }
 
     if (tableName === "appointment") {
-        // ✅ Handle related medical files first
         const files = await db
             .select({
                 id: medicalFile.id,
@@ -204,12 +233,10 @@ export async function deleteById(id: string, tableName: Tables) {
                 })
             );
 
-            // ✅ Delete medical file records
             await db.delete(medicalFile).where(eq(medicalFile.appointmentId, id));
         }
     }
 
-    // ✅ Delete the main record
     const deleted = await db.delete(table).where(eq(table.id, id)).returning();
 
     if (deleted.length > 0) {

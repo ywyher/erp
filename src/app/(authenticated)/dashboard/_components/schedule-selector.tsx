@@ -1,13 +1,10 @@
 'use client'
 
-import { Dispatch, SetStateAction, useEffect, useState } from "react";
-import { FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Dispatch, SetStateAction, useMemo, useState } from "react";
 import MultipleSelector from "@/components/ui/multi-select";
 import { days as daysList } from "@/app/(authenticated)/dashboard/constants";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import {
     Popover,
     PopoverContent,
@@ -20,6 +17,76 @@ import { parseTimeStringToDate, transformArrToObj } from "@/lib/funcs";
 import { toast } from "sonner";
 import { Trash2 } from "lucide-react";
 
+const ScheduleItem = ({
+    day,
+    schedules,
+    addSchedule,
+    removeSchedule,
+    startTime,
+    setStartTime,
+    endTime,
+    setEndTime
+}: {
+    day: string;
+    schedules: Schedules;
+    addSchedule: (day: string) => void;
+    removeSchedule: (day: string, index: number) => void;
+    startTime: string | undefined;
+    setStartTime: Dispatch<SetStateAction<string | undefined>>;
+    endTime: string | undefined;
+    setEndTime: Dispatch<SetStateAction<string | undefined>>;
+}) => (
+    <Popover>
+        <PopoverTrigger asChild>
+            <Badge className="cursor-pointer" variant="outline">{day}</Badge>
+        </PopoverTrigger>
+        <PopoverContent className="w-80">
+            <div className="flex flex-col gap-4">
+                <div className="flex flex-col gap-4">
+                    <Button onClick={() => addSchedule(day)}>Add Schedule</Button>
+                    <div className="flex flex-row gap-2">
+                        <TimePicker
+                            date={startTime ? parseTimeStringToDate(startTime) : undefined}
+                            onChange={(date) => setStartTime(date ? format(date, "HH:mm") : undefined)}
+                            granularity="minute"
+                            hourCycle={12}
+                            label="Start Time"
+                        />
+                    </div>
+                    <div className="flex flex-row gap-2">
+                        <TimePicker
+                            date={endTime ? parseTimeStringToDate(endTime) : undefined}
+                            onChange={(date) => setEndTime(date ? format(date, "HH:mm") : undefined)}
+                            granularity="minute"
+                            hourCycle={12}
+                            label="End Time"
+                        />
+                    </div>
+                </div>
+                <div>
+                    {schedules[day]?.length > 0 ? (
+                        <div className="flex flex-col gap-2">
+                            <label className="text-xl font-bold capitalize">{day} Schedule</label>
+                            <ul>
+                                {schedules[day].map((range, i) => (
+                                    <li key={i} className="flex flex-row justify-between">
+                                        {range.startTime} - {range.endTime}
+                                        <Trash2
+                                            className="w-4 h-4 text-red-500 cursor-pointer hover:text-red-700"
+                                            onClick={() => removeSchedule(day, i)}
+                                        />
+                                    </li>
+                                ))}
+                            </ul>
+                        </div>
+                    ) : (
+                        <p className="text-gray-500">No schedules added for {day}.</p>
+                    )}
+                </div>
+            </div>
+        </PopoverContent>
+    </Popover>
+);
 
 export default function ScheduleSelector({
     schedules,
@@ -36,54 +103,59 @@ export default function ScheduleSelector({
     const [endTime, setEndTime] = useState<string | undefined>(undefined);
 
     const handleDaysChange = (selectedOptions: any) => {
-        const selectedValues = selectedOptions.map((option: any) => option.value); // Extract values
+        const selectedValues = selectedOptions.map((option: any) => option.value);
+    
         setSelectedDays(selectedValues);
-        // Remove any days from the schedules state that were deselected
-        const deselectedDays = selectedDays.filter((day) => !selectedValues.includes(day));
-
-        if (deselectedDays.length > 0) {
-            setSchedules((prevSchedules) => {
-                const updatedSchedules = { ...prevSchedules };
-                deselectedDays.forEach((day) => {
-                    delete updatedSchedules[day]; // Remove the deselected day from schedules
-                });
-                return updatedSchedules;
-            });
-        }
+        setSchedules((prevSchedules) => {
+            return Object.fromEntries(
+                Object.entries(prevSchedules).filter(([day]) => selectedValues.includes(day))
+            );
+        });
     };
 
     const addSchedule = (day: string) => {
-        if (!startTime || !endTime) {
-            toast.error("Please select both start and end times.")
+        if (!startTime || !endTime) return toast.error("Please select both start and end times.");
+        if (startTime >= endTime) return toast.error("Invalid Time Range. The start time must be earlier than the end time.");
+    
+        const newSchedule = { startTime, endTime };
+        const currentSchedules = schedules[day] || [];
+    
+        // Check for overlapping schedules
+        const conflict = currentSchedules.find(({ startTime: s, endTime: e }) => {
+            return (
+                (startTime >= s && startTime < e) ||  // New start falls within an existing range
+                (endTime > s && endTime <= e) ||  // New end falls within an existing range
+                (startTime <= s && endTime >= e)  // New range fully overlaps an existing one
+            );
+        });
+    
+        if (conflict) {
+            toast.error(`Conflicting schedule: ${conflict.startTime} - ${conflict.endTime}`);
             return;
         }
-
-        if (startTime >= endTime) {
-            toast.error("Invalid Time Range The start time must be earlier than the end time.")
-            return;
-        }
-
+    
+        // Update state
         setSchedules((prevSchedules) => ({
             ...prevSchedules,
-            [day]: [
-                ...(prevSchedules[day] || []),
-                { startTime, endTime },
-            ],
+            [day]: [...(prevSchedules[day] || []), newSchedule],
         }));
-
-        // Reset the time inputs after adding
+    
+        // Reset after a schedule is successfully added
         setStartTime(undefined);
         setEndTime(undefined);
     };
+    
 
     const removeSchedule = (day: string, index: number) => {
         setSchedules((prevSchedules) => {
-            const updatedSchedules = { ...prevSchedules };
-            updatedSchedules[day] = updatedSchedules[day].filter((_, i) => i !== index);
-            if (updatedSchedules[day].length === 0) delete updatedSchedules[day];
-            return updatedSchedules;
+            const filteredSchedules = prevSchedules[day].filter((_, i) => i !== index);
+            return filteredSchedules.length
+                ? { ...prevSchedules, [day]: filteredSchedules }
+                : Object.fromEntries(Object.entries(prevSchedules).filter(([key]) => key !== day));
         });
     };
+
+    const memoizedSelectedDays = useMemo(() => selectedDays, [selectedDays]);
 
     return (
         <div className="flex flex-col gap-3">
@@ -102,57 +174,18 @@ export default function ScheduleSelector({
                 />
             </div>
             <div className="flex flex-row gap-3">
-                {selectedDays.map((day, index) => (
-                    <Popover key={index}>
-                        <PopoverTrigger asChild>
-                            <Badge className="cursor-pointer" variant="outline">{day}</Badge>
-                        </PopoverTrigger>
-                        <PopoverContent className="w-80">
-                            <div className="flex flex-col gap-4">
-                                <div className="flex flex-col gap-4">
-                                    <Button onClick={() => addSchedule(day)}>Add Schedule</Button>
-                                    <div className="flex flex-row gap-2">
-                                        <TimePicker
-                                            date={parseTimeStringToDate(startTime)}
-                                            onChange={(date) => setStartTime(date ? format(date, "HH:mm") : undefined)}
-                                            granularity="minute"
-                                            hourCycle={12}
-                                            label="Start Time"
-                                        />
-                                    </div>
-                                    <div className="flex flex-row gap-2">
-                                        <TimePicker
-                                            date={parseTimeStringToDate(endTime)}
-                                            onChange={(date) => setEndTime(date ? format(date, "HH:mm") : undefined)}
-                                            granularity="minute"
-                                            hourCycle={12}
-                                            label="End Time"
-                                        />
-                                    </div>
-                                </div>
-                                <div>
-                                    {schedules[day]?.length > 0 ? (
-                                        <div className="flex flex-col gap-2">
-                                            <label className="text-xl font-bold capitalize">{day} Schedule</label>
-                                            <ul>
-                                                {schedules[day].map((range, i) => (
-                                                    <li key={i} className="flex flex-row justify-between">
-                                                        {range.startTime} - {range.endTime}
-                                                        <Trash2
-                                                            className="w-4 h-4 text-red-500 cursor-pointer hover:text-red-700"
-                                                            onClick={() => removeSchedule(day, i)}
-                                                        />
-                                                    </li>
-                                                ))}
-                                            </ul>
-                                        </div>
-                                    ) : (
-                                        <p className="text-gray-500">No schedules added for {day}.</p>
-                                    )}
-                                </div>
-                            </div>
-                        </PopoverContent>
-                    </Popover>
+                {memoizedSelectedDays.map((day) => (
+                    <ScheduleItem 
+                        key={day}
+                        day={day}
+                        schedules={schedules}
+                        addSchedule={addSchedule}
+                        removeSchedule={removeSchedule}
+                        startTime={startTime}
+                        setStartTime={setStartTime}
+                        endTime={endTime}
+                        setEndTime={setEndTime}
+                    />
                 ))}
             </div>
         </div>

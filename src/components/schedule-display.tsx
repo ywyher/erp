@@ -114,7 +114,7 @@ export function ScheduleDisplay({
         <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
                 <Button variant="outline">
-                    <CalendarIcon className="mr-2 h-4 w-4" />
+                    <CalendarIcon className="h-4 w-4" />
                     View Schedules
                 </Button>
             </DialogTrigger>

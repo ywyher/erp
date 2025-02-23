@@ -14,6 +14,7 @@ export default async function Users() {
                 data={data ?? []}
                 bulkTableName="user"
                 hiddenColumns={['id']}
+                filters={['email', 'phoneNumber', 'nationalId', 'username']}
             />
             <CreateUser />
         </CardLayout>

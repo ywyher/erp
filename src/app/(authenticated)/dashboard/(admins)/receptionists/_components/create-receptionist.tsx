@@ -15,29 +15,9 @@ import { Schedules } from "@/app/(authenticated)/dashboard/types";
 import { useRouter } from "next/navigation";
 import { z } from "zod";
 import { createReceptionistSchema } from "@/app/(authenticated)/dashboard/(admins)/receptionists/types";
-import { createReceptionist } from "@/app/(authenticated)/dashboard/(admins)/receptionists/actions";
-
 import { toast } from "sonner";
-
-function CreateDialog({ children, open, setOpen }: { children: React.ReactNode, open: boolean, setOpen: Dispatch<SetStateAction<boolean>> }) {
-    return (
-        <div>
-            <Button onClick={() => setOpen(true)}>Create Receptionist</Button>
-            <Dialog open={open} onOpenChange={setOpen}>
-                <DialogContent>
-                    <DialogHeader>
-                        <DialogTitle>Create New Receptionist</DialogTitle>
-                        {/* Add a DialogDescription here */}
-                        <DialogDescription>
-                            Fill out the form below to create a new receptionist. All fields are required.
-                        </DialogDescription>
-                    </DialogHeader>
-                    {children}
-                </DialogContent>
-            </Dialog>
-        </div>
-    );
-}
+import { createReceptionist } from "@/app/(authenticated)/dashboard/(admins)/receptionists/actions";
+import DialogWrapper from "@/app/(authenticated)/dashboard/_components/dialog-wrapper";
 
 export default function CreateReceptionist() {
     const [isLoading, setIsLoading] = useState<boolean>(false)
@@ -52,32 +32,43 @@ export default function CreateReceptionist() {
     });
 
     const onSubmit = async (data: z.infer<typeof createReceptionistSchema>) => {
-        if (selectedDays.length == 0) {
-            toast.error(`Work days are required`)
+        if (!selectedDays.length) {
+            toast.error("Work days are required.");
+            return;
+        }
+        
+        if (selectedDays.some(day => !schedules[day]?.length)) {
+            toast.error(`The following days are missing schedules: ${selectedDays.filter(day => !schedules[day]?.length).join(", ")}`);
             return;
         }
 
-        const missingSchedules = selectedDays.filter((day) => !schedules[day] || schedules[day].length === 0);
-
-        if (missingSchedules.length > 0) {
-            toast.error(`The following days are missing schedules: ${missingSchedules.join(", ")}`)
-            return;
-        }
-
-        setIsLoading(true)
-        const result = await createReceptionist({ userData: data, schedulesData: schedules })
-
-        if (result?.error) {
-            toast.error(result.error)
+        try {
+            setIsLoading(true)
+            const result = await createReceptionist({ userData: data, schedulesData: schedules })
+    
+            if (result?.error) {
+                toast.error(result.error)
+                setIsLoading(false)
+                return;
+            }
+    
+            toast(result.message)
             setIsLoading(false)
-            return;
+            setOpen(false)
+            form.reset({
+                name: "",
+                email: "",
+                username: "",
+                phoneNumber: "",
+                nationalId: "",
+                department: undefined,
+                password: "",
+                confirmPassword: "",
+            });
+            router.push('/dashboard/receptionists')
+        } finally {
+            setIsLoading(false);
         }
-
-        toast(result.message)
-        setIsLoading(false)
-        form.reset()
-        setOpen(false)
-        router.push('/dashboard/receptionists')
     };
 
     const onError = () => {
@@ -85,7 +76,7 @@ export default function CreateReceptionist() {
     }
 
     return (
-        <CreateDialog open={open} setOpen={setOpen}>
+        <DialogWrapper open={open} setOpen={setOpen} label="receptionist" operation="update">
             <Form {...form}>
                 <form onSubmit={form.handleSubmit(onSubmit, onError)}>
                     <Tabs defaultValue="account">
@@ -94,7 +85,7 @@ export default function CreateReceptionist() {
                             <TabsTrigger value="schedules">Schedules</TabsTrigger>
                             <TabsTrigger value="password">Password</TabsTrigger>
                         </TabsList>
-                        <TabsContent value="account">
+                        <TabsContent value="account" className="flex flex-col gap-2">
                             <div className="flex flex-row gap-2">
                                 <FormFieldWrapper form={form} name="name" label="Name" />
                                 <FormFieldWrapper form={form} name="username" label="Username" />
@@ -134,6 +125,6 @@ export default function CreateReceptionist() {
                     </div>
                 </form>
             </Form>
-        </CreateDialog>
+        </DialogWrapper>
     );
 }

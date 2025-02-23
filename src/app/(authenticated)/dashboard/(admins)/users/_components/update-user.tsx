@@ -1,7 +1,6 @@
 'use client';
 
 import { FormFieldWrapper } from "@/components/formFieldWrapper";
-import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
@@ -15,9 +14,7 @@ import { User } from "@/lib/auth-client";
 import LoadingBtn from "@/components/loading-btn";
 import { revalidate } from "@/app/actions";
 import { z } from "zod";
-import { userSchema } from "@/app/types";
-import { revalidatePath } from "next/cache";
-
+import { updateUserSchema } from "@/app/types";
 import { toast } from "sonner";
 import { updateUser } from "@/lib/db/mutations";
 import DialogWrapper from "@/app/(authenticated)/dashboard/_components/dialog-wrapper";
@@ -43,11 +40,11 @@ export default function UpdateUser(
         }
     })
 
-    const form = useForm<z.infer<typeof userSchema>>({
-        resolver: zodResolver(userSchema),
+    const form = useForm<z.infer<typeof updateUserSchema>>({
+        resolver: zodResolver(updateUserSchema),
     });
 
-    const onCheckChangedFields = async (data: z.infer<typeof userSchema>) => {
+    const onCheckChangedFields = async (data: z.infer<typeof updateUserSchema>) => {
         if (!user) return;
 
         const sessionData = {
@@ -65,7 +62,7 @@ export default function UpdateUser(
             return;
         }
 
-        await onSubmit(changedFields as z.infer<typeof userSchema>);
+        await onSubmit(changedFields as z.infer<typeof updateUserSchema>);
     };
 
     useEffect(() => {
@@ -80,13 +77,13 @@ export default function UpdateUser(
         }
     }, [user, form.reset]);
 
-    const onSubmit = async (data: z.infer<typeof userSchema>) => {
+    const onSubmit = async (data: z.infer<typeof updateUserSchema>) => {
         if (!user) return;
         setIsLoading(true)
 
-        const normalizedData = normalizeData(data, 'object') as z.infer<typeof userSchema>
+        const normalizedData = normalizeData(data, 'object') as z.infer<typeof updateUserSchema>
 
-        const result = await updateUser({ data: normalizedData, userId: userId })
+        const result = await updateUser({ data: normalizedData, userId: userId, role: 'user' })
 
         if (result?.error) {
             toast.error(result.error)
@@ -122,41 +119,43 @@ export default function UpdateUser(
                 </TabsList>
                 <TabsContent value="account">
                     <Form {...form}>
-                        <form onSubmit={form.handleSubmit(onCheckChangedFields)}>
-                            <div className="flex flex-row gap-2">
+                        <form onSubmit={form.handleSubmit(onCheckChangedFields)} className="flex flex-col gap-3">
+                            <div className="flex flex-col gap-2">
+                                <div className="flex flex-row gap-2">
+                                    <FormFieldWrapper
+                                        form={form}
+                                        name="name"
+                                        label="Name"
+                                    />
+                                    <FormFieldWrapper
+                                        form={form}
+                                        name="username"
+                                        label="Username"
+                                    />
+                                </div>
+                                <div className="flex flex-row gap-2">
+                                    <FormFieldWrapper
+                                        form={form}
+                                        name="email"
+                                        label="Email"
+                                    />
+                                    <FormFieldWrapper
+                                        form={form}
+                                        type="number"
+                                        name="phoneNumber"
+                                        label="Phone Number"
+                                    />
+                                </div>
                                 <FormFieldWrapper
                                     form={form}
-                                    name="name"
-                                    label="Name"
-                                />
-                                <FormFieldWrapper
-                                    form={form}
-                                    name="username"
-                                    label="Username"
+                                    type="number"
+                                    name="nationalId"
+                                    label="National Id"
                                 />
                             </div>
-                            <div className="flex flex-row gap-2">
-                                <FormFieldWrapper
-                                    form={form}
-                                    name="email"
-                                    label="Email"
-                                />
-                                <FormFieldWrapper
-                                    form={form}
-                                    name="phoneNumber"
-                                    label="Phone Number"
-                                />
-                            </div>
-                            <FormFieldWrapper
-                                form={form}
-                                name="nationalId"
-                                label="National Id"
-                            />
-                            <div className="mt-4">
-                                <LoadingBtn isLoading={isLoading}>
-                                    Update
-                                </LoadingBtn>
-                            </div>
+                            <LoadingBtn isLoading={isLoading}>
+                                Update
+                            </LoadingBtn>
                         </form>
                     </Form>
                 </TabsContent>

@@ -11,7 +11,7 @@ import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useImageStore } from "@/app/store"
 import { z } from "zod"
-import { userSchema } from "@/app/types"
+import { updateUserSchema } from "@/app/types"
 import { getUserRegistrationType } from "@/lib/db/queries"
 import { checkVerificationNeeded, excludeField, normalizeData } from "@/lib/funcs"
 import { updateOnboarding } from "@/app/(auth)/actions"
@@ -62,8 +62,8 @@ export default function Onboarding() {
         setContext(user.emailVerified ? 'email' : 'phoneNumber');
     }, [user, router, isPending]);
 
-    const form = useForm<z.infer<typeof userSchema>>({
-        resolver: zodResolver(userSchema),
+    const form = useForm<z.infer<typeof updateUserSchema>>({
+        resolver: zodResolver(updateUserSchema),
         defaultValues: {
             email: '',
             phoneNumber: '',
@@ -73,17 +73,18 @@ export default function Onboarding() {
         },
     });
 
-    const handleSubmit = async (data: z.infer<typeof userSchema>) => {
+    const handleSubmit = async (data: z.infer<typeof updateUserSchema>) => {
         setIsLoading(true)
         if (!user || !context) return;
 
         const fieldToRemove = context; // Could be "email" or "phoneNumber"
-        const normalizedData = normalizeData(data, "object") as z.infer<typeof userSchema>;
+        const normalizedData = normalizeData(data, "object") as z.infer<typeof updateUserSchema>;
         const dataWithoutField = excludeField(normalizedData, fieldToRemove);
 
         const { success, message, error, userId } = await updateUser({
             data: dataWithoutField,
-            userId: user.id
+            userId: user.id,
+            role: 'user'
         })
 
         if (error) {

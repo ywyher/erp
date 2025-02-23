@@ -10,6 +10,7 @@ import { isFakeEmail } from "@/lib/funcs";
 import React from "react";
 import ReceptionistAction from "@/app/(authenticated)/dashboard/(admins)/receptionists/_components/receptionist-actions";
 import { ScheduleDisplay } from "@/components/schedule-display";
+import TableCell from "@/components/table-cell";
 
 const receptionistColumns = [
     { value: "name", header: "Name" },
@@ -51,43 +52,9 @@ export const receptionistTableColumns: ColumnDef<any>[] = [
         header: ({ column }: { column: Column<any, any> }) => (
             <DataTableColumnHeader column={column} title={header} />
         ),
-        cell: ({ row }: { row: Row<any> }) => {
-            const cellValue = row.getValue(value);
-
-            if (cellValue == null || isFakeEmail(row.getValue('email'))) {
-                return <span className="text-muted-foreground">Empty</span>
-            }
-
-            if (isBoolean) {
-                return cellValue === true ? "Yes" : "No"
-            }
-
-            if (value === 'schedules') {
-                const schedules = Array.isArray(cellValue) ? cellValue : [cellValue];
-
-                return (
-                    <ScheduleDisplay schedules={schedules} />
-                )
-            }
-
-            return dialog ? (
-                <Dialog>
-                    <DialogTrigger asChild>
-                        <Button variant="outline" size="sm">
-                            View
-                        </Button>
-                    </DialogTrigger>
-                    <DialogContent>
-                        <DialogHeader>
-                            <DialogTitle>{header}</DialogTitle>
-                        </DialogHeader>
-                        <div>{cellValue as string}</div>
-                    </DialogContent>
-                </Dialog>
-            ) : (
-                <span>{cellValue as string}</span>
-            );
-        },
+        cell: ({ row }: { row: Row<any> }) => (
+            <TableCell row={row} value={value} header={header} dialog={dialog} isBoolean={isBoolean} />
+        )
     })),
     {
         id: "actions",

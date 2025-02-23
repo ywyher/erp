@@ -13,7 +13,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { User } from "@/lib/auth-client";
 import LoadingBtn from "@/components/loading-btn";
 import { updateAdmin } from "@/app/(authenticated)/dashboard/(admins)/admins/action";
-import { userSchema } from "@/app/types";
+import { updateUserSchema } from "@/app/types";
 import { z } from "zod";
 import { toast } from "sonner";
 import DialogWrapper from "@/app/(authenticated)/dashboard/_components/dialog-wrapper";
@@ -39,11 +39,11 @@ export default function UpdateAdmin(
         }
     })
 
-    const form = useForm<z.infer<typeof userSchema>>({
-        resolver: zodResolver(userSchema),
+    const form = useForm<z.infer<typeof updateUserSchema>>({
+        resolver: zodResolver(updateUserSchema),
     });
 
-    const onCheckChangedFields = async (data: z.infer<typeof userSchema>) => {
+    const onCheckChangedFields = async (data: z.infer<typeof updateUserSchema>) => {
         if (!user) return;
 
         const sessionData = {
@@ -61,7 +61,7 @@ export default function UpdateAdmin(
             return;
         }
 
-        await onSubmit(changedFields as z.infer<typeof userSchema>);
+        await onSubmit(changedFields as z.infer<typeof updateUserSchema>);
     };
 
     useEffect(() => {
@@ -76,11 +76,11 @@ export default function UpdateAdmin(
         }
     }, [user, form.reset]);
 
-    const onSubmit = async (data: z.infer<typeof userSchema>) => {
+    const onSubmit = async (data: z.infer<typeof updateUserSchema>) => {
         if (!user) return;
         setIsLoading(true)
 
-        const normalizedData = normalizeData(data, 'object') as z.infer<typeof userSchema>
+        const normalizedData = normalizeData(data, 'object') as z.infer<typeof updateUserSchema>
         
         const result = await updateAdmin({ data: normalizedData, userId: userId })
 
@@ -117,41 +117,41 @@ export default function UpdateAdmin(
                 </TabsList>
                 <TabsContent value="account">
                     <Form {...form}>
-                        <form onSubmit={form.handleSubmit(onCheckChangedFields)}>
-                            <div className="flex flex-row gap-2">
+                        <form onSubmit={form.handleSubmit(onCheckChangedFields)} className="flex flex-col gap-3">
+                            <div className="flex flex-col gap-2">
+                                <div className="flex flex-row gap-2">
+                                    <FormFieldWrapper
+                                        form={form}
+                                        name="name"
+                                        label="Name"
+                                    />
+                                    <FormFieldWrapper
+                                        form={form}
+                                        name="username"
+                                        label="Username"
+                                    />
+                                </div>
+                                <div className="flex flex-row gap-2">
+                                    <FormFieldWrapper
+                                        form={form}
+                                        name="email"
+                                        label="Email"
+                                    />
+                                    <FormFieldWrapper
+                                        form={form}
+                                        name="phoneNumber"
+                                        label="Phone Number"
+                                    />
+                                </div>
                                 <FormFieldWrapper
                                     form={form}
-                                    name="name"
-                                    label="Name"
-                                />
-                                <FormFieldWrapper
-                                    form={form}
-                                    name="username"
-                                    label="Username"
+                                    name="nationalId"
+                                    label="National Id"
                                 />
                             </div>
-                            <div className="flex flex-row gap-2">
-                                <FormFieldWrapper
-                                    form={form}
-                                    name="email"
-                                    label="Email"
-                                />
-                                <FormFieldWrapper
-                                    form={form}
-                                    name="phoneNumber"
-                                    label="Phone Number"
-                                />
-                            </div>
-                            <FormFieldWrapper
-                                form={form}
-                                name="nationalId"
-                                label="National Id"
-                            />
-                            <div className="mt-4">
-                                <LoadingBtn isLoading={isLoading}>
-                                    Submit
-                                </LoadingBtn>
-                            </div>
+                            <LoadingBtn isLoading={isLoading}>
+                                Submit
+                            </LoadingBtn>
                         </form>
                     </Form>
                 </TabsContent>

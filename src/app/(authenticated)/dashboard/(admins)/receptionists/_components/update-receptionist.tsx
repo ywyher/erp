@@ -6,7 +6,6 @@ import { Form } from "@/components/ui/form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { departments } from "@/app/(authenticated)/dashboard/constants";
 import LoadingBtn from "@/components/loading-btn";
 import { useRouter } from "next/navigation";
@@ -15,34 +14,14 @@ import UpdatePassword from "@/components/update-password";
 import { useQuery } from "@tanstack/react-query";
 import { getUserById } from "@/lib/db/queries";
 import { User } from "@/lib/auth-client";
-import { isFakeEmail, normalizeData } from "@/lib/funcs";
+import { getChangedFields, isFakeEmail, normalizeData } from "@/lib/funcs";
 import UpdateSchedule from "@/app/(authenticated)/dashboard/_components/update-schedule";
 import { z } from "zod";
 import { updateReceptionist } from "@/app/(authenticated)/dashboard/(admins)/receptionists/actions";
-import { updateReceptionistSchema } from "@/app/(authenticated)/dashboard/(admins)/receptionists/types";
 import { Receptionist } from "@/lib/db/schema";
-
 import { toast } from "sonner";
-
-function UpdateDialog({ children, open, setOpen }: { children: React.ReactNode, open: boolean, setOpen: Dispatch<SetStateAction<boolean>> }) {
-    return (
-        <div>
-            <Button onClick={() => setOpen(true)}>Update Receptionist</Button>
-            <Dialog open={open} onOpenChange={setOpen}>
-                <DialogContent>
-                    <DialogHeader>
-                        <DialogTitle>Update Receptionist</DialogTitle>
-                        {/* Add a DialogDescription here */}
-                        <DialogDescription>
-                            Fill out the form below to create a new receptionist. All fields are required.
-                        </DialogDescription>
-                    </DialogHeader>
-                    {children}
-                </DialogContent>
-            </Dialog>
-        </div>
-    );
-}
+import DialogWrapper from "@/app/(authenticated)/dashboard/_components/dialog-wrapper";
+import { updateReceptionistSchema } from "@/app/(authenticated)/dashboard/(admins)/receptionists/types";
 
 export default function UpdateReceptionist(
     {
@@ -71,67 +50,63 @@ export default function UpdateReceptionist(
 
     useEffect(() => {
         if (user) {
-            form.setValue('name', user.user.name || '')
-            form.setValue('username', user.user.username || '')
-            form.setValue('email', isFakeEmail(user.user.email) ? '' : user.user.email || '')
-            form.setValue('phoneNumber', user.user.phoneNumber || '')
-            form.setValue('nationalId', user.user.nationalId || '')
-            form.setValue('department', user.receptionist.department || '')
+            form.reset({
+                name: user.user.name || '',
+                username: user.user.username || '',
+                email: isFakeEmail(user.user.email) ? '' : user.user.email || '',
+                phoneNumber: user.user.phoneNumber || '',
+                nationalId: user.user.nationalId || '',
+                department: user.receptionist.department || '',
+            })
         }
     }, [user])
 
     const onCheckChangedFields = async (data: z.infer<typeof updateReceptionistSchema>) => {
         if (!user) return;
 
-        const normalizedSessionData = {
-            name: normalizeData(user.user.name),
-            email: isFakeEmail(user.user.email) ? '' : normalizeData(user.user.email),
-            username: normalizeData(user.user.username || ""),
-            phoneNumber: normalizeData(user.user.phoneNumber || ""),
-            nationalId: normalizeData(user.user.nationalId || ""),
-            department: normalizeData(user.receptionist.department),
+        const sessionData = {
+            name: user.user.name,
+            email: isFakeEmail(user.user.email) ? '' : user.user.email,
+            username: user.user.username || "",
+            phoneNumber: user.user.phoneNumber || "",
+            nationalId: user.user.nationalId || "",
+            department: user.receptionist.department
         };
-
-        const changedFields: Partial<{ [key in keyof z.infer<typeof updateReceptionistSchema>]: string | null }> = {};
-
-        for (const key in normalizedSessionData) {
-            let formValue = normalizeData(data[key as keyof z.infer<typeof updateReceptionistSchema>] as string);
-            const sessionValue = normalizedSessionData[key as keyof typeof normalizedSessionData];
-
-            if (formValue !== sessionValue) {
-                changedFields[key as keyof typeof changedFields] = formValue;
-            }
-        }
+        
+        const changedFields = getChangedFields(sessionData, data);
 
         if (Object.keys(changedFields).length === 0) {
-            toast.error('No changes were mde thus no fields or schedules were updated.')
+            toast.error('No fields chagned thus no fields or schedules were updated.')
             return;
         }
 
-        await onSubmit({ ...changedFields } as z.infer<typeof updateReceptionistSchema>);
+        await onSubmit(changedFields as z.infer<typeof updateReceptionistSchema>);
     };
 
 
     const onSubmit = async (data: z.infer<typeof updateReceptionistSchema>) => {
         if (!user) return;
 
-        setIsLoading(true)
-        const result = await updateReceptionist({ data, userId: user.user.id });
-
-        if (result.error) {
-            toast.error(result.error)
+        try{ 
+            setIsLoading(true)
+            const result = await updateReceptionist({ data, userId: user.user.id });
+    
+            if (result.error) {
+                toast.error(result.error)
+                setIsLoading(false)
+                return;
+            }
+    
+            toast(result.message)
             setIsLoading(false)
-            return;
+            setOpen(false)
+        } finally {
+            setIsLoading(false)
         }
-
-        toast(result.message)
-        setIsLoading(false)
-        form.reset()
-        setOpen(false)
     };
 
     return (
-        <UpdateDialog open={open} setOpen={setOpen}>
+        <DialogWrapper open={open} setOpen={setOpen} label="receptionist" operation="update">
             <Tabs defaultValue="account">
                 <TabsList>
                     <TabsTrigger value="account">Account</TabsTrigger>
@@ -140,32 +115,32 @@ export default function UpdateReceptionist(
                 </TabsList>
                 <TabsContent value="account">
                     <Form {...form}>
-                        <form onSubmit={form.handleSubmit(onCheckChangedFields)}>
-                            <div className="flex flex-row gap-2">
-                                <FormFieldWrapper form={form} name="name" label="Name" />
-                                <FormFieldWrapper form={form} name="username" label="Username" />
-                            </div>
-                            <div className="flex flex-row gap-2">
-                                <FormFieldWrapper form={form} name="email" label="Email" />
-                                <FormFieldWrapper form={form} name="phoneNumber" label="Phone Number" />
-                            </div>
-                            <FormFieldWrapper form={form}
-                                name="nationalId"
-                                label="National Id"
-                            />
-                            <div className="flex flex-row gap-2">
+                        <form onSubmit={form.handleSubmit(onCheckChangedFields)} className="flex flex-col gap-3">
+                            <div className="flex flex-col gap-2">
+                                <div className="flex flex-row gap-2">
+                                    <FormFieldWrapper form={form} name="name" label="Name" />
+                                    <FormFieldWrapper form={form} name="username" label="Username" />
+                                </div>
+                                <div className="flex flex-row gap-2">
+                                    <FormFieldWrapper form={form} name="email" label="Email" />
+                                    <FormFieldWrapper form={form} name="phoneNumber" label="Phone Number" />
+                                </div>
                                 <FormFieldWrapper form={form}
-                                    name="department"
-                                    label="Department"
-                                    type="select"
-                                    options={departments}
+                                    name="nationalId"
+                                    label="National Id"
                                 />
+                                <div className="flex flex-row gap-2">
+                                    <FormFieldWrapper form={form}
+                                        name="department"
+                                        label="Department"
+                                        type="select"
+                                        options={departments}
+                                    />
+                                </div>
                             </div>
-                            <div className="mt-4">
-                                <LoadingBtn isLoading={isLoading}>
-                                    Update
-                                </LoadingBtn>
-                            </div>
+                            <LoadingBtn isLoading={isLoading}>
+                                Update
+                            </LoadingBtn>
                         </form>
                     </Form>
                 </TabsContent>
@@ -176,6 +151,6 @@ export default function UpdateReceptionist(
                     <UpdatePassword userId={userId} setOpen={setOpen} revalidatePath="/dashboard" />
                 </TabsContent>
             </Tabs>
-        </UpdateDialog>
+        </DialogWrapper>
     );
 }

@@ -1,13 +1,10 @@
 'use server'
 
-import { userSchema } from "@/app/types"
 import db from "@/lib/db"
-import { user } from "@/lib/db/schema"
+import { User, user } from "@/lib/db/schema"
 import { eq } from "drizzle-orm"
-import { z } from "zod"
 
-
-export async function updatePhoneNumberVerified(userId: string) {
+export async function updatePhoneNumberVerified(userId: User['id']) {
     const result = await db.update(user).set({
         phoneNumberVerified: true
     })
@@ -22,10 +19,10 @@ export async function updatePhoneNumberVerified(userId: string) {
     }
 }
 
-export async function updateOnboarding(userId: string, value: boolean) {
+export async function updateOnboarding(userId: User['id'], value: boolean) {
     const updateOnboarding = await db.update(user).set({
         onBoarding: value
-    })
+    }).where(eq(user.id, userId))
 
     if (updateOnboarding) {
         return {

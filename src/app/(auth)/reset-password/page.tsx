@@ -16,10 +16,11 @@ import AuthLayout from "@/app/(auth)/auth/_components/auth-layout";
 import { Input } from "@/components/ui/input";
 import { useState } from "react";
 import { resetPassword } from "@/lib/auth-client";
-import { passwordSchema, TPasswordSchema } from "@/app/types";
+import { passwordSchema } from "@/app/types";
 import { toast } from "sonner";
 import { FormFieldWrapper } from "@/components/formFieldWrapper";
 import LoadingBtn from "@/components/loading-btn";
+import { z } from "zod";
 
 export default function ResetPassword() {
     const [isLoading, setIsLoading] = useState(false)
@@ -28,7 +29,7 @@ export default function ResetPassword() {
     const token = new URLSearchParams(window.location.search).get("token");
 
 
-    const form = useForm<TPasswordSchema>({
+    const form = useForm<z.infer<typeof passwordSchema>>({
         resolver: zodResolver(passwordSchema),
         defaultValues: {
             password: "",
@@ -36,7 +37,7 @@ export default function ResetPassword() {
         },
     })
 
-    const onResetPassword = async (formData: TPasswordSchema) => {
+    const onResetPassword = async (formData: z.infer<typeof passwordSchema>) => {
         setIsLoading(true)
         if (!token) {
             // Handle the error

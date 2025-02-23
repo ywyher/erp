@@ -7,7 +7,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import LoadingBtn from "@/components/loading-btn";
-import { createUserSchema } from "@/app/(authenticated)/dashboard/types";
+import { createUserSchema } from "@/app/types";
 import { z } from "zod";
 import { createAdmin } from "@/app/(authenticated)/dashboard/(admins)/admins/action";
 import { toast } from "sonner";
@@ -63,22 +63,24 @@ export default function Create() {
     return (
         <DialogWrapper open={open} setOpen={setOpen} label="admin" operation="create">
             <Form {...form}>
-                <form onSubmit={form.handleSubmit(onSubmit, onError)}>
+                <form onSubmit={form.handleSubmit(onSubmit, onError)} className="flex flex-col gap-3">
                     <Tabs value={tab} onValueChange={(value) => setTab(value as 'account' | 'password')}>
                         <TabsList>
                             <TabsTrigger value="account">Account</TabsTrigger>
                             <TabsTrigger value="password">Password</TabsTrigger>
                         </TabsList>
-                        <TabsContent value="account">
-                            <div className="flex flex-row gap-3">
-                                <FormFieldWrapper form={form} name="name" label="Name" />
-                                <FormFieldWrapper form={form} name="username" label="Username" />
-                            </div>
-                            <div className="flex flex-row gap-3">
-                                <FormFieldWrapper form={form} name="email" label="Email" />
-                                <FormFieldWrapper form={form} type="number" name="phoneNumber" label="Phone Number" />
-                            </div>
-                            <FormFieldWrapper form={form} type="number" name="nationalId" label="National Id" />
+                        <TabsContent value="account" className="flex flex-col gap-2">
+                                <div className="flex flex-col gap-3">
+                                    <div className="flex flex-row gap-3">
+                                        <FormFieldWrapper form={form} name="name" label="Name" />
+                                        <FormFieldWrapper form={form} name="username" label="Username" />
+                                    </div>
+                                    <div className="flex flex-row gap-3">
+                                        <FormFieldWrapper form={form} name="email" label="Email" />
+                                        <FormFieldWrapper form={form} type="number" name="phoneNumber" label="Phone Number" />
+                                    </div>
+                                    <FormFieldWrapper form={form} type="number" name="nationalId" label="National Id" />
+                                </div>
                         </TabsContent>
                         <TabsContent value="password">
                             <div className="flex flex-row gap-3">
@@ -87,11 +89,9 @@ export default function Create() {
                             </div>
                         </TabsContent>
                     </Tabs>
-                    <div className="mt-4">
-                        <LoadingBtn isLoading={isLoading}>
-                            Create
-                        </LoadingBtn>
-                    </div>
+                    <LoadingBtn isLoading={isLoading}>
+                        Create
+                    </LoadingBtn>
                 </form>
             </Form>
         </DialogWrapper>
