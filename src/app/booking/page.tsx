@@ -5,7 +5,7 @@ import { createAppointment } from "@/app/(authenticated)/dashboard/appointments/
 import DoctorsList from "@/components/doctors/doctors-list";
 import { useAppointmentReservationStore, useDoctorIdStore, useDateStore } from "@/components/doctors/store";
 import Header from "@/components/header";
-import { emailOtp, getSession, phoneNumber } from "@/lib/auth-client";
+import { getSession } from "@/lib/auth-client";
 import { User } from "@/lib/db/schema";
 import { checkVerificationNeeded } from "@/lib/funcs";
 import { useQuery } from "@tanstack/react-query";
@@ -19,7 +19,7 @@ export default function Booking() {
     const setContext = useAuthStore((state) => state.setContext);
     const setOperation = useAuthStore((state) => state.setOperation);
 
-    const { data: user } = useQuery({
+    const { data: user, isLoading } = useQuery({
         queryKey: ['session', 'booking'],
         queryFn: async () => {
             const { data } = await getSession()
@@ -35,7 +35,7 @@ export default function Booking() {
         async function handleCreateAppointment() {
             try {
                 if (!doctorId || !date) return;
-                if (!user) {
+                if (!user || isLoading) {
                     toast.error("Unauthorized, Redirecting to /auth.")
                     router.push('/auth')
                     return;
@@ -44,7 +44,6 @@ export default function Booking() {
                 const verificationNeeded = checkVerificationNeeded(user);
         
                 if(verificationNeeded) {
-                    // Store the verification type & value and redirect to /verify
                     setValue(verificationNeeded.value);
                     setContext(verificationNeeded.type);
                     setOperation("verify");
@@ -61,28 +60,31 @@ export default function Booking() {
                     creatorId: user.id,
                 })
 
-                if (createdAppointment?.success) {
-                    toast(createdAppointment.message)
-                    setDoctorId(null)
-                    setDate(null)
-                    setReserved({
-                        reserved: true,
-                        appointmentId: createdAppointment?.appointmentId
-                    })
-                    router.push(`/booking/reservation`)
-                } else {
+                if (!createdAppointment || createdAppointment?.error) {
                     toast.error(createdAppointment?.message)
                     setDoctorId(null)
                     setDate(null)
                     return;
                 }
-            } catch (err) {
-                toast.error(err as string)
+                
+                toast(createdAppointment.message)
+                setDoctorId(null)
+                setDate(null)
+                setReserved({
+                    reserved: true,
+                    appointmentId: createdAppointment?.appointmentId,
+                    patientId: user.id
+                })
+                router.push(`/booking/reservation`)
+            } catch (err: any) {
+                toast.error(err.message)
             }
         }
 
-        handleCreateAppointment()
-    }, [doctorId, date, user])
+        if(!isLoading && user && doctorId && date) {
+            handleCreateAppointment()
+        }
+    }, [doctorId, date, user, isLoading])
 
     return (
         <>

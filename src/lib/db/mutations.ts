@@ -12,36 +12,36 @@ import { hashPassword } from "../password"
 import { deleteFile } from "@/lib/s3"
 import { revalidatePath } from "next/cache"
 
-export async function createUser({ data, role, dbInstance = db }: { 
+export async function createUser({ data, role, verified = false, dbInstance = db }: { 
     data: z.infer<typeof createUserSchema>,
     role: User['role'],
+    verified?: boolean;
     dbInstance?: typeof db;
-}) {
-    const createPayload: Partial<z.infer<typeof createUserSchema>> = {};
-
-    // Run availability checks BEFORE starting the transaction
-    const { error: usernameError } = await checkFieldAvailability({ field: 'username', value: data.username, dbInstance });
-    if (usernameError) return { error: usernameError };
-
-    const { error: nationalIdError } = await checkFieldAvailability({ field: 'nationalId', value: data.nationalId, dbInstance });
-    if (nationalIdError) return { error: nationalIdError };
-
-    if (data.email) {
-        const { error } = await checkFieldAvailability({ field: 'email', value: data.email, dbInstance });
-        if (error) return { error };
-        createPayload.email = data.email;
-    } else {
-        createPayload.email = generateFakeField("email", data.phoneNumber);
-    }
-
-    if (data.phoneNumber) {
-        const { error } = await checkFieldAvailability({ field: 'phoneNumber', value: data.phoneNumber, dbInstance });
-        if (error) return { error };
-        createPayload.phoneNumber = data.phoneNumber;
-    }
-
-    // Start transaction only if checks pass
+}) {    
     try {
+        const createPayload: Partial<z.infer<typeof createUserSchema>> = {};
+    
+        // Run availability checks BEFORE starting the transaction
+        const { error: usernameError } = await checkFieldAvailability({ field: 'username', value: data.username, dbInstance });
+        if (usernameError) throw new Error(usernameError);
+    
+        const { error: nationalIdError } = await checkFieldAvailability({ field: 'nationalId', value: data.nationalId, dbInstance });
+        if (nationalIdError) throw new Error(nationalIdError);
+    
+        if (data.email) {
+            const { error } = await checkFieldAvailability({ field: 'email', value: data.email, dbInstance });
+            if (error) throw new Error(error);
+            createPayload.email = data.email;
+        } else {
+            createPayload.email = generateFakeField("email", data.phoneNumber);
+        }
+    
+        if (data.phoneNumber) {
+            const { error } = await checkFieldAvailability({ field: 'phoneNumber', value: data.phoneNumber, dbInstance });
+            if (error) throw new Error(error);
+            createPayload.phoneNumber = data.phoneNumber;
+        }
+        
         return await dbInstance.transaction(async (tx) => {
             const userId = generateId();
             const accountId = generateId();
@@ -51,6 +51,8 @@ export async function createUser({ data, role, dbInstance = db }: {
                 name: data.name,
                 username: data.username,
                 ...createPayload,
+                emailVerified: createPayload.email && verified,
+                phoneNumberVerified: createPayload.phoneNumber && verified,
                 nationalId: data.nationalId,
                 role: role,
                 onBoarding: false,
@@ -101,75 +103,75 @@ export async function updateUser({ data, userId, dbInstance = db, role }: {
     role: User['role']
     dbInstance?: typeof db
 }) {
-  const updateUserPayload: Partial<z.infer<typeof updateUserSchema>> = {}
-
-  if (data.username) {
-      const { isAvailable, error } = await checkFieldAvailability({ field: 'username', value: data.username, dbInstance })
-      if (!isAvailable && error) {
-          return {
-              error: error
-          }
-      }else {
-          updateUserPayload.username = data.username
-      }
-  }
-
-  if (data.email) {
-      const { isAvailable, error } = await checkFieldAvailability({ field: 'email', value: data.email, dbInstance })
-      if (!isAvailable &&  error) {
-          return {
-              error: error
-          }
-      } else {
-          updateUserPayload.email = data.email
-      }
-  }
-
-  if (data.phoneNumber) {
-      const { isAvailable, error } = await checkFieldAvailability({ field: 'phoneNumber', value: data.phoneNumber, dbInstance })
-      if (!isAvailable &&  error) {
-          return {
-              error: error
-          }
-      } else {
-          updateUserPayload.phoneNumber = data.phoneNumber
-      }
-  }
-
-  if (data.nationalId) {
-      const { isAvailable, error } = await checkFieldAvailability({ field: 'nationalId', value: data.nationalId, dbInstance })
-      if (!isAvailable &&  error) {
-        console.log(error)
-          return {
-              error: error
-          }
-      } else {
-          updateUserPayload.nationalId = data.nationalId
-      }
-  }
-
-  if (data.name) {
-      updateUserPayload.name = data.name
-  }
-
-
-  const updatedUser = await dbInstance.update(user).set({
-      ...updateUserPayload,
-      role,
-      updatedAt: new Date(),
-  }).where(eq(user.id, userId)).returning()
-
-  if(!updatedUser[0].createdAt) {
-    return {
-        error: "Coudln't update the user"
+    try {
+        const updateUserPayload: Partial<z.infer<typeof updateUserSchema>> = {}
+    
+        if (data.username) {
+            const { isAvailable, error } = await checkFieldAvailability({ field: 'username', value: data.username, dbInstance })
+            if (!isAvailable && error) {
+                throw new Error(error)
+            }else {
+                updateUserPayload.username = data.username
+            }
+        }
+    
+        if (data.email) {
+            const { isAvailable, error } = await checkFieldAvailability({ field: 'email', value: data.email, dbInstance })
+            if (!isAvailable &&  error) {
+                throw new Error(error)
+            } else {
+                updateUserPayload.email = data.email
+            }
+        }
+    
+        if (data.phoneNumber) {
+            const { isAvailable, error } = await checkFieldAvailability({ field: 'phoneNumber', value: data.phoneNumber, dbInstance })
+            if (!isAvailable &&  error) {
+                throw new Error(error)
+            } else {
+                updateUserPayload.phoneNumber = data.phoneNumber
+            }
+        }
+    
+        if (data.nationalId) {
+            const { isAvailable, error } = await checkFieldAvailability({ field: 'nationalId', value: data.nationalId, dbInstance })
+            if (!isAvailable &&  error) {
+                console.log(error)
+                throw new Error(error)
+            } else {
+                updateUserPayload.nationalId = data.nationalId
+            }
+        }
+    
+        if (data.name) {
+            updateUserPayload.name = data.name
+        }
+    
+    
+        const updatedUser = await dbInstance.update(user).set({
+            ...updateUserPayload,
+            role,
+            updatedAt: new Date(),
+        }).where(eq(user.id, userId)).returning()
+    
+        if(!updatedUser[0].createdAt) {
+            throw new Error("Coudln't update the user")
+        }
+    
+        return {
+            success: true,
+            message: 'User updated successfully!',
+            userId: updatedUser[0].id,
+            error: null
+        }
+    } catch (error: any) {
+        return {
+            success:false,
+            message: null,
+            userId: null,
+            error: error.message
+        }
     }
-  }
-
-  return {
-      success: true,
-      message: 'User updated successfully!',
-      userId: updatedUser[0].id,
-  }
 }
 
 export async function updateUserRole({ userId, role, dbInstance = db }: {
@@ -244,5 +246,14 @@ export async function deleteById(id: string, tableName: Tables) {
         return { message: "Record deleted successfully" };
     } else {
         throw new Error("Failed to delete the record");
+    }
+}
+
+export async function revokeUserSessions(userId: string) {
+    await db.delete(session).where(eq(session.userId, userId))
+
+    return {
+        success: true,
+        message: 'User sessions revoked!'
     }
 }

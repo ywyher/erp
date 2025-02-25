@@ -5,16 +5,42 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardFooter } from "@/components/ui/card"
 import { Loader2, Download, FileText } from "lucide-react"
 import { toast } from "sonner"
+import { useEffect } from "react"
+import { useDocumentStore } from "@/app/(authenticated)/dashboard/operations/[operationId]/store"
 
 interface DocumentViewerProps {
-  pdfUrl: string | undefined
-  docxUrl: string | undefined
-  isGenerating: boolean
-  error: string | null
+  operationDocument: string
 }
 
-export default function DocumentViewer({ pdfUrl, docxUrl, isGenerating, error }: DocumentViewerProps) {
+export default function DocumentViewer({ operationDocument }: DocumentViewerProps) {
   const router = useRouter()
+  const { 
+    pdfUrl, 
+    docxUrl, 
+    isGenerating, 
+    error, 
+    generateDocuments,
+    needsRegeneration,
+    setNeedsRegeneration,
+    operationData
+  } = useDocumentStore()
+
+  // Effect to trigger document generation on first load or when data changes
+  useEffect(() => {
+    if (operationData && (needsRegeneration || (!pdfUrl && !docxUrl && !isGenerating))) {
+      generateDocuments(operationData, operationDocument)
+      setNeedsRegeneration(false)
+    }
+  }, [
+    operationData, 
+    operationDocument, 
+    pdfUrl, 
+    docxUrl, 
+    isGenerating, 
+    needsRegeneration, 
+    generateDocuments, 
+    setNeedsRegeneration
+  ])
 
   return (
     <div className="flex flex-col justify-between h-[calc(100vh-40px)]">

@@ -11,6 +11,7 @@ import { revalidatePath } from "next/cache";
 import { headers } from "next/headers";
 import { medicalFile } from "./schema/medical-file";
 import { getFileUrl } from "@/lib/funcs";
+import { operationDocumentKey } from "@/app/(authenticated)/dashboard/settings/keys";
 
 export async function getUserProvider(userId: string): Promise<{ provider: 'social' | 'credential' }> {
     const result = await db.query.account.findFirst({
@@ -81,15 +82,6 @@ export async function getUserById(userId: string, role: Roles) {
         return result[0] as { user: User, receptionist: Receptionist, schedules: Schedule[] };
     }
 
-}
-
-export async function revokeUserSessions(userId: string) {
-    await db.delete(session).where(eq(session.userId, userId))
-
-    return {
-        success: true,
-        message: 'User sessions revoked!'
-    }
 }
 
 export async function listUsers(role: Roles, merge: boolean = false) {
@@ -245,9 +237,22 @@ export async function getWorkerUserId(workerId: string, table: 'doctor' | 'recep
     }
 }
 
-export const getOperationDocument = async () => { 
-    const [operationDocument] = await db.select().from(settings)
-    .where(eq(settings.key, 'operation-document-url'))
+export const getOperationDocument = async ({dbInstance = db}: { dbInstance: typeof db }) => { 
+    try {
+        const [operationDocument] = await dbInstance.select().from(settings)
+            .where(eq(settings.key, operationDocumentKey))
 
-    return operationDocument?.value;
+            
+        if(!operationDocument.id) throw new Error("Couldn't get operation document");
+    
+        return { 
+            name: operationDocument.value,
+            error: null
+        };
+    } catch (error: any) {
+        return {
+            name: null,
+            error: error.message,
+        }
+    }
 }

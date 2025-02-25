@@ -40,7 +40,7 @@ export default function DateSelector({
       )}
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Schedules</DialogTitle>
+          <DialogTitle>{selectedTab == 'official' ? 'Schedules' : 'Date'}</DialogTitle>
         </DialogHeader>
         <Tabs defaultValue={selectedTab} onValueChange={(val) => setSelectedTab(val as typeof selectedTab)}>
           <TabsList>

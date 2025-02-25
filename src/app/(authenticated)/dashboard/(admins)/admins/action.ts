@@ -10,7 +10,7 @@ import { revalidatePath } from "next/cache";
 import { updateUser } from "@/lib/db/mutations";
 
 export async function createAdmin(data: z.infer<typeof createUserSchema>) {
-    const result = await createUser({ data, role: 'admin' });
+    const result = await createUser({ data, role: 'admin', verified: true });
 
     if (result?.error) {
         return {

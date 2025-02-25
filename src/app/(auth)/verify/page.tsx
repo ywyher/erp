@@ -127,7 +127,6 @@ export default function Verify() {
                 otp: data.otp
             }, {
                 onSuccess: onSuccessRedirect,
-                onRequest: () => console.log('loading'),
                 onError: (ctx) => {
                     toast.error(ctx.error.message);
                     setIsLoading(false);
@@ -238,7 +237,6 @@ export default function Verify() {
                     </p>
                 </div>
             </div>
-            <Seeder />
         </AuthLayout>
     );
 }

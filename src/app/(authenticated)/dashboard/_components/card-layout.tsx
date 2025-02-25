@@ -4,17 +4,21 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 type CardLayoutProps = {
   children: React.ReactNode;
   title?: string;
+  className?: string;
 };
 
-export default function CardLayout({ children, title }: CardLayoutProps) {
+export default function CardLayout({ children, title, className = "" }: CardLayoutProps) {
   return (
-    <Card className="p-4 shadow-md rounded-lg w-full m-2">
+    <Card className={`
+      relative shadow-md rounded-lg w-full m-2 flex flex-col gap-2
+      ${className}
+    `}>
       {title && (
         <CardHeader className="pb-2">
           <CardTitle className="text-lg font-semibold">{title}</CardTitle>
         </CardHeader>
       )}
-      <CardContent>{children}</CardContent>
+      <CardContent className="flex-1">{children}</CardContent>
     </Card>
   );
 }

@@ -6,25 +6,39 @@ import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { MoreHorizontal } from "lucide-react";
 import { useState } from "react";
-import { Appointment } from "@/lib/db/schema";
+import { Appointment, User } from "@/lib/db/schema";
 import Link from "next/link";
 import { useQuery } from "@tanstack/react-query";
 import { getSession } from "@/lib/auth-client";
 import { Roles } from "@/app/types";
 import { useRouter } from "next/navigation";
 import { updateAppointmentStatus } from "@/app/(authenticated)/dashboard/appointments/actions";
+import { useAppointmentReservationStore } from "@/components/doctors/store";
 
-export default function AppointmentActions({ appointmentId, status, role }: {
+export default function AppointmentActions({ appointmentId, status, role, patientId }: {
     appointmentId: string,
     status: Appointment['status']
     role: Roles
+    patientId: User['id']
 }) {
     const router = useRouter();
     const [open, setOpen] = useState<boolean>(false)
 
+    const { setReserved } = useAppointmentReservationStore()
+
     const handleStart = async () => {
         await updateAppointmentStatus({ appointmentId, status: 'ongoing' })
         router.push(`/dashboard/appointments/${appointmentId}`)
+    }
+
+    const handleAttachFiles = async () => {
+        setReserved({
+            reserved: true,
+            appointmentId,
+            patientId
+        })
+        router.push(`/booking/reservation`)
+        return;
     }
 
     return (
@@ -44,13 +58,23 @@ export default function AppointmentActions({ appointmentId, status, role }: {
                             Start
                         </Button>
                     )}
-                    {status == 'pending' || status == 'ongoing' && (
-                        <Delete
-                            id={appointmentId}
-                            table="appointment"
-                            label="cancel"
-                            setPopOpen={setOpen}
-                        />
+                    {/* {(status == 'pending' && (role == 'user' || role == 'receptionist')) && (
+                        <Button onClick={() => handleAttachFiles()}>
+                            Attach Files
+                        </Button>
+                    )} */}
+                    {(status == 'pending' || status == 'ongoing') && (
+                        <>
+                            <Button onClick={() => handleAttachFiles()}>
+                                Attach Files
+                            </Button>
+                            <Delete
+                                id={appointmentId}
+                                table="appointment"
+                                label="cancel"
+                                setPopOpen={setOpen}
+                            />
+                        </>
                     )}
                     {status == 'completed' && (
                         <Link href={`/dashboard/appointments/${appointmentId}`}>

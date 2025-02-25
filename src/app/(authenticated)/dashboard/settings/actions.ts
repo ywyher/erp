@@ -6,6 +6,7 @@ import { settings, User } from "@/lib/db/schema";
 import { generateId } from "@/lib/funcs";
 import { deleteFile } from "@/lib/s3";
 import { eq } from "drizzle-orm";
+import { revalidatePath } from "next/cache";
 import { z } from "zod";
 
 export async function createSetting({ data, creatorId }: { data: z.infer<typeof settingSchema>, creatorId: User['id'] }) {
@@ -27,6 +28,7 @@ export async function createSetting({ data, creatorId }: { data: z.infer<typeof 
     error: "Couldn't create the desired setting!!"
   }
 
+  revalidatePath('/dashboard/settings')
   return {
     message: "Setting created!",
     settingId: createdSetting.id,
@@ -67,7 +69,7 @@ export async function updateSetting({
     }
   }
   
-
+  revalidatePath('/dashboard/settings')
   return {
     message: "Setting updated successfully!",
     settingId: updatedSetting.id,

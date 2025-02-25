@@ -2,7 +2,6 @@
 
 import Image from "next/image";
 import {
-  ColumnsPhotoAlbum,
   RenderImageContext,
   RenderImageProps,
   RowsPhotoAlbum,
@@ -10,8 +9,8 @@ import {
 import "react-photo-album/rows.css";
 import type { Photo } from "react-photo-album";
 
-import { useEffect, useRef, useState } from "react";
-import { MedicalFile, medicalFile } from "@/lib/db/schema";
+import { useMemo, useRef, useState } from "react";
+import { MedicalFile } from "@/lib/db/schema";
 import { getFileUrl } from "@/lib/funcs";
 
 import NextJsImage from "@/components/next-js-image";
@@ -25,6 +24,7 @@ import Zoom from "yet-another-react-lightbox/plugins/zoom";
 import "yet-another-react-lightbox/styles.css";
 import "yet-another-react-lightbox/plugins/counter.css";
 import "yet-another-react-lightbox/plugins/thumbnails.css";
+import { FullscreenRef } from "yet-another-react-lightbox";
 
 function renderNextImage(
   { alt = "", title, sizes }: RenderImageProps,
@@ -52,22 +52,22 @@ function renderNextImage(
 }
 
 export default function Images({ files }: { files: MedicalFile[] }) {
-  const [images, setImages] = useState<Photo[]>([]);
-  const [open, setOpen] = useState<boolean>();
   const [index, setIndex] = useState(-1);
-  const fullscreenRef = useRef(null);
-  
-  useEffect(() => {
-    if (files) {
-      const formattedImages = files.filter((file) => file.type.startsWith('image')).map((file) => ({
-        src: getFileUrl(file.name) as string,
-        width: 1920,
-        height: 1080,
-        alt: 'test',
-      }));
-      setImages(formattedImages);
-    }
-  }, [files]);
+  const fullscreenRef = useRef<FullscreenRef | null>(null);
+
+  // Memoize the processed image list
+  const images = useMemo(
+    () =>
+      files
+        .filter((file) => file.type.startsWith("image"))
+        .map((file) => ({
+          src: getFileUrl(file.name) as string,
+          width: 1920,
+          height: 1080,
+          alt: "test",
+        })),
+    [files]
+  );
 
   return (
     <>
@@ -84,18 +84,18 @@ export default function Images({ files }: { files: MedicalFile[] }) {
         onClick={({ index: current }) => setIndex(current)}
       />
       <Lightbox
-          index={index}
-          open={index >= 0}
-          close={() => setIndex(-1)}
-          slides={images}
-          render={{ slide: NextJsImage }}
-          plugins={[Thumbnails, Counter, Fullscreen, Video, Zoom]}
-          counter={{ container: { style: { top: "unset", bottom: 0 } } }}
-          fullscreen={{ ref: fullscreenRef }}
-          on={{
-            click: () => fullscreenRef.current?.enter(),
-          }}
-        />
-      </>
+        index={index}
+        open={index >= 0}
+        close={() => setIndex(-1)}
+        slides={images}
+        render={{ slide: NextJsImage }}
+        plugins={[Thumbnails, Counter, Fullscreen, Video, Zoom]}
+        counter={{ container: { style: { top: "unset", bottom: 0 } } }}
+        fullscreen={{ ref: fullscreenRef }}
+        on={{
+          click: () => fullscreenRef.current?.enter(),
+        }}
+      />
+    </>
   );
 }

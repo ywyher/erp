@@ -76,7 +76,7 @@ export default function CreateReceptionist() {
     }
 
     return (
-        <DialogWrapper open={open} setOpen={setOpen} label="receptionist" operation="update">
+        <DialogWrapper open={open} setOpen={setOpen} label="receptionist" operation="create">
             <Form {...form}>
                 <form onSubmit={form.handleSubmit(onSubmit, onError)}>
                     <Tabs defaultValue="account">

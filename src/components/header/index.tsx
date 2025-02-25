@@ -24,7 +24,7 @@ export default function Header() {
 
     return (
         <nav className={`
-            flex items-center justify-between w-full px-6 border-b-2 border-b-zinc-800
+            flex items-center justify-between w-full px-6 border-b-2 border-b-black dark:border-b-zinc-800
             ${isMobile && `py-3`}
         `}>
             {!isMobile ? (

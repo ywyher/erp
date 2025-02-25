@@ -14,24 +14,27 @@ import CustomDate from "@/components/custom-date"
 import DataSelector from "@/components/date-selector"
 
 export default function CreateOperation({
+  // id from the user table
   id,
+  // id from the doctor table
   doctorWorkId,
   role,
 }: { id: string; doctorWorkId?: Doctor["id"]; role: "doctor" | "receptionist" | "admin" }) {
   const router = useRouter()
 
-  const [isCreateUser, setIsCreateUser] = useState<boolean>(false)
   const [patientId, setPatientId] = useState<User["id"] | null>(null)
   const [open, setOpen] = useState<boolean>(false)
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const { setDate, date } = useDateStore()
   const { doctorId, setDoctorId } = useDoctorIdStore()
 
   useEffect(() => {
     async function handleCreateOperation() {
-      try {
-        if (!doctorId || !date || !patientId) return
+      if (!doctorId || !date || !patientId || isSubmitting) return
+      setIsSubmitting(true);
 
+      try {
         const result = await createOperation({
           patientId: patientId,
           doctorId: doctorId,
@@ -41,24 +44,31 @@ export default function CreateOperation({
           creatorId: id,
         })
 
-        if (result && result.message) {
-          toast(result.message)
-          setDoctorId(null)
-          setDate(null)
-          router.push(`/dashboard/operations/${result.operationId}`)
-        } else {
-          toast.error(result.message)
+        if (!result || result.error) {
+          toast.error(result?.error)
           setDoctorId(null)
           setDate(null)
           return
         }
+
+        if (role == "doctor") {
+          router.push(`/dashboard/appointments/${result.operationId}`)
+        } else {
+          router.push(`/dashboard/appointments`)
+        }
+
+        toast.message(result.message)
+        setDoctorId(null)
+        setDate(null)
       } catch (err) {
         console.error("Error in useEffect:", err)
+      } finally {
+        setIsSubmitting(false);
       }
     }
 
     handleCreateOperation()
-  }, [doctorId, date, patientId, role, id, router, setDate, setDoctorId])
+  }, [doctorId, date, patientId, role, id, router])
 
   // Set the date for the doctor role and open dialog
   useEffect(() => {
@@ -66,20 +76,16 @@ export default function CreateOperation({
       setDoctorId(doctorWorkId)
       setOpen(true)
     }
-  }, [patientId, role, doctorWorkId, setDoctorId])
+  }, [patientId, role, doctorWorkId])
   
   return (
     <div className="p-2">
       {!patientId && (
-        <>
-          <ExistingUser setSelectedUserId={setPatientId} setIsCreateUser={setIsCreateUser} />
-          {isCreateUser && <NewUser setCreatedUserId={setPatientId} setIsCreateUser={setIsCreateUser} />}
-        </>
+          <ExistingUser setSelectedUserId={setPatientId} title="Create an operation" newUser={true} />
       )}
       {patientId && role === "doctor" && (
         <>
-          <ExistingUser setSelectedUserId={setPatientId} setIsCreateUser={setIsCreateUser} />
-          {isCreateUser && <NewUser setCreatedUserId={setPatientId} setIsCreateUser={setIsCreateUser} />}
+          <ExistingUser setSelectedUserId={setPatientId} title="Create an operation" newUser={true} />
           <DataSelector 
             onOpenChange={() => {
               setOpen(false)

@@ -1,7 +1,7 @@
 import CreateAppointment from "@/app/(authenticated)/dashboard/appointments/create/_components/create-appointment";
-import { getSession, User } from "@/lib/auth-client"
+import { getSession } from "@/lib/auth-client"
 import db from "@/lib/db";
-import { doctor, receptionist, Schedule, schedule } from "@/lib/db/schema";
+import { doctor, Schedule, schedule, User } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
 import { headers } from "next/headers"
 import { redirect } from "next/navigation";
@@ -30,7 +30,7 @@ export default async function CreateAppointmentPage() {
         }
     })
 
-    if (!data || (data.user.role != 'doctor' && data.user.role != 'receptionist' && data.user.role != 'admin')) return redirect('/dashboard')
+    if (!data || data.user.role == 'user') return redirect('/dashboard');
 
     if (!data.user) return;
 
@@ -44,10 +44,10 @@ export default async function CreateAppointmentPage() {
     return (
         <div className='w-full'>
             <CreateAppointment
-             id={data.user.id}
-             schedules={schedules}
-             role={data?.user.role}
-             doctorWorkId={data.user.role == 'doctor' ? doctorId : undefined}
+                id={data.user.id}
+                schedules={schedules}
+                role={data?.user.role as 'admin' | 'receptionist' | 'doctor'}
+                doctorWorkId={data.user.role == 'doctor' ? doctorId : undefined}
             />
         </div>
     )

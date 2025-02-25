@@ -3,14 +3,16 @@ import { Badge } from '@/components/ui/badge'
 import { User } from '@/lib/db/schema'
 import Pfp from '@/components/pfp'
 
-export function UserCard({ data }: { data: User }) {
+export default function UserCard({ data }: { data: User }) {
     return (
         <Card className="w-full h-full flex flex-col">
-            <CardHeader className="flex flex-col items-center text-center">
+            <CardHeader className="flex flex-row gap-4 items-center text-center">
                 <Pfp image={data.image} className="w-20 h-20 sm:w-24 sm:h-24" />
-                <CardTitle className="text-xl mb-1">{data.name}</CardTitle>
-                <p className="text-sm text-muted-foreground">@{data.username}</p>
-                <Badge variant="secondary" className="mb-2">{data.role}</Badge>
+                <div className='flex flex-col gap-2'>
+                    <CardTitle className="text-xl capitalize">{data.name}</CardTitle>
+                    <p className="text-sm text-muted-foreground">@{data.username}</p>
+                    <Badge variant="secondary">{data.role}</Badge>
+                </div>
             </CardHeader>
             <CardContent className="flex-grow">
                 <div className="space-y-2">

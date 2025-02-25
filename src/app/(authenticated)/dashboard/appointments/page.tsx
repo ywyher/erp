@@ -1,3 +1,4 @@
+import CardLayout from "@/app/(authenticated)/dashboard/_components/card-layout";
 import { appointmentTableColumns } from "@/app/(authenticated)/dashboard/appointments/columns";
 import { Button } from "@/components/ui/button";
 import { DataTable } from "@/components/ui/data-table";
@@ -67,17 +68,25 @@ export default async function Appointments() {
     console.log(appointments)
 
     return (
-        <div className="w-[100%]">
+        <CardLayout title="Manage Appointments" className="flex-1">
             {appointments && (
-                <div className="flex flex-col gap-3">
-                    <DataTable columns={appointmentTableColumns} data={appointments} filter={null} />
-                    <Button>
+                <div className="h-screen flex flex-col">
+                    <div className="flex-1">
+                        <DataTable 
+                            columns={appointmentTableColumns}
+                            data={appointments}
+                            filters={['doctorId', 'patientId']}
+                            bulkTableName="appointment"
+                            hiddenColumns={['id']}
+                        />
+                    </div>
+                    <Button className="sticky bottom-4 p-4 shadow-md w-full">
                         <Link href="/dashboard/appointments/create">
                             Create Appointment
                         </Link>
                     </Button>
                 </div>
             )}
-        </div>
-    )
+        </CardLayout>
+    );
 }

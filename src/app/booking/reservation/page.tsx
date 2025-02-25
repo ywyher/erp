@@ -5,6 +5,7 @@ import ReservationAttatchFiles from "@/app/booking/reservation/_components/reser
 import ReservationNotes from "@/app/booking/reservation/_components/reservation-notes";
 import { getAppointment } from "@/app/booking/reservation/actions";
 import { useAppointmentReservationStore } from "@/components/doctors/store"
+import Header from "@/components/header";
 import { Appointment, Doctor, User } from "@/lib/db/schema";
 import { useQuery } from "@tanstack/react-query";
 import { useRouter } from "next/navigation"
@@ -36,13 +37,14 @@ export default function Reserved() {
     if (isLoading) return <>Loading...</>
 
     return (
-        <>
+        <div className="flex flex-col gap-3">
+            <Header />
             {appointmentData && (
                 <div className="grid grid-cols-2 gap-5 p-5">
                     <ReservationAppointmentData data={appointmentData} />
                     <ReservationNotes />
                 </div>
             )}
-        </>
+        </div>
     )
 }

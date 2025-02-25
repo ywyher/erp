@@ -6,7 +6,7 @@ import { Consultation, Doctor, Prescription as TPrescription, User, type Appoint
 import Prescription from "@/components/prescription"
 import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
-import { handleFinishConsultation } from "@/app/(authenticated)/dashboard/appointments/[appointmentId]/handleFinishConsultation"
+import { handleFinishConsultation } from "@/app/(authenticated)/dashboard/appointments/[appointmentId]/handle-finish-consultation"
 import {
   AlertDialog,
   AlertDialogAction,
@@ -104,8 +104,6 @@ export default function Prescriptions({
 
   return (
     <div className="flex flex-col h-[calc(100vh-64px)]">
-      {" "}
-      {/* Adjust 64px to match your header height */}
       <div className="flex-grow overflow-auto">
         <Tabs defaultValue={tabs[0].key} className="w-full">
           <TabsList>

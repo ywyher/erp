@@ -2,10 +2,11 @@
 
 import SidebarGroup from "@/app/(authenticated)/dashboard/_components/sidebar/sidebar-group";
 import { MenuItem } from "@/app/(authenticated)/dashboard/types";
-import { CalendarCheck, ConciergeBell, Home, Lock, LogOut, Settings, Stethoscope, User2 } from "lucide-react";
+import { SidebarSeparator } from "@/components/ui/sidebar";
+import { CalendarCheck, ConciergeBell, Cross, Home, Lock, Settings, Slice, SquarePlus, Stethoscope, User2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 
-export default function AdminDashboard() {
+export default function AdminSidebar() {
     const router = useRouter()
 
     const mainGroupItems: MenuItem[] = [
@@ -13,28 +14,15 @@ export default function AdminDashboard() {
             title: "Home",
             url: "/dashboard",
             icon: Home,
-            actions: [
-                {
-                    label: "Settings",
-                    onClick: () => {
-                        router.push("/settings");
-                    },
-                    icon: Settings,
-                },
-                {
-                    label: "Logout",
-                    onClick: () => {
-                        router.push("/logout");
-                    },
-                    icon: LogOut,
-                },
-            ],
         },
         {
             title: "Settings",
             url: "/dashboard/settings",
             icon: Settings ,
         },
+    ];
+
+    const manageGroupItems: MenuItem[] = [
         {
             title: "Admin",
             url: "/dashboard/admins",
@@ -59,17 +47,37 @@ export default function AdminDashboard() {
             title: "Appointments",
             url: "/dashboard/appointments",
             icon: CalendarCheck,
+            actions: [
+                {
+                    label: "Create",
+                    onClick: () => {
+                        router.push("/dashboard/appointments/create");
+                    },
+                    icon: SquarePlus,
+                },
+            ],
         },
         {
             title: "Operations",
             url: "/dashboard/operations",
-            icon: CalendarCheck,
+            icon: Cross,
+            actions: [
+                {
+                    label: "Create",
+                    onClick: () => {
+                        router.push("/dashboard/operations/create");
+                    },
+                    icon: Slice,
+                },
+            ],
         },
-    ];
+    ]
 
     return (
-        <>
+        <div className="flex flex-col gap-1">
             <SidebarGroup items={mainGroupItems} label="Main" />
-        </>
+            <SidebarSeparator />
+            <SidebarGroup items={manageGroupItems} label="Manage" />
+        </div>
     )
 }

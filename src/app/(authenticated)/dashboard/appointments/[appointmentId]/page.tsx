@@ -1,4 +1,5 @@
-import AppointmentTabs from "@/app/(authenticated)/dashboard/appointments/[appointmentId]/_components/tabs"
+import CardLayout from "@/app/(authenticated)/dashboard/_components/card-layout"
+import AppointmentTabs from "@/app/(authenticated)/dashboard/appointments/[appointmentId]/_components/appointment-tabs"
 import { getSession } from "@/lib/auth-client"
 import db from "@/lib/db"
 import { Consultation, Doctor, MedicalFile, Prescription, medicalFile as TMedicalFile, User } from "@/lib/db/schema"
@@ -67,16 +68,18 @@ export default async function Appointment({ params: { appointmentId } }: { param
     }
     
     return (
-        <AppointmentTabs 
-            patient={patient}
-            medicalFiles={medicalFiles}
-            appointmentId={appointmentId}
-            doctorId={doctorId}
-            operation={operation}
-            consultation={consultation}
-            prescriptions={prescriptions}
-            editable={data.user.role == 'doctor' ? true : false}
-            creatorId={data.user.id}
-        />
+        <CardLayout className="py-4">
+            <AppointmentTabs 
+                patient={patient}
+                medicalFiles={medicalFiles}
+                appointmentId={appointmentId}
+                doctorId={doctorId}
+                operation={operation}
+                consultation={consultation}
+                prescriptions={prescriptions}
+                editable={data.user.role == 'doctor' ? true : false}
+                creatorId={data.user.id}
+            />
+        </CardLayout>
     )
 }

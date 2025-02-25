@@ -14,7 +14,7 @@ import { createReceptionistSchema, updateReceptionistSchema } from "@/app/(authe
 export async function createReceptionist({ userData, schedulesData }: { userData: z.infer<typeof createReceptionistSchema>, schedulesData: Schedules }) {
     try {
         return await db.transaction(async (tx) => {
-            const createdUser = await createUser({ data: userData, role: 'receptionist', dbInstance: tx });
+            const createdUser = await createUser({ data: userData, role: 'receptionist', verified: true, dbInstance: tx });
         
             if (("error" in createdUser && createdUser.error) || ("error" in createdUser && !createdUser.userId)) {
                 throw new Error(createdUser.error);

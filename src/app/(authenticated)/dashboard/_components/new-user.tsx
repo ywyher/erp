@@ -15,13 +15,14 @@ import { createUserSchema } from "@/app/types"
 import { User } from "@/lib/db/schema"
 import { toast } from "sonner"
 import { createUser } from "@/lib/db/mutations"
+import { Button } from "@/components/ui/button"
+import { UserPlus } from "lucide-react"
 
-export default function NewUser({ setCreatedUserId, setIsCreateUser }: {
+export default function NewUser({ setCreatedUserId }: {
     setCreatedUserId: Dispatch<SetStateAction<User['id'] | null>>,
-    setIsCreateUser: Dispatch<SetStateAction<boolean>>,
 }) {
     const [isLoading, setIsLoading] = useState<boolean>(false)
-    const [open, setOpen] = useState<boolean>(true)
+    const [open, setOpen] = useState<boolean>(false)
 
     const form = useForm<z.infer<typeof updateUserSchema>>({
         resolver: zodResolver(updateUserSchema)
@@ -32,18 +33,25 @@ export default function NewUser({ setCreatedUserId, setIsCreateUser }: {
         data.password = data.nationalId
         const createdUser = await createUser({ data: data as z.infer<typeof createUserSchema>, role: 'user' })
 
-        if (!createdUser || !createdUser?.success || createdUser?.error) {
-            toast.error(createdUser?.error)
+        if (!createdUser || createdUser.error) {
+            toast.error(createdUser.error)
             setIsLoading(false)
             return;
         }
 
+        toast.message(createdUser.message)
         setCreatedUserId(createdUser.userId)
         setOpen(false)
     }
 
     return (
-        <Dialog open={open} onOpenChange={setIsCreateUser}>
+        <Dialog>
+            <DialogTrigger asChild>
+                <Button className="ml-4">
+                    <UserPlus className="h-4 w-4" />
+                    New User
+                </Button>
+            </DialogTrigger>
             <DialogContent className="sm:max-w-[425px]">
                 <DialogHeader>
                     <DialogTitle>Create New User</DialogTitle>

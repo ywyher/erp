@@ -3,7 +3,6 @@
 import { specialties as specialtiesArr } from "@/app/(authenticated)/dashboard/constants"
 import { useQueryState, parseAsArrayOf, parseAsString } from 'nuqs'
 import MultipleSelector from "@/components/ui/multi-select"
-import { useEffect } from "react"
 
 export default function SpecialtiesFilter() {
     const [specialties, setSpecialties] = useQueryState('specialties', parseAsArrayOf(parseAsString))
@@ -17,6 +16,7 @@ export default function SpecialtiesFilter() {
 
     return (
         <MultipleSelector
+            className="w-full"
             options={specialtiesOptions}
             value={selectedSpecialties}
             onChange={handleSpecialtiesChange}

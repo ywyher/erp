@@ -20,11 +20,6 @@ export default function UserActions({ userId }: { userId: string }) {
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
                 <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                <DropdownMenuItem
-                    onClick={() => navigator.clipboard.writeText(userId)}
-                >
-                    Copy User ID
-                </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <div className="flex flex-col gap-2">
                     <UpdateUser setPopOpen={setOpen} userId={userId} />

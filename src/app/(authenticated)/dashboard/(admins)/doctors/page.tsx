@@ -9,7 +9,12 @@ export default async function Doctors() {
 
     return (
         <CardLayout title="Manage Doctors">
-            <DataTable columns={doctorTableColumns} data={data ?? []} bulkTableName="doctor" />
+            <DataTable 
+                columns={doctorTableColumns} 
+                data={data ?? []} 
+                bulkTableName="user" 
+                filters={['email', 'phoneNumber', 'name', 'username', 'nationalId', 'specialty']}
+            />
             <CreateDoctor />
         </CardLayout>
     )

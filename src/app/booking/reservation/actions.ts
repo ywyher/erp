@@ -2,7 +2,7 @@
 
 import { getSession } from "@/lib/auth-client"
 import db from "@/lib/db"
-import { appointment, Appointment, doctor, medicalFile, user } from "@/lib/db/schema"
+import { appointment, Appointment, doctor, medicalFile, User, user } from "@/lib/db/schema"
 import { generateId } from "@/lib/funcs"
 import { eq } from "drizzle-orm"
 import { headers } from "next/headers"
@@ -40,23 +40,13 @@ export const saveMedicalFilesInDb = async ({
     appointmentId,
     name,
     type,
+    patientId
 }: {
     appointmentId: Appointment['id'],
     name: string,
     type: File['type']
+    patientId: User['id']
 }) => {
-    const { data } = await getSession({
-        fetchOptions: {
-            headers: await headers()
-        }
-    });
-
-    if (!data) {
-        throw new Error('User not found');
-    }
-
-    const patient = data.user;
-
     if (!name || !type) {
         return {
             error: 'Invalid file',
@@ -67,13 +57,13 @@ export const saveMedicalFilesInDb = async ({
         id: generateId(),
         name: name,
         type: type,
-        patientId: patient.id,
+        patientId: patientId,
         appointmentId: appointmentId
     }).returning();
 
 
     return {
-        success: true,
+        error: null,
         message: 'Files uploaded successfully',
         file
     };

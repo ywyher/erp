@@ -1,4 +1,4 @@
-'use server'
+"use server"
 
 import { createUser, updateUser } from "@/lib/db/mutations"
 import { Schedules } from "@/app/(authenticated)/dashboard/types";
@@ -13,7 +13,7 @@ import { z } from "zod";
 export async function createDoctor({ userData, schedulesData }: { userData: z.infer<typeof createDoctorSchema>, schedulesData: Schedules }) {
     try {
         return await db.transaction(async (tx) => {
-            const createdUser = await createUser({ data: userData, role: 'doctor', dbInstance: tx });
+            const createdUser = await createUser({ data: userData, role: 'doctor', verified: true, dbInstance: tx });
 
             if (("error" in createdUser && createdUser.error) || ("error" in createdUser && !createdUser.userId)) {
                 throw new Error(createdUser.error);
@@ -29,12 +29,12 @@ export async function createDoctor({ userData, schedulesData }: { userData: z.in
             });
 
 
-            if (!createdDoctor.length) return {
-                error: "Failed to create doctor record."
-            }
+            if (!createdDoctor.length) throw new Error("Failed to create doctor record.")
 
             const scheduleRecords = transformSchedulesToRecords(schedulesData, createdUser.userId );
             await tx.insert(schedule).values(scheduleRecords);
+
+            if(!scheduleRecords.length) throw new Error('Failed to insert schedules')
 
             revalidatePath("/dashboard/doctors");
             return { error: null, message: "Doctor created successfully!" };
@@ -76,7 +76,7 @@ export async function updateDoctor(
         });
     } catch (error: any) {
         return {
-            error: error.message,
+            error: error.message || "Failed to update doctor",
             message: null
         }
     }

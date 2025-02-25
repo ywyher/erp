@@ -70,14 +70,14 @@ export default function DateFilters({
     : undefined;
 
   return (
-    <div className={cn("grid gap-2", className)}>
+    <div className={cn("grid gap-2 w-full", className)}>
       <Popover>
-        <PopoverTrigger asChild>
+        <PopoverTrigger asChild className="w-full">
           <Button
             id="date"
             variant={"outline"}
             className={cn(
-              "w-[300px] justify-start text-left font-normal",
+              "justify-start text-left font-normal",
               !dateRange && "text-muted-foreground"
             )}
           >

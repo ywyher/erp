@@ -24,26 +24,35 @@ export async function createAppointment({
     date: Date;
     creatorId: User['id']
 }) {
-
-    const createdAppointment = await db.insert(appointment).values({
-        id: generateId(),
-        patientId: patientId,
-        doctorId: doctorId,
-        creatorId: creatorId,
-        startTime: date,
-        status: status,
-        createdBy: createdBy,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-    }).returning()
-
-
-    if (createdAppointment) {
-        revalidatePath('/dashboard/appointments')
+    try {
+        const [createdAppointment] = await db.insert(appointment).values({
+            id: generateId(),
+            patientId: patientId,
+            doctorId: doctorId,
+            creatorId: creatorId,
+            startTime: date,
+            status: status,
+            createdBy: createdBy,
+            createdAt: new Date(),
+            updatedAt: new Date(),
+        }).returning({ id: appointment.id })
+    
+        if(!createdAppointment.id) throw new Error("Failed to create appointment")
+    
+    
+        if (createdAppointment) {
+            revalidatePath('/dashboard/appointments')
+            return {
+                error: null,
+                message: 'Appointment Created Successfuly',
+                appointmentId: createdAppointment.id,
+            }
+        }
+    } catch (error: any) {
         return {
-            success: true,
-            message: 'Appointment Created Successfuly',
-            appointmentId: createdAppointment[0].id,
+            error: error.message,
+            message: null,
+            appointmentId: null,
         }
     }
 }

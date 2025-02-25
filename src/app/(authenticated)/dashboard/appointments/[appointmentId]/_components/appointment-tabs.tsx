@@ -7,7 +7,7 @@ import type { Appointment, Consultation as TConsultation, Doctor, MedicalFile, P
 import { useConsultationStore } from "@/app/(authenticated)/dashboard/appointments/[appointmentId]/store"
 import { useEffect, useState } from "react"
 import Prescriptions from "@/app/(authenticated)/dashboard/appointments/[appointmentId]/_components/prescriptions/page"
-import UserData from "@/app/(authenticated)/dashboard/_components/user-data/user-data"
+import UserCard from "@/components/user-card"
 
 type AppointmentTabs = {
   patient: User
@@ -32,6 +32,7 @@ export default function AppointmentTabs({
    editable,
    creatorId
    }: AppointmentTabs) {
+    
   const { selectedPrescriptions } = useConsultationStore(appointmentId); // Invoke the Zustand store function
   const [activeTab, setActiveTab] = useState<"user" | "prescriptions" | "consultation">("user")
   const { 
@@ -41,6 +42,8 @@ export default function AppointmentTabs({
      setRadiologies,
      setMedicines,
      setSelectedPrescriptions,
+
+     // Prescriptions content
      setLaboratory,
      setRadiology,
      setMedicine 
@@ -94,19 +97,19 @@ export default function AppointmentTabs({
         )}
       </TabsList>
       <TabsContent value="user" className="flex flex-col gap-3">
-        <UserData user={patient} />
+        <UserCard data={patient} />
         <UserMedicalFiles files={medicalFiles} />
       </TabsContent>
       <TabsContent value="consultation">
         <Consultation
-         appointmentId={appointmentId}
-         doctorId={doctorId} patientId={patient.id}
-         operation={operation}
-         consultationId={consultation?.id}
-         prescriptions={prescriptions}
-         setActiveTab={setActiveTab}
-         editable={editable}
-         creatorId={creatorId}
+          appointmentId={appointmentId}
+          doctorId={doctorId} patientId={patient.id}
+          operation={operation}
+          consultationId={consultation?.id}
+          prescriptions={prescriptions}
+          setActiveTab={setActiveTab}
+          editable={editable}
+          creatorId={creatorId}
         />
       </TabsContent>
       {selectedPrescriptions.length > 0 && (

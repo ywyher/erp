@@ -1,9 +1,9 @@
 import UserMedicalFiles from "@/app/(authenticated)/dashboard/_components/user-data/medical-files"
-import UserData from "@/app/(authenticated)/dashboard/_components/user-data/user-data"
 import ConsultationData from "@/app/(authenticated)/dashboard/operations/[operationId]/_components/consultation-data"
 import PrescriptionTabs from "@/app/(authenticated)/dashboard/operations/[operationId]/_components/prescription-tabs"
 import Prescription from "@/components/prescription"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import UserCard from "@/components/user-card"
 import { Consultation, MedicalFile, User } from "@/lib/db/schema"
 
 type PatientData = {
@@ -29,8 +29,8 @@ export default function PatientData({
           <TabsTrigger value="prescriptions">Prescriptions</TabsTrigger>
         )}
       </TabsList>
-      <TabsContent value="personal">
-        <UserData user={patient} />
+      <TabsContent value="personal" className="flex flex-col gap-3">
+        <UserCard data={patient} />
         {medicalFiles && medicalFiles.length > 0 && (
           <UserMedicalFiles files={medicalFiles} />
         )}

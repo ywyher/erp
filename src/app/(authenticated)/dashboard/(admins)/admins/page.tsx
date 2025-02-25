@@ -13,7 +13,7 @@ export default async function Admin() {
                 columns={adminTableColumns} 
                 data={data ?? []}
                 bulkTableName="user"
-                hiddenColumns={['id']}
+                filters={['email', 'phoneNumber', 'name', 'username', 'nationalId']}
             />
             <CreateAdmin />
         </CardLayout>

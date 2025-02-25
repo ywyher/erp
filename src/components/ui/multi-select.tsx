@@ -183,7 +183,7 @@ const MultipleSelector = React.forwardRef<MultipleSelectorRef, MultipleSelectorP
       emptyIndicator,
       maxSelected = Number.MAX_SAFE_INTEGER,
       onMaxSelected,
-      hidePlaceholderWhenSelected,
+      hidePlaceholderWhenSelected = true,
       disabled,
       groupBy,
       className,
@@ -427,7 +427,7 @@ const MultipleSelector = React.forwardRef<MultipleSelectorRef, MultipleSelectorP
     }, [creatable, commandProps?.filter]);
 
     return (
-      <div className='flex flex-col gap-2'>
+      <div className='flex flex-col gap-2 w-full'>
         {label && <p className='capitalize'>{label}</p>}
         <Command
           ref={dropdownRef}
@@ -513,7 +513,7 @@ const MultipleSelector = React.forwardRef<MultipleSelectorRef, MultipleSelectorP
                   triggerSearchOnFocus && onSearch?.(debouncedSearchTerm);
                   inputProps?.onFocus?.(event);
                 }}
-                placeholder={hidePlaceholderWhenSelected && selected.length !== 0 ? '' : placeholder}
+                placeholder={hidePlaceholderWhenSelected && selected.length != 0 ? '' : placeholder}
                 className={cn(
                   'flex-1 bg-transparent outline-none placeholder:text-muted-foreground',
                   {

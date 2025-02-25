@@ -11,10 +11,12 @@ import { MoreHorizontal, Loader2, UserPlus } from 'lucide-react'
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { toast } from "sonner"
+import NewUser from "@/app/(authenticated)/dashboard/_components/new-user"
 
-export default function ExistingUser({ setSelectedUserId, setIsCreateUser }: {
+export default function ExistingUser({ setSelectedUserId, newUser = false, title }: {
     setSelectedUserId: Dispatch<SetStateAction<User['id'] | null>>,
-    setIsCreateUser?: Dispatch<SetStateAction<boolean>>,
+    newUser?: boolean,
+    title: string;
 }) {
     const [searchQuery, setSearchQuery] = useState<string>('')
     const [searchResults, setSearchResults] = useState<User[]>([])
@@ -51,9 +53,9 @@ export default function ExistingUser({ setSelectedUserId, setIsCreateUser }: {
     return (
         <Card className="w-full">
             <CardHeader>
-                <CardTitle>Reserve an Appointment</CardTitle>
+                <CardTitle>{title}</CardTitle>
                 <CardDescription>
-                    Search for existing patients or create a new user
+                    Search for existing users or create a new user
                 </CardDescription>
             </CardHeader>
             <CardContent>
@@ -70,10 +72,7 @@ export default function ExistingUser({ setSelectedUserId, setIsCreateUser }: {
                                 <Loader2 className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 animate-spin text-muted-foreground" />
                             )}
                         </div>
-                        <Button className="ml-4" onClick={() => setIsCreateUser && setIsCreateUser(true)}>
-                            <UserPlus className="mr-2 h-4 w-4" />
-                            New User
-                        </Button>
+                        {newUser && <NewUser setCreatedUserId={setSelectedUserId} />}
                     </div>
 
                     <div className="rounded-md border">

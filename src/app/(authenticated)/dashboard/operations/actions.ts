@@ -2,7 +2,7 @@
 
 import db from "@/lib/db"
 import { Appointment, Doctor, Operation, operation, OperationData, operationData, Schedule, User } from "@/lib/db/schema"
-import { generateId, streamToBuffer } from "@/lib/funcs"
+import { generateId } from "@/lib/funcs"
 import { eq } from "drizzle-orm"
 import { revalidatePath } from "next/cache"
 import { z } from "zod"
@@ -60,8 +60,8 @@ export async function createOperation({
     }
 }
 
-export async function updateOperationStatus({ operationId, status }: { operationId: Operation['id'], status: Operation['status'] }) {
-    const [updatedOperation] = await db.update(operation).set({
+export async function updateOperationStatus({ operationId, status, dbInstance = db }: { operationId: Operation['id'], status: Operation['status'], dbInstance?: typeof db }) {
+    const [updatedOperation] = await dbInstance.update(operation).set({
         status: status
     })
         .where(eq(operation.id, operationId))
@@ -77,8 +77,8 @@ export async function updateOperationStatus({ operationId, status }: { operation
     }
 }
 
-export async function updateOperationEndTime({ operationId, date }: { operationId: Operation['id'] ,date: Date }) {
-    const [updatedOperation] = await db.update(operation).set({
+export async function updateOperationEndTime({ operationId, date, dbInstance = db }: { operationId: Operation['id'], date: Date, dbInstance?: typeof db }) {
+    const [updatedOperation] = await dbInstance.update(operation).set({
         endTime: date
     }).returning()
 
@@ -95,38 +95,46 @@ export async function updateOperationEndTime({ operationId, date }: { operationI
 
 
 export async function createOperationData({ data, operationId }: { data: any, operationId: Operation['id'] }) {
+    try {
+        return await db.transaction(async (tx) => {
+            const operationDataId = generateId();
+        
+            const { name } = await getOperationDocument({ dbInstance: tx })
 
-    const operationDataId = generateId();
+            console.log(name)
 
-    const operationDocument = await getOperationDocument()
-
-    const [createdOperationData] = await db.insert(operationData).values({
-        id: operationDataId,
-        data,
-        documentName: operationDocument,
-        operationId: operationId,
-    }).returning()
-
-    if(!createdOperationData.id) return {
-        error: "Failed to create operation data entry!!"
-    }
-
-    const updatedOperationData = await updateOperationStatus({ operationId: operationId, status: 'completed' })
-
-    if(updatedOperationData.error) return {
-        error: updatedOperationData.error
-    }
-
-    const updatedOperationEndTime = await updateOperationEndTime({ operationId, date: new Date() })
-
-    if(updatedOperationEndTime.error) return {
-        error: updatedOperationEndTime.error
-    }
-
-    return {
-        data: createdOperationData as OperationData,
-        message: "Operation data inserted!",
-        error: null
+            if(!name) throw new Error("Couldn't get the document")
+        
+            const [createdOperationData] = await tx.insert(operationData).values({
+                id: operationDataId,
+                data,
+                documentName: name,
+                operationId: operationId,
+            }).returning()
+        
+            if(!createdOperationData.id) throw new Error("Failed to create operation data entry!!")
+        
+            const updatedOperationData = await updateOperationStatus({ operationId: operationId, status: 'completed', dbInstance: tx })
+        
+            if(updatedOperationData.error) throw new Error(updatedOperationData.error)
+    
+            const updatedOperationEndTime = await updateOperationEndTime({ operationId, date: new Date(), dbInstance: tx })
+        
+            if(updatedOperationEndTime.error) throw new Error(updatedOperationEndTime.error)
+        
+            revalidatePath(`/dashboard/operations/${operationId}`)
+            return {
+                data: createdOperationData as OperationData,
+                message: "Operation data inserted!",
+                error: null
+            }
+        })
+    } catch (error: any) {
+        return {
+            message: null,
+            data: null,
+            error: error.message
+        }
     }
 }
 
@@ -145,7 +153,7 @@ export async function updateOperationData({ data, operationDataId }: { data: any
         };
     }
 
-    revalidatePath(`/dashboard/operations/${updatedOperationData.operationId}`)
+    revalidatePath(`/dashboard/operations/${operationDataId}`)
     return {
         data: updatedOperationData as OperationData,
         message: "Operation data updated successfully!",
@@ -157,43 +165,41 @@ export async function updateOperationData({ data, operationDataId }: { data: any
 export const getOperationStatus = async (operationId: Operation['id']) => {
     const [query] = await db.select().from(operation)
       .where(eq(operation.id, operationId))
-  
-    if(!query) {
-        redirect('/dashboard/operations')
-        return;
-    }
 
     return query.status;
 } 
 
+
 export async function extractPlaceholders(fileKey: string): Promise<string[]> {
-    try {
-        const { S3_BUCKET_NAME } = process.env;
+    // Fetch the file from R2 bucket
+    const fileBuffer = await fetchFileFromS3(fileKey);
 
-        if (!S3_BUCKET_NAME) {
-            throw new Error('Missing required environment variables for S3 configuration');
-        }
+    // Extract raw text using Mammoth
+    const { value: text } = await mammoth.extractRawText({ buffer: fileBuffer });
 
-        // Fetch the file from R2 bucket
-        const { Body } = await s3.send(new GetObjectCommand({ Bucket: process.env.S3_BUCKET_NAME, Key: fileKey }));
+    // Use matchAll() for better performance and clarity
+    const placeholderRegex = /\{([^}]+)\}/g;
+    const placeholders = new Set([...text.matchAll(placeholderRegex)].map((match) => match[1]));
 
-        // Read the file buffer from the stream
-        if (!Body) throw new Error('Failed to retrieve file from R2');
-        const fileBuffer = await streamToBuffer(Body as NodeJS.ReadableStream);
+    return Array.from(placeholders);
+}
 
-        // Extract raw text using Mammoth
-        const result = await mammoth.extractRawText({ buffer: fileBuffer });
-        const text = result.value;
-
-        // Use regex to find all placeholders (words inside {})
-        const placeholderRegex = /\{([^}]+)\}/g;
-        const matches = text.match(placeholderRegex);
-
-        if (!matches) return []; // No placeholders found
-
-        return [...new Set(matches.map((match) => match.slice(1, -1)))];
-    } catch (error) {
-        console.error('Error processing the .docx file:', error);
-        throw error;
+// Helper function to fetch file from S3
+async function fetchFileFromS3(fileKey: string): Promise<Buffer> {
+    const { S3_BUCKET_NAME } = process.env;
+    if (!S3_BUCKET_NAME) {
+        throw new Error("Missing S3_BUCKET_NAME environment variable");
     }
+
+    const { Body } = await s3.send(new GetObjectCommand({ Bucket: S3_BUCKET_NAME, Key: fileKey }));
+    if (!Body) throw new Error("Failed to retrieve file from R2");
+    return streamToBuffer(Body as NodeJS.ReadableStream);
+}
+
+async function streamToBuffer(stream: NodeJS.ReadableStream): Promise<Buffer> {
+    const chunks: Buffer[] = [];
+    for await (const chunk of stream) {
+        chunks.push(Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk));
+    }
+    return Buffer.concat(chunks);
 }

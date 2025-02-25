@@ -8,10 +8,10 @@ import {
   SidebarTrigger,
 } from "@/components/ui/sidebar";
 import SidebarFooter from "@/app/(authenticated)/dashboard/_components/sidebar/sidebar-footer";
-import AdminDashboard from "@/app/(authenticated)/dashboard/_components/sidebar/admin/admin-dashboard";
-import DoctorDashboard from "@/app/(authenticated)/dashboard/_components/sidebar/doctor/doctor-dashboard";
-import ReceptionistDashboard from "@/app/(authenticated)/dashboard/_components/sidebar/receptionist/receptionist-dashboard";
-import UserDashboard from "@/app/(authenticated)/dashboard/_components/sidebar/user/user-dashboard";
+import AdminDashboard from "@/app/(authenticated)/dashboard/_components/sidebar/admin/admin-sidebar";
+import DoctorDashboard from "@/app/(authenticated)/dashboard/_components/sidebar/doctor/doctor-sidebar";
+import ReceptionistDashboard from "@/app/(authenticated)/dashboard/_components/sidebar/receptionist/receptionist-sidebar";
+import UserDashboard from "@/app/(authenticated)/dashboard/_components/sidebar/user/user-sidebar";
 import { User } from "@/lib/db/schema";
 import Logo from "@/components/logo";
 import { useSidebar } from "@/components/ui/sidebar"

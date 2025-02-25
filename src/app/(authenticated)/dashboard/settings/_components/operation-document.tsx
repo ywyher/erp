@@ -17,6 +17,7 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter }
 import { Upload, Download, AlertTriangle } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { getFileUrl } from "@/lib/funcs"
+import { operationDocumentKey } from "@/app/(authenticated)/dashboard/settings/keys"
 
 const schema = z.object({
   file: z.array(z.instanceof(File)),
@@ -24,12 +25,12 @@ const schema = z.object({
 
 type Schema = z.infer<typeof schema>
 
-export default function OperationDocumentUrl({
+export default function OperationDocument({
   userId,
-  currentUrl,
+  currentName,
 }: {
   userId: User["id"]
-  currentUrl: string
+  currentName: string
 }) {
   const [isLoading, setIsLoading] = useState(false)
   const { handleUpload, progresses, setProgresses, setIsUploading } = useFileUpload()
@@ -51,7 +52,7 @@ export default function OperationDocumentUrl({
     const input = form.getValues()
 
     if(!input.file[0]) {
-      toast.error('No file uploadad!')
+      toast.error('Select a file first!')
       setIsLoading(false)
       setShowAlert(false)
       return;
@@ -65,14 +66,14 @@ export default function OperationDocumentUrl({
     }
 
     const data: z.infer<typeof settingSchema> = {
-      key: "operation-document-url",
+      key: operationDocumentKey,
       value: fileName,
       description: "Operation document url",
     }
 
     let result: { message?: string; error: string | null; settingId?: string }
-    if (currentUrl) {
-      result = await updateSetting({ data, editorId: userId, settingKey: "operation-document-url" })
+    if (currentName) {
+      result = await updateSetting({ data, editorId: userId, settingKey: operationDocumentKey })
     } else {
       result = await createSetting({ data, creatorId: userId })
     }
@@ -99,10 +100,10 @@ export default function OperationDocumentUrl({
             <Upload className="w-6 h-6" />
             Upload Operation Document
           </CardTitle>
-          {currentUrl && (
+          {currentName && (
             <Button variant="outline" size="sm" asChild>
               <a
-                href={getFileUrl(currentUrl)}
+                href={getFileUrl(currentName)}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center gap-2"
@@ -115,7 +116,7 @@ export default function OperationDocumentUrl({
         </div>
         <CardDescription>
           Attach files for the doctor. Accepted format: .docx (Word document)
-          {currentUrl && (
+          {currentName && (
             <p className="mt-2 text-sm text-muted-foreground">
               A document is currently uploaded. Uploading a new one will replace the existing document.
             </p>

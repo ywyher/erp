@@ -1,9 +1,10 @@
-import { Appointment, Doctor, Schedule } from '@/lib/db/schema';
+import { Appointment, Doctor, Schedule, User } from '@/lib/db/schema';
 import { create } from 'zustand';
 
 type ReservedState = {
   reserved: boolean | null;
   appointmentId: Appointment['id'] | null;
+  patientId: User['id'] | null
 };
 
 type AppointmentReservationStore = {
@@ -15,11 +16,13 @@ export const useAppointmentReservationStore = create<AppointmentReservationStore
   reserved: {
     reserved: false,
     appointmentId: null,
+    patientId: null
   },
   setReserved: (reserved) => set({
     reserved: {
       reserved: reserved.reserved ?? null,
-      appointmentId: reserved.appointmentId ?? null
+      appointmentId: reserved.appointmentId ?? null,
+      patientId: reserved.patientId ?? null
     }
   }),
 }));

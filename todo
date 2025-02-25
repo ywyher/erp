@@ -1,1 +1,14 @@
 # add the ability for the patient to add personal data like whiehg height and so onn
+
+# charts page.tsx (/dashboard)
+
+# check if drizzle-studio have a way to make records appears as if they arent there and maybe make a request for it if not
+
+# Error: Route "/dashboard/operations/[operationId]" used `params.operationId`. `params` should be awaited before using its properties. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis
+#     at Operation (src/app/(authenticated)/dashboard/operations/[operationId]/page.tsx:55:52)
+#   53 | }
+#   54 |
+# > 55 | export default async function Operation({ params: { operationId } }: { params: { operationId: string } }) {
+#      |
+
+# redirect to onboarding from verify page yet doesnt work as expected

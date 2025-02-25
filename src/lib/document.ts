@@ -1,8 +1,6 @@
-import type { OperationData } from "@/lib/db/schema"
 import Docxtemplater from "docxtemplater"
 import PizZip from "pizzip"
 import { saveAs } from "file-saver"
-import path from "path"
 
 // Define a type for PizZipUtils
 type PizZipUtilsType = {

@@ -6,20 +6,14 @@ import { Form } from "@/components/ui/form"
 import { useQuery, useQueryClient } from "@tanstack/react-query"
 import { getSession } from "@/lib/auth-client"
 import { useEffect, useState } from "react"
-import { useImageStore } from "@/app/store"
 import LoadingBtn from "@/components/loading-btn"
-import { isFakeEmail, normalizeData } from "@/lib/funcs"
+import { getChangedFields, isFakeEmail, normalizeData } from "@/lib/funcs"
 import { z } from "zod"
 import { updateUserSchema } from "@/app/types"
 import { FormFieldWrapper } from "@/components/formFieldWrapper"
 import { getUserRegistrationType } from "@/lib/db/queries"
 import { toast } from "sonner"
 import { updateUser } from "@/lib/db/mutations"
-
-type UpdateField = {
-    value: string | null;
-    nullable: boolean;
-};
 
 export default function SettingsForm() {
     const [isLoading, setIsLoading] = useState<boolean>(false)
@@ -47,35 +41,28 @@ export default function SettingsForm() {
             }
         })
         if (user) {
-            form.setValue('name', user.name || '')
-            form.setValue('username', user.username || '')
-            form.setValue('email', isFakeEmail(user.email) ? '' : user.email || '')
-            form.setValue('phoneNumber', user.phoneNumber || '')
-            form.setValue('nationalId', user.nationalId || '')
+            form.reset({
+                name: user.name || '',
+                username: user.username || '',
+                email: isFakeEmail(user.email) ? '' : user.email || '',
+                phoneNumber: user.phoneNumber || '',
+                nationalId: user.nationalId || '',
+            });
         }
     }, [user])
 
     const onCheckChangedFields = async (data: z.infer<typeof updateUserSchema>) => {
         if (!user) return;
 
-        const normalizedSessionData = {
-            name: normalizeData(user.name),
-            email: isFakeEmail(user.email) ? '' : normalizeData(user.email),
-            username: normalizeData(user.username || ""),
-            phoneNumber: normalizeData(user.phoneNumber || ""),
-            nationalId: normalizeData(user.nationalId || "")
+        const sessionData = {
+            name: user.name,
+            email: isFakeEmail(user.email) ? '' : user.email,
+            username: user.username || "",
+            phoneNumber: user.phoneNumber || "",
+            nationalId: user.nationalId || ""
         };
 
-        const changedFields: Partial<z.infer<typeof updateUserSchema>> = {};
-
-        for (const key in normalizedSessionData) {
-            let formValue = normalizeData(data[key as keyof z.infer<typeof updateUserSchema>] as string);
-            const sessionValue = normalizedSessionData[key as keyof typeof normalizedSessionData];
-
-            if (formValue !== sessionValue) {
-                changedFields[key as keyof typeof changedFields] = formValue;
-            }
-        }
+        const changedFields = getChangedFields(sessionData, data);
 
         if (Object.keys(changedFields).length === 0) {
             toast.error("No Changes thus no fields were updated.");
@@ -89,7 +76,10 @@ export default function SettingsForm() {
     const onSubmit = async (data: z.infer<typeof updateUserSchema>) => {
         if (!user || !user.id) return;
         setIsLoading(true)
-        const result = await updateUser({ data, userId: user.id, role: 'user' });
+
+        const normalizedData = normalizeData(data, 'object')
+
+        const result = await updateUser({ data: normalizedData, userId: user.id, role: 'user' });
 
         if (result && result.error) {
             toast.error(result.error)

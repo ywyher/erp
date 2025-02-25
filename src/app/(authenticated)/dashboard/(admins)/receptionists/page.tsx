@@ -8,8 +8,12 @@ export default async function Doctors() {
     const data = await listUsers('receptionist', true)
 
     return (
-        <CardLayout title="Manage Doctors">
-            <DataTable columns={receptionistTableColumns} data={data ?? []} bulkTableName="receptionist" />
+        <CardLayout title="Manage Receptionists">
+            <DataTable
+                columns={receptionistTableColumns} data={data ?? []}
+                bulkTableName="user" 
+                filters={['email', 'phoneNumber', 'name', 'username', 'nationalId']}
+            />
             <CreateReceptionist />
         </CardLayout>
     )

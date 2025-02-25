@@ -9,8 +9,10 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { DataTableViewOptions } from "@/components/ui/data-table-view-options"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
+import { DropdownMenu, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { deleteById } from "@/lib/db/mutations"
+import { DataTableStatusFilter } from "@/components/ui/data-table-status-filter"
+import { Checkbox } from "@/components/ui/checkbox"
 
 interface DataTableToolbarProps<TData extends { id: string }> {
   table: Table<TData>
@@ -64,25 +66,35 @@ export function DataTableToolbar<TData extends { id: string }>({
             </DropdownMenuTrigger>
             <DropdownMenuContent align="start">
               {filters.map((filter) => (
-                <DropdownMenuItem key={filter} onClick={() => setActiveFilter(filter)} className="capitalize">
-                  {activeFilter == filter && <Check />} {filter}
-                </DropdownMenuItem>
+                <DropdownMenuCheckboxItem 
+                  key={filter} 
+                  className="flex flex-row gap-4 capitalize"
+                  checked={filter == activeFilter}
+                  onCheckedChange={(value) => setActiveFilter(filter)}
+                >
+                  {filter}
+                </DropdownMenuCheckboxItem>
               ))}
             </DropdownMenuContent>
           </DropdownMenu>
         )}
+
         {isFiltered && (
           <Button
-            variant="ghost"
+            variant="outline"
             onClick={() => table.resetColumnFilters()}
             className="h-8 px-2 lg:px-3"
           >
             Reset
-            <X />
+            <X className="ml-2 h-4 w-4" />
           </Button>
         )}
       </div>
       <div className="flex items-center space-x-2">
+        {/* Status Filter Component */}
+        {table.getAllColumns().some(col => col.id === "status") && (
+          <DataTableStatusFilter table={table} />
+        )}
         {selectedRows.length > 0 && (
           <>
             <Button variant="destructive" onClick={() => setOpen(true)}>

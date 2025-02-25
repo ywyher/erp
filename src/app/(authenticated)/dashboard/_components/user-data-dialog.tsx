@@ -5,8 +5,9 @@ import { Button } from "@/components/ui/button"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { getUserById, getWorkerUserId } from "@/lib/db/queries"
 import { Roles } from '@/app/types'
-import { UserCard } from '@/components/user-card'
+import UserCard from '@/components/user-card'
 import { DoctorCard } from '@/components/doctors/doctor-card'
+import { Eye } from 'lucide-react'
 
 export default function UserDataDialog({ userId, role }: { userId: string, role: Roles }) {
     const [userData, setUserData] = useState<any>(null)
@@ -29,7 +30,8 @@ export default function UserDataDialog({ userId, role }: { userId: string, role:
         <Dialog>
             <DialogTrigger asChild>
                 <Button variant="outline" onClick={fetchUserData}>
-                    Open
+                    <Eye size={20}/>
+                    See Data
                 </Button>
             </DialogTrigger>
             <DialogContent aria-describedby='idk'>

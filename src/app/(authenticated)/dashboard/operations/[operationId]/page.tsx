@@ -1,4 +1,5 @@
-import OperationTabs from "@/app/(authenticated)/dashboard/operations/[operationId]/_components/tabs"
+import CardLayout from "@/app/(authenticated)/dashboard/_components/card-layout"
+import OperationTabs from "@/app/(authenticated)/dashboard/operations/[operationId]/_components/operation-tabs"
 import { getSession } from "@/lib/auth-client"
 import db from "@/lib/db"
 import { getOperationDocument } from "@/lib/db/queries"
@@ -25,10 +26,6 @@ const getPatientData = async (operationId: string) => {
     const consultation = operation.appointmentId ? await db.select().from(consultationTable)
       .where(eq(consultationTable.appointmentId, operation.appointmentId))
       : null
-    
-    const prescriptions = consultation ? await db.query.prescription.findMany({
-        where: (prescription, { eq }) => eq(prescription.consultationId, consultation[0].id)
-    }) : [];
 
     const patient = await db.query.user.findFirst({
         where: (user, { eq }) => eq(user.id, operation.patientId)
@@ -49,10 +46,8 @@ const getPatientData = async (operationId: string) => {
 
     return {
         patient,
-        doctorId: operation.doctorId,
         medicalFiles: medicalFiles || null,
         consultation: consultation && consultation.length > 0 ? consultation[0] : undefined,
-        prescriptions,
         operationData: operationDataVar,
     };
 }
@@ -61,16 +56,12 @@ export default async function Operation({ params: { operationId } }: { params: {
     const {
          patient,
          medicalFiles,
-         doctorId,
          consultation,
-         prescriptions,
          operationData,
         } = await getPatientData(operationId) as {
             patient: User;
-            doctorId: Doctor['id'];
             medicalFiles: MedicalFile[];
             consultation?: Consultation;
-            prescriptions?: Prescription[]
             operationData?: OperationData
         }
 
@@ -84,30 +75,31 @@ export default async function Operation({ params: { operationId } }: { params: {
         return new Error("Couldn't retrieve data")
     }
 
-    let operationDocument;
+    let operationDocument: { name: string, error: string | null };
     if(!operationData?.documentName) {
-        operationDocument = await getOperationDocument();
+        operationDocument = await getOperationDocument() as { name: string, error: string | null };
 
         if(!operationDocument) {
-            redirect('/dashboard/operations')
+            redirect('/dashboard/operations?error=Missing%20operation%20document%20contact%20the%20admin.');
+            return;
         }
     }else {
-        operationDocument = operationData?.documentName
+        operationDocument = { name: operationData?.documentName, error: null }
     }
 
     if(!operationDocument) return new Error("couldnt get operation document")
 
     return (
-        <OperationTabs
-            patient={patient}
-            medicalFiles={medicalFiles}
-            operationId={operationId}
-            doctorId={doctorId}
-            consultation={consultation}
-            prescriptions={prescriptions}
-            operationData={operationData}
-            operationDocument={operationDocument}
-            editable={data.user.role == 'doctor' ? true : false}
-        />
+        <CardLayout className="py-4">
+            <OperationTabs
+                patient={patient}
+                medicalFiles={medicalFiles}
+                operationId={operationId}
+                consultation={consultation}
+                operationData={operationData}
+                operationDocument={operationDocument.name}
+                editable={data.user.role == 'doctor' ? true : false}
+            />
+        </CardLayout>
     )
 }

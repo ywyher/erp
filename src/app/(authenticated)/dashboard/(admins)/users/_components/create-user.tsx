@@ -25,7 +25,7 @@ export default function CreateUser() {
 
     const onSubmit = async (data: z.infer<typeof createUserSchema>) => {
         setIsLoading(true)
-        const result = await createUser({ data, role: 'user' })
+        const result = await createUser({ data, role: 'user', verified: true })
 
         if (result?.error) {
             toast.error(result?.error)

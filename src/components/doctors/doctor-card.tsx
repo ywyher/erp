@@ -4,7 +4,7 @@ import { Doctor, Schedule, User } from '@/lib/db/schema'
 import Pfp from '@/components/pfp'
 import { ScheduleDisplay } from '@/components/schedule-display'
 import { useDoctorIdStore, useDateStore } from '@/components/doctors/store'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import {
     Tabs,
     TabsContent,
@@ -14,7 +14,6 @@ import {
 import {
     Dialog,
     DialogContent,
-    DialogDescription,
     DialogHeader,
     DialogTitle,
     DialogTrigger,

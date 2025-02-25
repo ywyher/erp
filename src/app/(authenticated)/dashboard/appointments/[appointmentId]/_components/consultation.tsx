@@ -1,6 +1,6 @@
 "use client"
 
-import { handleFinishConsultation } from "@/app/(authenticated)/dashboard/appointments/[appointmentId]/handleFinishConsultation"
+import { handleFinishConsultation } from "@/app/(authenticated)/dashboard/appointments/[appointmentId]/handle-finish-consultation"
 import { useConsultationStore } from "@/app/(authenticated)/dashboard/appointments/[appointmentId]/store"
 import { consultationSchema } from "@/app/(authenticated)/dashboard/appointments/types"
 import {
@@ -30,6 +30,12 @@ import {
 import { Button } from "@/components/ui/button"
 import DateSelector from "@/components/date-selector"
 import { toast } from "sonner"
+
+const normalizeText = (text: string) => 
+  text
+    .split('_')
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(' ');
 
 export default function Consultation({
   appointmentId,
@@ -80,17 +86,7 @@ export default function Consultation({
 
   const form = useForm<z.infer<typeof consultationSchema>>({
     resolver: zodResolver(consultationSchema),
-    defaultValues: {
-      history: history || "",
-      diagnosis: diagnosis || "",
-    },
   })
-
-  const normalizeText = (text: string) => 
-    text
-      .split('_')
-      .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-      .join(' ');
 
   const handleConsultation = async (data: z.infer<typeof consultationSchema>) => {
     setIsLoading(true)
@@ -158,10 +154,14 @@ export default function Consultation({
   }
 
   useEffect(() => {
-    form.setValue("laboratories", laboratories);
-    form.setValue("radiologies", radiologies);
-    form.setValue("medicines", medicines);
-  }, [laboratories, radiologies, medicines]);
+    form.reset({
+      diagnosis: diagnosis || "",
+      history: history || "",
+      laboratories,
+      radiologies,
+      medicines,
+    })
+  }, [history, diagnosis, laboratories, radiologies, medicines]);
 
   useEffect(() => {
     if(operationDate) {
@@ -185,6 +185,7 @@ export default function Consultation({
              form={form}
              name="diagnosis" 
              label="Diagnosis"
+             type="textarea"
              disabled={!editable}
             />
             <FormFieldWrapper
@@ -213,12 +214,11 @@ export default function Consultation({
             />
           </div>
           {editable && (
-            <LoadingBtn isLoading={isLoading}>Save Consultation</LoadingBtn>
+            <LoadingBtn isLoading={isLoading}>{operation == 'create' ? 'Save' : 'Update'} Consultation</LoadingBtn>
           )}
         </form>
       </Form>
 
-      {/* Alert Dialog for Ending Session */}
       {editable && (
         <>
           <AlertDialog open={showAlert} onOpenChange={setShowAlert}>

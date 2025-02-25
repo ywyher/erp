@@ -67,6 +67,7 @@ export default function ReservationAttatchFiles() {
                         name: fileName,
                         type: file.type,
                         appointmentId: reservation.appointmentId as string,
+                        patientId: reservation.patientId as string
                     });
                 } catch (dbError) {
                     console.error("Database error:", dbError);
@@ -82,7 +83,7 @@ export default function ReservationAttatchFiles() {
                 id: toastId,
             });
             form.reset();
-            setReserved({ reserved: false, appointmentId: null })
+            setReserved({ reserved: false, appointmentId: null, patientId: null })
             router.replace('/dashboard/appointments');
             setIsLoading(false);
         } catch (err) {

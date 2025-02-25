@@ -1,16 +1,17 @@
-import { appointmentTableColumns } from "@/app/(authenticated)/dashboard/appointments/columns";
+import CardLayout from "@/app/(authenticated)/dashboard/_components/card-layout";
 import { operationTableColumns } from "@/app/(authenticated)/dashboard/operations/columns";
+import ToastWrapper from "@/components/toast-wrapper";
 import { Button } from "@/components/ui/button";
 import { DataTable } from "@/components/ui/data-table";
 import { getSession } from "@/lib/auth-client";
 import db from "@/lib/db"
-import { appointment, doctor, operation, receptionist, user, User } from "@/lib/db/schema"
+import { doctor, operation, user, User } from "@/lib/db/schema"
 import { format } from "date-fns";
 import { eq } from "drizzle-orm";
 import { headers } from "next/headers";
 import Link from "next/link";
 
-const listAppointments = async (userId: User['id'], role: User['role']) => {
+const listOperaitons = async (userId: User['id'], role: User['role']) => {
     let operations;
 
     if (role == 'admin') {
@@ -55,7 +56,6 @@ const listAppointments = async (userId: User['id'], role: User['role']) => {
 }
 
 export default async function Operations() {
-
     const { data } = await getSession({
         fetchOptions: {
             headers: await headers()
@@ -64,20 +64,29 @@ export default async function Operations() {
 
     if (!data) throw new Error('Unauthorized');
 
-    const operations = await listAppointments(data.user.id, data.user.role as User['role'])
+    const operations = await listOperaitons(data.user.id, data.user.role as User['role'])
 
     return (
-        <div className="w-[100%]">
+        <CardLayout title="Manage Operations"  className="flex-1">
+            <ToastWrapper name="error" />
             {operations && (
-                <div className="flex flex-col gap-3">
-                    <DataTable columns={operationTableColumns} data={operations} filter={null} />
-                    <Button>
+                <div className="h-screen flex flex-col">
+                    <div className="flex-1">
+                        <DataTable 
+                            columns={operationTableColumns}
+                            data={operations}
+                            filters={['doctorId', 'patientId']}
+                            bulkTableName="operation"
+                            hiddenColumns={['id']}
+                        />
+                    </div>
+                    <Button className="sticky bottom-4 p-4 shadow-md w-full">
                         <Link href="/dashboard/operations/create">
                             Create Operation
                         </Link>
                     </Button>
                 </div>
             )}
-        </div>
+        </CardLayout>
     )
 }

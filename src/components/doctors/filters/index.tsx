@@ -15,17 +15,17 @@ export default function DoctorsFilters({ onApply, onReset }: { onApply: () => vo
     return (
         <Card>
             <CardHeader>
-                <CardTitle>Filters Options</CardTitle>
+                <CardTitle>Filter Options</CardTitle>
             </CardHeader>
-            <CardContent className="flex flex-row gap-4 w-full">
-                <div className="flex flex-row items-center gap-4 w-full">
+            <CardContent className="flex flex-col lg:flex-row gap-4 w-full">
+                <div className="flex flex-col lg:flex-row items-center gap-4 w-full">
                     <NameFilter />
                     <SpecialtyFilter />
                     <DateFilters />
                 </div>
-                <div className="flex flex-row gap-4">
-                    <Button onClick={onApply}>Apply Filters</Button>
-                    <Button onClick={onReset}>Reset</Button>
+                <div className="flex flex-col lg:flex-row gap-4 w-full lg:w-auto">
+                    <Button onClick={onApply} className="w-full lg:w-auto">Apply Filters</Button>
+                    <Button onClick={onReset} className="w-full lg:w-auto">Reset</Button>
                 </div>
             </CardContent>
         </Card>
