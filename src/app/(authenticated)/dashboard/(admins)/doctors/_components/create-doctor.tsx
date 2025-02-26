@@ -1,6 +1,6 @@
 'use client';
 
-import { FormFieldWrapper } from "@/components/formFieldWrapper";
+import { FormFieldWrapper } from "@/components/form-field-wrapper";
 import { Form } from "@/components/ui/form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useState } from "react";

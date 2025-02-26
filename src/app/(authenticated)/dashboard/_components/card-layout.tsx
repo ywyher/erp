@@ -14,7 +14,7 @@ export default function CardLayout({ children, title, className = "" }: CardLayo
       ${className}
     `}>
       {title && (
-        <CardHeader className="pb-2">
+        <CardHeader className="pb-0">
           <CardTitle className="text-lg font-semibold">{title}</CardTitle>
         </CardHeader>
       )}

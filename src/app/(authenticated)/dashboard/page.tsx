@@ -1,20 +1,36 @@
 'use client'
 
 import CardLayout from "@/app/(authenticated)/dashboard/_components/card-layout";
-import { motion } from "framer-motion";
+import AdminPage from "@/app/(authenticated)/dashboard/_components/page/admin/admin-page";
+import ReceptionistPage from "@/app/(authenticated)/dashboard/_components/page/receptionist/receptionist-page";
+import DoctorPage from "@/app/(authenticated)/dashboard/_components/page/doctor/doctor-page";
+import { getSession } from "@/lib/auth-client";
+import { User } from "@/lib/db/schema";
+import { useQuery } from "@tanstack/react-query";
 
 export default function Dashboard() {
+    const { data: user, isLoading } = useQuery({
+        queryKey: ["session", "dashboard"],
+        queryFn: async () => {
+            const { data } = await getSession();
+            return data?.user as User || null;
+        },
+    });
+
+    if(!user || isLoading) return <>Loading...</>;
+
+
     return (
-        <CardLayout className="flex items-center justify-center min-h-screen">
-            <motion.div 
-                className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-center"
-                animate={{ opacity: [0, 1, 0] }} 
-                transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-            >
-                <h1 className="text-6xl font-bold text-zinc-900 dark:text-zinc-100">
-                    Coming Soon
-                </h1>
-            </motion.div>
+        <CardLayout>
+            {user.role == 'admin' && (
+                <AdminPage />
+            )}
+            {user.role == 'receptionist' && (
+                <ReceptionistPage />
+            )}
+            {user.role == 'doctor' && (
+                <DoctorPage />
+            )}
         </CardLayout>
     );
 }

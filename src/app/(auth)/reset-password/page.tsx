@@ -18,7 +18,7 @@ import { useState } from "react";
 import { resetPassword } from "@/lib/auth-client";
 import { passwordSchema } from "@/app/types";
 import { toast } from "sonner";
-import { FormFieldWrapper } from "@/components/formFieldWrapper";
+import { FormFieldWrapper } from "@/components/form-field-wrapper";
 import LoadingBtn from "@/components/loading-btn";
 import { z } from "zod";
 

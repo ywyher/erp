@@ -4,7 +4,7 @@ import { UseFormReturn } from "react-hook-form"
 import { Form } from "@/components/ui/form"
 import LoadingBtn from "@/components/loading-btn"
 import { useEffect } from "react"
-import { FormFieldWrapper } from "@/components/formFieldWrapper"
+import { FormFieldWrapper } from "@/components/form-field-wrapper"
 import { z } from "zod"
 import { updateUserSchema } from "@/app/types"
 

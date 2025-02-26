@@ -46,12 +46,14 @@ export async function seed() {
             createdAt: new Date(),
             updatedAt: new Date(),
         }).returning();
-
+        
         // Create a doctor
         const doctor = await db.insert(schema.doctor).values({
             id: generateId(),
             specialty: 'General Practice',
             userId: doctorUser[0].id,
+            createdAt: new Date(),
+            updatedAt: new Date(),
         }).returning();
 
         // Create a schedule for the doctor

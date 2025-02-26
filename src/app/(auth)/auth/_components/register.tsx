@@ -12,7 +12,7 @@ import { emailOtp, phoneNumber, signUp } from "@/lib/auth-client"
 import { useQueryClient } from "@tanstack/react-query"
 import { generateFakeField } from "@/lib/funcs"
 import { z } from "zod"
-import { FormFieldWrapper } from "@/components/formFieldWrapper"
+import { FormFieldWrapper } from "@/components/form-field-wrapper"
 import { toast } from "sonner"
 
 export default function Register() {

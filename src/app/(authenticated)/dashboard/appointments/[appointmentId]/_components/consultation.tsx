@@ -8,7 +8,7 @@ import {
   radiologies as radiologiesConst,
   medicines as medicinesConst,
 } from "@/app/(authenticated)/dashboard/constants"
-import { FormFieldWrapper } from "@/components/formFieldWrapper"
+import { FormFieldWrapper } from "@/components/form-field-wrapper"
 import LoadingBtn from "@/components/loading-btn"
 import { Form, FormItem, FormLabel, FormControl, FormDescription, FormMessage, FormField } from "@/components/ui/form"
 import type { Appointment, Consultation, Doctor, Prescription, User } from "@/lib/db/schema"

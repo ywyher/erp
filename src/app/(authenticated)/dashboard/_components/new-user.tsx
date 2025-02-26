@@ -3,7 +3,7 @@
 import { useRouter } from "next/navigation"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { Form } from "@/components/ui/form"
-import { FormFieldWrapper } from "@/components/formFieldWrapper"
+import { FormFieldWrapper } from "@/components/form-field-wrapper"
 import LoadingBtn from "@/components/loading-btn"
 import { z } from "zod"
 import { updateUserSchema } from "@/app/types"

@@ -48,9 +48,6 @@ export default function DoctorsList({ book, customSchedule = false }: { book: bo
         setFilters({ date: null, name: null, specialties: null })
     }
 
-
-
-
     return (
         <CardLayout title="Book an appointment">
             <div className="flex flex-col gap-4">

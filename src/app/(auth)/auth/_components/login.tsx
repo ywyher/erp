@@ -9,7 +9,7 @@ import { useState } from "react";
 import LoadingBtn from "@/components/loading-btn";
 import { useAuthStore } from "@/app/(auth)/store";
 import { z } from "zod";
-import { FormFieldWrapper } from "@/components/formFieldWrapper";
+import { FormFieldWrapper } from "@/components/form-field-wrapper";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 

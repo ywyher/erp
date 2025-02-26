@@ -1,17 +1,20 @@
 'use server'
 
-import { Roles } from "@/app/types";
+import { Roles, tableMap } from "@/app/types";
 import { auth } from "@/lib/auth";
+import pluralize from "pluralize"; // Install with: npm install pluralize
 import { signIn, User } from "@/lib/auth-client";
 import db from "@/lib/db";
-import { account, appointment, Doctor, doctor, receptionist, Receptionist, Schedule, schedule, session, settings, Tables, user } from "@/lib/db/schema";
+import { account, appointment, dayEnum, Doctor, doctor, receptionist, Receptionist, Schedule, schedule, session, settings, Tables, user } from "@/lib/db/schema";
 import { deleteFile } from "@/lib/s3";
-import { and, ConsoleLogWriter, eq, like, or, sql } from "drizzle-orm";
+import { and, ConsoleLogWriter, eq, gte, inArray, like, lte, or, sql } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { headers } from "next/headers";
 import { medicalFile } from "./schema/medical-file";
-import { getFileUrl } from "@/lib/funcs";
+import { getDaysInRange, getFileUrl } from "@/lib/funcs";
 import { operationDocumentKey } from "@/app/(authenticated)/dashboard/settings/keys";
+import { DateRange } from "react-day-picker";
+import { format } from "date-fns";
 
 export async function getUserProvider(userId: string): Promise<{ provider: 'social' | 'credential' }> {
     const result = await db.query.account.findFirst({
@@ -159,7 +162,6 @@ export async function listUsers(role: Roles, merge: boolean = false) {
         });
     }
 
-
     return users;
 }
 
@@ -255,4 +257,172 @@ export const getOperationDocument = async ({dbInstance = db}: { dbInstance: type
             error: error.message,
         }
     }
+}
+
+export async function getEmployees({ role, date }: { role: User["role"], date?: { from: string; to?: string } | undefined }) {
+    console.log(date)
+  // Format the time as HH:MM for comparison
+  const fromDate = new Date(date?.from || "");
+  const toDate = date?.to ? new Date(date?.to) : new Date(fromDate);
+
+  /*
+      const fromDate = new Date("2025-02-26"); // Feb 26, 2025 at 00:00:00
+      const toDate = new Date("2025-02-28");   // Feb 28, 2025 at 00:00:00 (Midnight)
+  
+      // Without setHours(23, 59, 59, 999), filtering may miss Feb 28 completely
+  */
+  toDate.setHours(23, 59, 59, 999);
+
+  const daysInRange = getDaysInRange(fromDate, toDate) as ("sunday" | "monday" | "tuesday" | "wednesday" | "thursday" | "friday" | "saturday")[];
+
+  if (role === 'doctor') {
+    const doctors = await db.query.user.findMany({
+        where: eq(user.role, 'doctor'),
+        with: {
+            doctor: true,
+            schedules: {
+                where: and(
+                    inArray(schedule.day, daysInRange),
+                ),
+            },
+        },
+    });
+      
+    // Filter out doctors with no matching schedules
+    return doctors
+      .filter(doc => doc.doctor && doc.schedules.length > 0)
+      .map(doc => ({
+        user: doc,
+        doctor: {
+          id: doc.doctor.id,
+          specialty: doc.doctor.specialty,
+          userId: doc.doctor.userId
+        },
+        schedules: doc.schedules
+      }));
+  } else if (role === 'receptionist') {
+    const receptionists = await db.query.user.findMany({
+        where: eq(user.role, 'receptionist'),
+        with: {
+            receptionist: true,
+            schedules: {
+                where: and(
+                    inArray(schedule.day, daysInRange),
+                ),
+            },
+        },
+    });
+      
+    // Filter out receptionists with no matching schedules
+    return receptionists
+      .filter(rec => rec.receptionist && rec.schedules.length > 0)
+      .map(rec => ({
+        user: rec,
+        receptionist: {
+          id: rec.receptionist.id,
+          department: rec.receptionist.department,
+          userId: rec.receptionist.userId,
+          createdAt: rec.receptionist.createdAt,
+          updatedAt: rec.receptionist.updatedAt
+        },
+        schedules: rec.schedules
+      }));
+  }
+  
+  return [];
+}
+
+export async function getQuantityByDay({
+    tableNames,
+    condition,
+    startDate,
+    endDate,
+  }: {
+    tableNames: Tables | Tables[],
+    condition?: string,
+    startDate?: Date,
+    endDate?: Date
+  }) {
+    // Convert single table name to array for consistent handling
+    const tables = Array.isArray(tableNames) ? tableNames : [tableNames];
+    
+    // Fetch data for each table
+    const allResults = await Promise.all(tables.map(async (tableName) => {
+      const table = tableMap[tableName];
+      if (!table) {
+        throw new Error(`Invalid table name: ${tableName}`);
+      }
+      
+      // Build the WHERE clause dynamically
+      let whereConditions: string[] = [];
+      
+      // Add date range conditions only if provided
+      if (startDate) {
+        whereConditions.push(`${table.createdAt} >= ${sql`${startDate.toISOString()}`}`);
+      }
+      if (endDate) {
+        whereConditions.push(`${table.createdAt} <= ${sql`${endDate.toISOString()}`}`);
+      }
+      
+      // Add any additional conditions if provided
+      if (condition) {
+        whereConditions.push(condition);
+      }
+      
+      // Combine all conditions with AND
+      const whereClause = whereConditions.length > 0
+        ? sql`WHERE ${sql.raw(whereConditions.join(' AND '))}`
+        : undefined;
+      
+      // Format the result in the shape you need - using PostgreSQL's TO_CHAR function
+      const result = await db
+        .select({
+          date: sql`TO_CHAR(${table.createdAt}, 'YYYY-MM-DD')`.as('date'),
+          [pluralize(tableName)]: sql`COUNT(*)`.as(`${pluralize(tableName)}`)
+        })
+        .from(table)
+        .where(whereClause)
+        .groupBy(sql`TO_CHAR(${table.createdAt}, 'YYYY-MM-DD')`)
+        .orderBy(sql`date`);
+        
+      return { tableName, data: result };
+    }));
+    
+    // If only one table was queried, return its data directly
+    if (allResults.length === 1) {
+      return allResults[0].data;
+    }
+    
+    // Otherwise, merge all the data by date
+    const dateMap = new Map();
+    
+    // Process each table's results
+    allResults.forEach(({ tableName, data }) => {
+      const tablePlural = pluralize(tableName);
+      
+      // First, get all unique dates from this table
+      data.forEach(item => {
+        const date = item.date as string; // Type assertion
+        if (dateMap.has(date)) {
+          // Update existing entry
+          dateMap.get(date)[tablePlural] = item[tablePlural];
+        } else {
+          // Create new entry with default values (0) for all tables
+          const newEntry: Record<string, string> = { date };
+          
+          allResults.forEach(res => {
+            newEntry[pluralize(res.tableName)] = "0";
+          });
+          newEntry[tablePlural] = item[tablePlural] as string;
+          dateMap.set(date, newEntry);
+        }
+      });
+    });
+    
+    // Convert map to array and sort by date
+    const combinedResults = Array.from(dateMap.values()).sort((a, b) => 
+      new Date(a.date).getTime() - new Date(b.date).getTime()
+    );
+    
+    return combinedResults;
 }

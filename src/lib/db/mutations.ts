@@ -2,7 +2,7 @@
 
 import { z } from "zod"
 import { checkFieldAvailability } from "./queries"
-import { updateUserSchema } from "@/app/types"
+import { tableMap, Tables, updateUserSchema } from "@/app/types"
 import db from "."
 import { account, appointment, doctor, medicalFile, schedule, session, User, user } from "./schema"
 import { eq } from "drizzle-orm"
@@ -194,19 +194,6 @@ export async function updateUserRole({ userId, role, dbInstance = db }: {
         message: 'User role updated!'
     }
 }
-
-// 1️⃣ Explicitly define Tables type
-type Tables = keyof typeof tableMap;
-
-// 2️⃣ Ensure tableMap is correctly typed
-const tableMap: Record<string, any> = {
-    user,
-    doctor,
-    schedule,
-    session,
-    account,
-    appointment,
-};
 
 export async function deleteById(id: string, tableName: Tables) {
     const table = tableMap[tableName];

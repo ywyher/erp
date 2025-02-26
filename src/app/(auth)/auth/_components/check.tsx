@@ -12,7 +12,7 @@ import { signIn } from "@/lib/auth-client"
 import { Dispatch, useState } from "react"
 import { checkFieldAvailability } from "@/lib/db/queries"
 import { z } from "zod"
-import { FormFieldWrapper } from "@/components/formFieldWrapper"
+import { FormFieldWrapper } from "@/components/form-field-wrapper"
 import { toast } from "sonner"
 
 export default function Check({ setPort }: { setPort: Dispatch<React.SetStateAction<'check' | 'register' | 'login'>> }) {

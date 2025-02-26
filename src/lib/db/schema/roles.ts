@@ -50,6 +50,8 @@ export const doctor = pgTable('doctor', {
   id: text('id').primaryKey(),
   specialty: text('specialty'),
   userId: text('userId').references(() => user.id, { onDelete: 'cascade', onUpdate: 'cascade' }).notNull(),
+  createdAt: timestamp('createdAt').notNull().defaultNow(),
+  updatedAt: timestamp('updatedAt').notNull().defaultNow(),
 })
 
 export const doctorRelation = relations(doctor, ({ one, many }) => ({

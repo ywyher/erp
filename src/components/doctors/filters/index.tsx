@@ -1,7 +1,7 @@
 'use client'
 
 import SpecialtyFilter from "@/components/doctors/filters/specialty-filters"
-import DateFilters from "@/components/doctors/filters/date-filters"
+import DateFilters from "@/components/date-filters"
 import NameFilter from "@/components/doctors/filters/name-filter"
 import {
     Card,

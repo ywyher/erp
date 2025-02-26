@@ -219,3 +219,16 @@ export function getChangedFields<T extends Record<string, any>>(
         Object.entries(normalizedNew).filter(([key, newValue]) => newValue !== normalizedOriginal[key])
     ) as Partial<T>;
 }
+
+export function getDaysInRange(start: Date, end: Date): string[] {
+    const days = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
+    const result = [];
+    const current = new Date(start);
+
+    while (current <= end) {
+        result.push(days[current.getDay()]);
+        current.setDate(current.getDate() + 1);
+    }
+
+    return [...new Set(result)]; // Remove duplicates
+}

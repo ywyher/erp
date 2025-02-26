@@ -6,7 +6,6 @@ import {
     FormItem,
     FormLabel,
     FormControl,
-    FormDescription,
     FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
@@ -130,7 +129,7 @@ export const FormFieldWrapper: React.FC<FormFieldWrapperProps> = ({
                                     defaultValue={field.value}
                                     disabled={disabled}
                                 >
-                                    <SelectTrigger className="w-[450px]">
+                                    <SelectTrigger className="w-full">
                                         <SelectValue placeholder={placeholder} />
                                     </SelectTrigger>
                                     <SelectContent>

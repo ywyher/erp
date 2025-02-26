@@ -2,7 +2,7 @@
 
 import { changePassword } from "@/app/actions/db.actions";
 import { passwordSchema } from "@/app/types";
-import { FormFieldWrapper } from "@/components/formFieldWrapper";
+import { FormFieldWrapper } from "@/components/form-field-wrapper";
 import LoadingBtn from "@/components/loading-btn";
 import { Form } from "@/components/ui/form";
 import { zodResolver } from "@hookform/resolvers/zod";

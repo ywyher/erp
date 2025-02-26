@@ -1,4 +1,5 @@
 import { specialties } from "@/app/(authenticated)/dashboard/constants";
+import { account, appointment, doctor, operation, receptionist, schedule, session, user } from "@/lib/db/schema";
 import { z } from "zod";
 
 export type Roles = 'admin' | 'user' | 'doctor' | 'receptionist';
@@ -129,3 +130,18 @@ export const updateUserSchema = applySharedRefinements(baseUserSchema);
 
 // User Schema (Base User + Password fields)
 export const createUserSchema = applySharedRefinements(baseUserSchema.merge(basePasswordSchema));
+
+// 1️⃣ Explicitly define Tables type
+export type Tables = keyof typeof tableMap;
+
+// 2️⃣ Ensure tableMap is correctly typed
+export const tableMap: Record<string, any> = {
+    user,
+    receptionist,
+    doctor,
+    schedule,
+    session,
+    account,
+    appointment,
+    operation,
+};

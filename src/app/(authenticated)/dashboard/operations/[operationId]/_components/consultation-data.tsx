@@ -1,7 +1,7 @@
 'use client'
 
 import { consultationSchema } from "@/app/(authenticated)/dashboard/appointments/types";
-import { FormFieldWrapper } from "@/components/formFieldWrapper";
+import { FormFieldWrapper } from "@/components/form-field-wrapper";
 import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
 import { Consultation } from "@/lib/db/schema";

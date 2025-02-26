@@ -1,7 +1,7 @@
 'use client'
 
 import { createOperationData, extractPlaceholders, updateOperationData } from "@/app/(authenticated)/dashboard/operations/actions"
-import { FormFieldWrapper } from "@/components/formFieldWrapper"
+import { FormFieldWrapper } from "@/components/form-field-wrapper"
 import LoadingBtn from "@/components/loading-btn"
 import { Form } from "@/components/ui/form"
 import { Operation, OperationData as TOperationData } from "@/lib/db/schema"
