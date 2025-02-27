@@ -426,3 +426,12 @@ export async function getQuantityByDay({
     
     return combinedResults;
 }
+
+export async function getSchedules(userId: User['id']) {
+    const schedules = await db
+        .select()
+        .from(schedule)
+        .where(eq(schedule.userId, userId))
+
+    return schedules;
+}

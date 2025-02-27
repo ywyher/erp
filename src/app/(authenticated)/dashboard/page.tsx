@@ -19,17 +19,16 @@ export default function Dashboard() {
 
     if(!user || isLoading) return <>Loading...</>;
 
-
     return (
-        <CardLayout>
+        <CardLayout title={`${user.role.charAt(0).toUpperCase() + user.role.slice(1)} Dashboard`}>
             {user.role == 'admin' && (
                 <AdminPage />
             )}
             {user.role == 'receptionist' && (
-                <ReceptionistPage />
+                <ReceptionistPage userId={user.id} />
             )}
             {user.role == 'doctor' && (
-                <DoctorPage />
+                <DoctorPage userId={user.id} />
             )}
         </CardLayout>
     );

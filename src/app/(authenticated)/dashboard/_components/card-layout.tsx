@@ -10,7 +10,7 @@ type CardLayoutProps = {
 export default function CardLayout({ children, title, className = "" }: CardLayoutProps) {
   return (
     <Card className={`
-      relative shadow-md rounded-lg w-full m-2 flex flex-col gap-2
+      relative shadow-md rounded-lg w-full m-2 flex flex-col gap-3
       ${className}
     `}>
       {title && (

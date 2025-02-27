@@ -8,16 +8,10 @@
 
 # Notification system for when an appoinment/operation or completed or something not sure yet (priorty -> 0)
 
+# basic pagination for booking/employees components (real one not just slicing them)
+
+# useMediaQuery hook and change the maxItemPerPage for the pagination system depending on the device !!
+
 # check if drizzle-studio have a way to make records appears as if they arent there and maybe make a request for it if not
 
 # Error: Route "/dashboard/operations/[operationId]" used `params.operationId`. `params` should be awaited before using its properties. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis
-
-# at Operation (src/app/(authenticated)/dashboard/operations/[operationId]/page.tsx:55:52)
-
-# 53 | }
-
-# 54 |
-
-# > 55 | export default async function Operation({ params: { operationId } }: { params: { operationId: string } }) {
-
-# |
