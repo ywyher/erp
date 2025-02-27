@@ -1,17 +1,15 @@
-# add the ability for the patient to add personal data like whiehg height and so onn
-
-# getQuantityByDay() -> allow to pass custom conditions to each table on its own and figure out how to use it
-
-# doctor/receptionist dashboard page should have a component that shows their work days
-
 # redirect to onboarding from verify page yet doesnt work as expected
-
-# Notification system for when an appoinment/operation or completed or something not sure yet (priorty -> 0)
 
 # basic pagination for booking/employees components (real one not just slicing them)
 
 # useMediaQuery hook and change the maxItemPerPage for the pagination system depending on the device !!
 
-# check if drizzle-studio have a way to make records appears as if they arent there and maybe make a request for it if not
-
 # Error: Route "/dashboard/operations/[operationId]" used `params.operationId`. `params` should be awaited before using its properties. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis
+
+<!-- Priorty 0 -->
+
+# add the ability for the patient to add personal data like whiehg height and so onn
+
+# Notification system for when an appoinment/operation or completed or something not sure yet (priorty -> 0)
+
+# check if drizzle-studio have a way to make records appears as if they arent there and maybe make a request for it if not

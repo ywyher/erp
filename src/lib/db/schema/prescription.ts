@@ -7,16 +7,24 @@ import { consultation } from "@/lib/db/schema/consultation";
 // having issue now
 // export const typeEnum = pgEnum('type', ['laboratory', 'radiology', 'medicine'])
 
-export const prescription = pgTable('prescription', {
-  id: text('id').primaryKey(),
-  content: text('content').notNull(),
-  type: text('type').notNull(),
-  consultationId: text('consultationId').references(() => consultation.id, { onDelete: 'cascade' }).notNull(),
-  appointmentId: text('appointmentId').references(() => appointment.id, { onDelete: 'cascade' }).notNull(),
-  doctorId: text('doctorId').references(() => doctor.id, { onDelete: 'cascade' }).notNull(),
-  patientId: text('patientId').references(() => user.id, { onDelete: 'cascade' }).notNull(),
-  createdAt: timestamp('createdAt').notNull(),
-  updatedAt: timestamp('updatedAt').notNull(),
+export const prescription = pgTable("prescription", {
+  id: text("id").primaryKey(),
+  content: text("content").notNull(),
+  type: text("type").notNull(),
+  consultationId: text("consultationId")
+    .references(() => consultation.id, { onDelete: "cascade" })
+    .notNull(),
+  appointmentId: text("appointmentId")
+    .references(() => appointment.id, { onDelete: "cascade" })
+    .notNull(),
+  doctorId: text("doctorId")
+    .references(() => doctor.id, { onDelete: "cascade" })
+    .notNull(),
+  patientId: text("patientId")
+    .references(() => user.id, { onDelete: "cascade" })
+    .notNull(),
+  createdAt: timestamp("createdAt").notNull(),
+  updatedAt: timestamp("updatedAt").notNull(),
 });
 
 export const prescriptionRelations = relations(prescription, ({ one }) => ({
@@ -30,10 +38,10 @@ export const prescriptionRelations = relations(prescription, ({ one }) => ({
   }),
   doctor: one(doctor, {
     fields: [prescription.doctorId],
-    references: [doctor.id]
+    references: [doctor.id],
   }),
   user: one(user, {
     fields: [prescription.patientId],
-    references: [user.id]
+    references: [user.id],
   }),
 }));

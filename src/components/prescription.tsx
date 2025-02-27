@@ -1,4 +1,4 @@
-'use client'
+"use client";
 
 import { useConsultationStore } from "@/app/(authenticated)/dashboard/appointments/[appointmentId]/store";
 import { PrescriptionTypes } from "@/app/(authenticated)/dashboard/appointments/[appointmentId]/types";
@@ -10,43 +10,47 @@ import { useReactToPrint } from "react-to-print";
 import { Button } from "@/components/ui/button";
 import { Printer } from "lucide-react";
 
-type PrescriptionProps = { 
-    appointmentId?: Appointment['id'],
-    content: string[],
-    context: PrescriptionTypes,
-    editable: boolean
+type PrescriptionProps = {
+  appointmentId?: Appointment["id"];
+  content: string[];
+  context: PrescriptionTypes;
+  editable: boolean;
 };
 
 export default function Prescription({
-   appointmentId,
-   content,
-   context,
-   editable
+  appointmentId,
+  content,
+  context,
+  editable,
 }: PrescriptionProps) {
-  
-  const consultationStore = appointmentId ? useConsultationStore(appointmentId) : null;
-  
+  const consultationStore = appointmentId
+    ? useConsultationStore(appointmentId)
+    : null;
+
   const contentRef = useRef<HTMLDivElement>(null);
   const handlePrint = useReactToPrint({ contentRef });
 
   // Get the existing prescription value from the store based on the context if appointmentId exists
-  const existingPrescription = appointmentId ? (
-    context === "laboratory" ? consultationStore?.laboratory :
-    context === "radiology" ? consultationStore?.radiology :
-    context === "medicine" ? consultationStore?.medicine :
-    null
-  ) : null;
+  const existingPrescription = appointmentId
+    ? context === "laboratory"
+      ? consultationStore?.laboratory
+      : context === "radiology"
+        ? consultationStore?.radiology
+        : context === "medicine"
+          ? consultationStore?.medicine
+          : null
+    : null;
 
   // Normalize content: Capitalize first letter & replace underscores
-  const normalizeText = (text: string) => 
+  const normalizeText = (text: string) =>
     text
-      .split('_')
-      .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-      .join(' ');
+      .split("_")
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(" ");
 
   // Initialize the state with the existing prescription value if available, otherwise use the content prop
   const [value, setValue] = useState<string>(
-    existingPrescription || content.map(normalizeText).join('\n')
+    existingPrescription || content.map(normalizeText).join("\n"),
   );
 
   const handleSubmit = () => {
@@ -75,7 +79,9 @@ export default function Prescription({
   return (
     <div className="w-full">
       <div className="flex justify-between items-center mb-2">
-        <label className="font-semibold capitalize">{context} Prescription</label>
+        <label className="font-semibold capitalize">
+          {context} Prescription
+        </label>
         <Button variant="outline" size="sm" onClick={() => handlePrint()}>
           <Printer className="h-4 w-4" />
           Print

@@ -1,1 +1,1 @@
-export const operationDocumentKey = 'operation-document-name';
+export const operationDocumentKey = "operation-document-name";

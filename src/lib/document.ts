@@ -1,46 +1,53 @@
-import Docxtemplater from "docxtemplater"
-import PizZip from "pizzip"
-import { saveAs } from "file-saver"
+import Docxtemplater from "docxtemplater";
+import PizZip from "pizzip";
+import { saveAs } from "file-saver";
 
 // Define a type for PizZipUtils
 type PizZipUtilsType = {
-  getBinaryContent: (url: string, callback: (error: Error | null, content?: string) => void) => void
-}
+  getBinaryContent: (
+    url: string,
+    callback: (error: Error | null, content?: string) => void,
+  ) => void;
+};
 
 // Declare PizZipUtils as a promise that resolves to PizZipUtilsType
-let PizZipUtilsPromise: Promise<PizZipUtilsType> | null = null
+let PizZipUtilsPromise: Promise<PizZipUtilsType> | null = null;
 
 if (typeof window !== "undefined") {
-  PizZipUtilsPromise = import("pizzip/utils/index.js").then((module) => module as unknown as PizZipUtilsType)
+  PizZipUtilsPromise = import("pizzip/utils/index.js").then(
+    (module) => module as unknown as PizZipUtilsType,
+  );
 }
 
 async function loadFile(url: string): Promise<string> {
   if (!PizZipUtilsPromise) {
-    throw new Error("PizZipUtils is not available")
+    throw new Error("PizZipUtils is not available");
   }
-  const PizZipUtils = await PizZipUtilsPromise
+  const PizZipUtils = await PizZipUtilsPromise;
   return new Promise((resolve, reject) => {
-    PizZipUtils.getBinaryContent(url, (error: Error | null, content?: string) => {
-      if (error) {
-        reject(error)
-      } else {
-        resolve(content || "")
-      }
-    })
-  })
+    PizZipUtils.getBinaryContent(
+      url,
+      (error: Error | null, content?: string) => {
+        if (error) {
+          reject(error);
+        } else {
+          resolve(content || "");
+        }
+      },
+    );
+  });
 }
 
 export const generateDocument = async ({
-   data,
-   filePath,
-   download = false,
-  }: { 
-   data: Record<string, string>,
-   filePath: string
-   download?: boolean 
-  }) => {
-
-  if(!filePath) return;
+  data,
+  filePath,
+  download = false,
+}: {
+  data: Record<string, string>;
+  filePath: string;
+  download?: boolean;
+}) => {
+  if (!filePath) return;
 
   try {
     const content = await loadFile(filePath);
@@ -61,7 +68,8 @@ export const generateDocument = async ({
 
     const blob = doc.getZip().generate({
       type: "blob",
-      mimeType: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+      mimeType:
+        "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
     });
 
     // Output the document using Data-URI

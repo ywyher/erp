@@ -8,19 +8,30 @@ import { statusEnum } from "@/lib/db/schema/enums";
 
 // Appointment table
 
-export const createdByEnum = pgEnum('createdBy', ['user', 'receptionist', 'doctor', 'admin'])
+export const createdByEnum = pgEnum("createdBy", [
+  "user",
+  "receptionist",
+  "doctor",
+  "admin",
+]);
 
-export const appointment = pgTable('appointment', {
-  id: text('id').primaryKey().notNull(),
-  patientId: text('patientId').references(() => user.id, { onDelete: 'cascade' }).notNull(),
-  doctorId: text('doctorId').references(() => doctor.id, { onDelete: 'cascade' }).notNull(),
-  creatorId: text('creatorId').references(() => user.id, { onDelete: 'cascade' }),
-  startTime: timestamp('startTime').notNull(),
-  endTime: timestamp('endTime'),
-  status: statusEnum('status').notNull().default('pending'),
-  createdBy: createdByEnum('createdBy').notNull(),
-  createdAt: timestamp('createdAt').notNull().defaultNow(),
-  updatedAt: timestamp('updatedAt').notNull().defaultNow(),
+export const appointment = pgTable("appointment", {
+  id: text("id").primaryKey().notNull(),
+  patientId: text("patientId")
+    .references(() => user.id, { onDelete: "cascade" })
+    .notNull(),
+  doctorId: text("doctorId")
+    .references(() => doctor.id, { onDelete: "cascade" })
+    .notNull(),
+  creatorId: text("creatorId").references(() => user.id, {
+    onDelete: "cascade",
+  }),
+  startTime: timestamp("startTime").notNull(),
+  endTime: timestamp("endTime"),
+  status: statusEnum("status").notNull().default("pending"),
+  createdBy: createdByEnum("createdBy").notNull(),
+  createdAt: timestamp("createdAt").notNull().defaultNow(),
+  updatedAt: timestamp("updatedAt").notNull().defaultNow(),
 });
 // Relations
 export const appointmentRelations = relations(appointment, ({ one, many }) => ({

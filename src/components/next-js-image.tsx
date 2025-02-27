@@ -14,7 +14,15 @@ function isNextJsImage(slide: any) {
   );
 }
 
-export default function NextJsImage({ slide, offset, rect }: { slide: any, offset: any, rect: any }) {
+export default function NextJsImage({
+  slide,
+  offset,
+  rect,
+}: {
+  slide: any;
+  offset: any;
+  rect: any;
+}) {
   const {
     on: { click },
     carousel: { imageFit },

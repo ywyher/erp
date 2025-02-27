@@ -1,14 +1,14 @@
-import Image from "next/image"
+import Image from "next/image";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card"
-import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
-import { EmptyCard } from "@/components/empty-card"
-import { getFileUrl } from "@/lib/funcs"
+} from "@/components/ui/card";
+import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
+import { EmptyCard } from "@/components/empty-card";
+import { getFileUrl } from "@/lib/funcs";
 
 export function UploadedFilesCard({ uploadedFiles }: { uploadedFiles: any }) {
   return (
@@ -49,5 +49,5 @@ export function UploadedFilesCard({ uploadedFiles }: { uploadedFiles: any }) {
         )}
       </CardContent>
     </Card>
-  )
+  );
 }

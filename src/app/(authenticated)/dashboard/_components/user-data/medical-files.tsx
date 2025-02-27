@@ -1,20 +1,30 @@
-import type { MedicalFile, medicalFile } from "@/lib/db/schema"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import Images from "./images"
-import Videos from "./videos"
-import Pdfs from "./pdfs"
-import CardLayout from "@/app/(authenticated)/dashboard/_components/card-layout"
+import type { MedicalFile, medicalFile } from "@/lib/db/schema";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import Images from "./images";
+import Videos from "./videos";
+import Pdfs from "./pdfs";
+import CardLayout from "@/app/(authenticated)/dashboard/_components/card-layout";
 
 export default function UserMedicalFiles({ files }: { files: MedicalFile[] }) {
-  const hasImages = files.some((file) => file.type.startsWith("image/"))
-  const hasVideos = files.some((file) => file.type.startsWith("video/"))
-  const hasPdfs = files.some((file) => file.type === "application/pdf")
+  const hasImages = files.some((file) => file.type.startsWith("image/"));
+  const hasVideos = files.some((file) => file.type.startsWith("video/"));
+  const hasPdfs = files.some((file) => file.type === "application/pdf");
 
   const tabs = [
-    { value: "images", label: "Images", condition: hasImages, component: Images },
-    { value: "videos", label: "Videos", condition: hasVideos, component: Videos },
+    {
+      value: "images",
+      label: "Images",
+      condition: hasImages,
+      component: Images,
+    },
+    {
+      value: "videos",
+      label: "Videos",
+      condition: hasVideos,
+      component: Videos,
+    },
     { value: "pdfs", label: "PDFs", condition: hasPdfs, component: Pdfs },
-  ].filter((tab) => tab.condition)
+  ].filter((tab) => tab.condition);
 
   if (tabs.length === 0) {
     return;
@@ -37,5 +47,5 @@ export default function UserMedicalFiles({ files }: { files: MedicalFile[] }) {
         ))}
       </Tabs>
     </CardLayout>
-  )
+  );
 }

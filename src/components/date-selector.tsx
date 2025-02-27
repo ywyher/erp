@@ -1,7 +1,13 @@
-'use client'
+"use client";
 
 import { useEffect, useState } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ScheduleDisplay } from "@/components/schedule-display";
 import CustomDate from "@/components/custom-date";
@@ -19,17 +25,19 @@ export default function DateSelector({
   onOpenChange: (open: boolean) => void;
   open: boolean;
   setDate: (date: Date | null) => void;
-  trigger?: string
+  trigger?: string;
   schedules?: Schedule[];
   tab?: "official" | "custom"; // Ensuring tab can only be "official" or "custom"
 }) {
-  const [selectedTab, setSelectedTab] = useState<'official' | 'custom'>('custom');
+  const [selectedTab, setSelectedTab] = useState<"official" | "custom">(
+    "custom",
+  );
 
   useEffect(() => {
-    if(schedules && schedules.length > 0) {
-      setSelectedTab('official')
+    if (schedules && schedules.length > 0) {
+      setSelectedTab("official");
     }
-  }, [tab, schedules])
+  }, [tab, schedules]);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -40,9 +48,14 @@ export default function DateSelector({
       )}
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>{selectedTab == 'official' ? 'Schedules' : 'Date'}</DialogTitle>
+          <DialogTitle>
+            {selectedTab == "official" ? "Schedules" : "Date"}
+          </DialogTitle>
         </DialogHeader>
-        <Tabs defaultValue={selectedTab} onValueChange={(val) => setSelectedTab(val as typeof selectedTab)}>
+        <Tabs
+          defaultValue={selectedTab}
+          onValueChange={(val) => setSelectedTab(val as typeof selectedTab)}
+        >
           <TabsList>
             {schedules && schedules.length > 0 && (
               <TabsTrigger value="official">Official</TabsTrigger>
@@ -51,7 +64,11 @@ export default function DateSelector({
           </TabsList>
           <TabsContent value="official">
             {schedules && schedules.length > 0 && (
-              <ScheduleDisplay onClick={(e) => setDate(e)} dialog={false} schedules={schedules} />
+              <ScheduleDisplay
+                onClick={(e) => setDate(e)}
+                dialog={false}
+                schedules={schedules}
+              />
             )}
           </TabsContent>
           <TabsContent value="custom">

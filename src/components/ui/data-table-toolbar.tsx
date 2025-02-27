@@ -1,23 +1,35 @@
-"use client"
+"use client";
 
-import { Table } from "@tanstack/react-table"
-import { X, Trash2, FileDown, Settings, Check } from "lucide-react"
-import { useState } from "react"
-import { utils, writeFile } from "xlsx"
+import { Table } from "@tanstack/react-table";
+import { X, Trash2, FileDown, Settings, Check } from "lucide-react";
+import { useState } from "react";
+import { utils, writeFile } from "xlsx";
 
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { DataTableViewOptions } from "@/components/ui/data-table-view-options"
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
-import { DropdownMenu, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
-import { deleteById } from "@/lib/db/mutations"
-import { DataTableStatusFilter } from "@/components/ui/data-table-status-filter"
-import { Checkbox } from "@/components/ui/checkbox"
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { DataTableViewOptions } from "@/components/ui/data-table-view-options";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import {
+  DropdownMenu,
+  DropdownMenuCheckboxItem,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { deleteById } from "@/lib/db/mutations";
+import { DataTableStatusFilter } from "@/components/ui/data-table-status-filter";
+import { Checkbox } from "@/components/ui/checkbox";
 
 interface DataTableToolbarProps<TData extends { id: string }> {
-  table: Table<TData>
-  filters: string[]
-  bulkTableName: string
+  table: Table<TData>;
+  filters: string[];
+  bulkTableName: string;
 }
 
 export function DataTableToolbar<TData extends { id: string }>({
@@ -25,33 +37,35 @@ export function DataTableToolbar<TData extends { id: string }>({
   filters,
   bulkTableName,
 }: DataTableToolbarProps<TData>) {
-  const isFiltered = table.getState().columnFilters.length > 0
-  const selectedRows = table.getSelectedRowModel().rows
-  const [open, setOpen] = useState(false)
-  const [activeFilter, setActiveFilter] = useState(filters[0])
+  const isFiltered = table.getState().columnFilters.length > 0;
+  const selectedRows = table.getSelectedRowModel().rows;
+  const [open, setOpen] = useState(false);
+  const [activeFilter, setActiveFilter] = useState(filters[0]);
 
   const handleDelete = async () => {
     for (const row of selectedRows) {
-      await deleteById(row.original.id, bulkTableName)
+      await deleteById(row.original.id, bulkTableName);
     }
-    setOpen(false)
-    table.resetRowSelection()
-  }
+    setOpen(false);
+    table.resetRowSelection();
+  };
 
   const handleExport = () => {
-    const dataToExport = selectedRows.map((row) => row.original)
-    const worksheet = utils.json_to_sheet(dataToExport)
-    const workbook = utils.book_new()
-    utils.book_append_sheet(workbook, worksheet, "Data")
-    writeFile(workbook, "export.xlsx")
-  }
+    const dataToExport = selectedRows.map((row) => row.original);
+    const worksheet = utils.json_to_sheet(dataToExport);
+    const workbook = utils.book_new();
+    utils.book_append_sheet(workbook, worksheet, "Data");
+    writeFile(workbook, "export.xlsx");
+  };
 
   return (
     <div className="flex items-center justify-between">
       <div className="flex flex-1 items-center space-x-2">
         <Input
           placeholder={`Filter Via ${activeFilter.charAt(0).toUpperCase() + activeFilter.slice(1)}...`}
-          value={(table.getColumn(activeFilter)?.getFilterValue() as string) ?? ""}
+          value={
+            (table.getColumn(activeFilter)?.getFilterValue() as string) ?? ""
+          }
           onChange={(event) =>
             table.getColumn(activeFilter)?.setFilterValue(event.target.value)
           }
@@ -66,8 +80,8 @@ export function DataTableToolbar<TData extends { id: string }>({
             </DropdownMenuTrigger>
             <DropdownMenuContent align="start">
               {filters.map((filter) => (
-                <DropdownMenuCheckboxItem 
-                  key={filter} 
+                <DropdownMenuCheckboxItem
+                  key={filter}
                   className="flex flex-row gap-4 capitalize"
                   checked={filter == activeFilter}
                   onCheckedChange={(value) => setActiveFilter(filter)}
@@ -92,7 +106,7 @@ export function DataTableToolbar<TData extends { id: string }>({
       </div>
       <div className="flex items-center space-x-2">
         {/* Status Filter Component */}
-        {table.getAllColumns().some(col => col.id === "status") && (
+        {table.getAllColumns().some((col) => col.id === "status") && (
           <DataTableStatusFilter table={table} />
         )}
         {selectedRows.length > 0 && (
@@ -108,7 +122,10 @@ export function DataTableToolbar<TData extends { id: string }>({
                 <DialogHeader>
                   <DialogTitle>Confirm Deletion</DialogTitle>
                 </DialogHeader>
-                <p>Are you sure you want to delete {selectedRows.length} selected item(s)?</p>
+                <p>
+                  Are you sure you want to delete {selectedRows.length} selected
+                  item(s)?
+                </p>
                 <DialogFooter>
                   <Button variant="outline" onClick={() => setOpen(false)}>
                     Cancel
@@ -124,5 +141,5 @@ export function DataTableToolbar<TData extends { id: string }>({
         <DataTableViewOptions table={table} />
       </div>
     </div>
-  )
+  );
 }

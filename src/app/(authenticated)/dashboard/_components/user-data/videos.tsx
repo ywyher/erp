@@ -1,14 +1,14 @@
-"use client"
+"use client";
 
-import type { MedicalFile } from "@/lib/db/schema"
-import { getFileUrl } from "@/lib/funcs"
-import { useMemo } from "react"
+import type { MedicalFile } from "@/lib/db/schema";
+import { getFileUrl } from "@/lib/funcs";
+import { useMemo } from "react";
 
 type Video = {
-  src: string
-  alt: string
-  type: string
-}
+  src: string;
+  alt: string;
+  type: string;
+};
 
 export default function Videos({ files }: { files: MedicalFile[] }) {
   const videos = useMemo(
@@ -20,8 +20,8 @@ export default function Videos({ files }: { files: MedicalFile[] }) {
           alt: file.name,
           type: file.type,
         })),
-    [files]
-  )
+    [files],
+  );
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -39,5 +39,5 @@ export default function Videos({ files }: { files: MedicalFile[] }) {
         ))}
       </div>
     </div>
-  )
+  );
 }

@@ -1,1 +1,1 @@
-export type PrescriptionTypes = 'laboratory' | 'radiology' | 'medicine'
+export type PrescriptionTypes = "laboratory" | "radiology" | "medicine";

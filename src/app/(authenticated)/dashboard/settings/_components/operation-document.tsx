@@ -1,96 +1,128 @@
-"use client"
+"use client";
 
-import { useForm } from "react-hook-form"
-import { z } from "zod"
-import { AlertDialog, AlertDialogTrigger, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogAction, AlertDialogCancel } from "@/components/ui/alert-dialog"
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
-import { FileUploader } from "@/components/file-uploader"
-import { useFileUpload } from "@/hooks/use-upload-file"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { useState } from "react"
-import { createSetting, updateSetting } from "@/app/(authenticated)/dashboard/settings/actions"
-import type { settingSchema } from "@/app/(authenticated)/dashboard/settings/types"
-import LoadingBtn from "@/components/loading-btn"
-import type { User } from "@/lib/db/schema"
-import { toast } from "sonner"
-import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card"
-import { Upload, Download, AlertTriangle } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { getFileUrl } from "@/lib/funcs"
-import { operationDocumentKey } from "@/app/(authenticated)/dashboard/settings/keys"
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import {
+  AlertDialog,
+  AlertDialogTrigger,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogAction,
+  AlertDialogCancel,
+} from "@/components/ui/alert-dialog";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { FileUploader } from "@/components/file-uploader";
+import { useFileUpload } from "@/hooks/use-upload-file";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useState } from "react";
+import {
+  createSetting,
+  updateSetting,
+} from "@/app/(authenticated)/dashboard/settings/actions";
+import type { settingSchema } from "@/app/(authenticated)/dashboard/settings/types";
+import LoadingBtn from "@/components/loading-btn";
+import type { User } from "@/lib/db/schema";
+import { toast } from "sonner";
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+  CardContent,
+  CardFooter,
+} from "@/components/ui/card";
+import { Upload, Download, AlertTriangle } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { getFileUrl } from "@/lib/funcs";
+import { operationDocumentKey } from "@/app/(authenticated)/dashboard/settings/keys";
 
 const schema = z.object({
   file: z.array(z.instanceof(File)),
-})
+});
 
-type Schema = z.infer<typeof schema>
+type Schema = z.infer<typeof schema>;
 
 export default function OperationDocument({
   userId,
   currentName,
 }: {
-  userId: User["id"]
-  currentName: string
+  userId: User["id"];
+  currentName: string;
 }) {
-  const [isLoading, setIsLoading] = useState(false)
-  const { handleUpload, progresses, setProgresses, setIsUploading } = useFileUpload()
-  const [showAlert, setShowAlert] = useState(false)
+  const [isLoading, setIsLoading] = useState(false);
+  const { handleUpload, progresses, setProgresses, setIsUploading } =
+    useFileUpload();
+  const [showAlert, setShowAlert] = useState(false);
 
   const form = useForm<Schema>({
     resolver: zodResolver(schema),
     defaultValues: {
       file: [],
     },
-  })
+  });
 
   const onSubmit = async (input: Schema) => {
-    setShowAlert(true)
-  }
+    setShowAlert(true);
+  };
 
   const handleConfirmedUpload = async () => {
-    setIsLoading(true)
-    const input = form.getValues()
+    setIsLoading(true);
+    const input = form.getValues();
 
-    if(!input.file[0]) {
-      toast.error('Select a file first!')
-      setIsLoading(false)
-      setShowAlert(false)
+    if (!input.file[0]) {
+      toast.error("Select a file first!");
+      setIsLoading(false);
+      setShowAlert(false);
       return;
     }
 
-    const fileName = await handleUpload(input.file[0])
+    const fileName = await handleUpload(input.file[0]);
 
     if (!fileName) {
-      setIsLoading(false)
-      throw new Error("Failed to upload file")
+      setIsLoading(false);
+      throw new Error("Failed to upload file");
     }
 
     const data: z.infer<typeof settingSchema> = {
       key: operationDocumentKey,
       value: fileName,
       description: "Operation document url",
-    }
+    };
 
-    let result: { message?: string; error: string | null; settingId?: string }
+    let result: { message?: string; error: string | null; settingId?: string };
     if (currentName) {
-      result = await updateSetting({ data, editorId: userId, settingKey: operationDocumentKey })
+      result = await updateSetting({
+        data,
+        editorId: userId,
+        settingKey: operationDocumentKey,
+      });
     } else {
-      result = await createSetting({ data, creatorId: userId })
+      result = await createSetting({ data, creatorId: userId });
     }
 
     if (result.error) {
-      toast.error(result.error)
-      setIsLoading(false)
-      return
+      toast.error(result.error);
+      setIsLoading(false);
+      return;
     }
 
-    toast.message(result.message)
-    setProgresses({})
-    setIsUploading(false)
-    form.reset()
-    setIsLoading(false)
-    setShowAlert(false)
-  }
+    toast.message(result.message);
+    setProgresses({});
+    setIsUploading(false);
+    form.reset();
+    setIsLoading(false);
+    setShowAlert(false);
+  };
 
   return (
     <Card className="w-full max-w-2xl mx-auto">
@@ -118,20 +150,26 @@ export default function OperationDocument({
           Attach files for the doctor. Accepted format: .docx (Word document)
           {currentName && (
             <p className="mt-2 text-sm text-muted-foreground">
-              A document is currently uploaded. Uploading a new one will replace the existing document.
+              A document is currently uploaded. Uploading a new one will replace
+              the existing document.
             </p>
           )}
         </CardDescription>
       </CardHeader>
       <CardContent>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="flex w-full flex-col gap-6">
+          <form
+            onSubmit={form.handleSubmit(onSubmit)}
+            className="flex w-full flex-col gap-6"
+          >
             <FormField
               control={form.control}
               name="file"
               render={({ field }) => (
                 <FormItem className="w-full">
-                  <FormLabel className="text-base font-semibold">Document Upload</FormLabel>
+                  <FormLabel className="text-base font-semibold">
+                    Document Upload
+                  </FormLabel>
                   <FormControl>
                     <FileUploader
                       value={field.value}
@@ -140,7 +178,8 @@ export default function OperationDocument({
                       maxSize={11 * 1024 * 1024}
                       disabled={isLoading}
                       accept={{
-                        "application/vnd.openxmlformats-officedocument.wordprocessingml.document": [""],
+                        "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
+                          [""],
                       }}
                       progresses={progresses}
                     />
@@ -166,26 +205,37 @@ export default function OperationDocument({
                 <div className="flex items-start space-x-2">
                   <AlertTriangle className="w-5 h-5 text-yellow-500 mt-0.5" />
                   <div>
-                    Uploading a new document will replace the current one. However, please note:
+                    Uploading a new document will replace the current one.
+                    However, please note:
                     <ul className="list-disc pl-5 mt-2 space-y-1">
-                      <li>All previous documents and associated data will remain accessible in the system.</li>
-                      <li>Historical records and analytics will not be affected by this update.</li>
                       <li>
-                        Users with appropriate permissions can still view and reference past documents when needed.
+                        All previous documents and associated data will remain
+                        accessible in the system.
+                      </li>
+                      <li>
+                        Historical records and analytics will not be affected by
+                        this update.
+                      </li>
+                      <li>
+                        Users with appropriate permissions can still view and
+                        reference past documents when needed.
                       </li>
                     </ul>
-                    Are you sure you want to proceed with uploading the new document?
+                    Are you sure you want to proceed with uploading the new
+                    document?
                   </div>
                 </div>
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
               <AlertDialogCancel>Cancel</AlertDialogCancel>
-              <AlertDialogAction onClick={handleConfirmedUpload}>Confirm Upload</AlertDialogAction>
+              <AlertDialogAction onClick={handleConfirmedUpload}>
+                Confirm Upload
+              </AlertDialogAction>
             </AlertDialogFooter>
           </AlertDialogContent>
         </AlertDialog>
       </CardFooter>
     </Card>
-  )
+  );
 }

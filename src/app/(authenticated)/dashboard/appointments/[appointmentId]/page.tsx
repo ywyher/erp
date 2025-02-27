@@ -1,85 +1,114 @@
-import CardLayout from "@/app/(authenticated)/dashboard/_components/card-layout"
-import AppointmentTabs from "@/app/(authenticated)/dashboard/appointments/[appointmentId]/_components/appointment-tabs"
-import { getSession } from "@/lib/auth-client"
-import db from "@/lib/db"
-import { Consultation, Doctor, MedicalFile, Prescription, medicalFile as TMedicalFile, User } from "@/lib/db/schema"
-import { medicalFile } from "@/lib/db/schema/medical-file"
-import { and, eq } from "drizzle-orm"
-import { headers } from "next/headers"
-import { redirect } from "next/navigation"
+import CardLayout from "@/app/(authenticated)/dashboard/_components/card-layout";
+import AppointmentTabs from "@/app/(authenticated)/dashboard/appointments/[appointmentId]/_components/appointment-tabs";
+import { getSession } from "@/lib/auth-client";
+import db from "@/lib/db";
+import {
+  Consultation,
+  Doctor,
+  MedicalFile,
+  Prescription,
+  medicalFile as TMedicalFile,
+  User,
+} from "@/lib/db/schema";
+import { medicalFile } from "@/lib/db/schema/medical-file";
+import { and, eq } from "drizzle-orm";
+import { headers } from "next/headers";
+import { redirect } from "next/navigation";
 
 const getUserData = async (appointmentId: string) => {
-    const appointment = await db.query.appointment.findFirst({
-        columns: {
-            id: true,
-            patientId: true,
-            doctorId: true,
-        },
-        where: (appointment, { eq }) => eq(appointment.id, appointmentId)
-    })
+  const appointment = await db.query.appointment.findFirst({
+    columns: {
+      id: true,
+      patientId: true,
+      doctorId: true,
+    },
+    where: (appointment, { eq }) => eq(appointment.id, appointmentId),
+  });
 
-    if (!appointment) redirect('/dashboard/appointments');
+  if (!appointment) redirect("/dashboard/appointments");
 
-    const consultation = await db.query.consultation.findFirst({
-        where: (consultation, { eq }) => eq(consultation.appointmentId, appointmentId)
-    })
+  const consultation = await db.query.consultation.findFirst({
+    where: (consultation, { eq }) =>
+      eq(consultation.appointmentId, appointmentId),
+  });
 
-    const prescriptions = consultation ? await db.query.prescription.findMany({
-        where: (prescription, { eq }) => eq(prescription.consultationId, consultation.id)
-    }) : [];
+  const prescriptions = consultation
+    ? await db.query.prescription.findMany({
+        where: (prescription, { eq }) =>
+          eq(prescription.consultationId, consultation.id),
+      })
+    : [];
 
-    const patient = await db.query.user.findFirst({
-        where: (user, { eq }) => eq(user.id, appointment.patientId)
-    })
+  const patient = await db.query.user.findFirst({
+    where: (user, { eq }) => eq(user.id, appointment.patientId),
+  });
 
-    const medicalFiles = await db.select().from(medicalFile)
-        .where(and(eq(medicalFile.patientId, appointment.patientId), eq(medicalFile.appointmentId, appointmentId)))
+  const medicalFiles = await db
+    .select()
+    .from(medicalFile)
+    .where(
+      and(
+        eq(medicalFile.patientId, appointment.patientId),
+        eq(medicalFile.appointmentId, appointmentId),
+      ),
+    );
 
-    if (!patient) return;
+  if (!patient) return;
 
-    return {
-        patient,
-        doctorId: appointment.doctorId,
-        medicalFiles: medicalFiles || null,
-        operation: consultation?.id ? 'update' : 'create',
-        consultation,
-        prescriptions
-    };
-}
+  return {
+    patient,
+    doctorId: appointment.doctorId,
+    medicalFiles: medicalFiles || null,
+    operation: consultation?.id ? "update" : "create",
+    consultation,
+    prescriptions,
+  };
+};
 
-export default async function Appointment({ params: { appointmentId } }: { params: { appointmentId: string } }) {
-    const { patient, medicalFiles, doctorId, operation, consultation, prescriptions } = await getUserData(appointmentId) as {
-         patient: User,
-         doctorId: Doctor['id'],
-         medicalFiles: MedicalFile[],
-         operation: 'update' | 'create';
-         consultation?: Consultation;
-         prescriptions?: Prescription[];
-    };
+export default async function Appointment({
+  params: { appointmentId },
+}: {
+  params: { appointmentId: string };
+}) {
+  const {
+    patient,
+    medicalFiles,
+    doctorId,
+    operation,
+    consultation,
+    prescriptions,
+  } = (await getUserData(appointmentId)) as {
+    patient: User;
+    doctorId: Doctor["id"];
+    medicalFiles: MedicalFile[];
+    operation: "update" | "create";
+    consultation?: Consultation;
+    prescriptions?: Prescription[];
+  };
 
-    const { data } = await getSession({
-        fetchOptions: {
-            headers: await headers(),
-        },
-    });
-    
-    if(!data || !data.user) {
-        return new Error("Couldn't retrieve data")
-    }
-    
-    return (
-        <CardLayout className="py-4">
-            <AppointmentTabs 
-                patient={patient}
-                medicalFiles={medicalFiles}
-                appointmentId={appointmentId}
-                doctorId={doctorId}
-                operation={operation}
-                consultation={consultation}
-                prescriptions={prescriptions}
-                editable={data.user.role == 'doctor' ? true : false}
-                creatorId={data.user.id}
-            />
-        </CardLayout>
-    )
+  const { data } = await getSession({
+    fetchOptions: {
+      headers: await headers(),
+    },
+  });
+
+  if (!data || !data.user) {
+    return new Error("Couldn't retrieve data");
+  }
+
+  return (
+    <CardLayout className="py-4">
+      <AppointmentTabs
+        patient={patient}
+        medicalFiles={medicalFiles}
+        appointmentId={appointmentId}
+        doctorId={doctorId}
+        operation={operation}
+        consultation={consultation}
+        prescriptions={prescriptions}
+        editable={data.user.role == "doctor" ? true : false}
+        creatorId={data.user.id}
+      />
+    </CardLayout>
+  );
 }

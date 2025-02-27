@@ -1,4 +1,4 @@
-'use client'
+"use client";
 
 import {
   Sidebar as CSidebar,
@@ -14,48 +14,41 @@ import ReceptionistDashboard from "@/app/(authenticated)/dashboard/_components/s
 import UserDashboard from "@/app/(authenticated)/dashboard/_components/sidebar/user/user-sidebar";
 import { User } from "@/lib/db/schema";
 import Logo from "@/components/logo";
-import { useSidebar } from "@/components/ui/sidebar"
+import { useSidebar } from "@/components/ui/sidebar";
 import { ThemeToggle } from "@/components/theme-toggle";
 
-export default function Sidebar({ userRole }: { userRole: User['role'] }) {
-  const {
-    state,
-    isMobile
-  } = useSidebar()
-  
+export default function Sidebar({ userRole }: { userRole: User["role"] }) {
+  const { state, isMobile } = useSidebar();
+
   return (
     <CSidebar collapsible="icon" variant="floating">
-      <SidebarHeader className={`
+      <SidebarHeader
+        className={`
           flex justify-between items-center
-          ${!isMobile && state == 'collapsed' ? `flex-col` : 'flex-row'}
-        `}>
-        {!isMobile && state == 'collapsed' ? ( 
-          <Logo size={70} type='icon' />
-        ): (
+          ${!isMobile && state == "collapsed" ? `flex-col` : "flex-row"}
+        `}
+      >
+        {!isMobile && state == "collapsed" ? (
+          <Logo size={70} type="icon" />
+        ) : (
           <Logo size={100} />
         )}
-        <div className={`
+        <div
+          className={`
           flex gap-1 items-center
-          ${state != 'collapsed' ? `flex-row`: 'flex-col'}
-        `}>
+          ${state != "collapsed" ? `flex-row` : "flex-col"}
+        `}
+        >
           <ThemeToggle />
-          <SidebarTrigger size={'icon'} />
+          <SidebarTrigger size={"icon"} />
         </div>
       </SidebarHeader>
       <SidebarSeparator />
       <SidebarContent>
-        {userRole == 'admin' && (
-          <AdminDashboard />
-        )}
-        {userRole == 'doctor' && (
-          <DoctorDashboard />
-        )}
-        {userRole == 'receptionist' && (
-          <ReceptionistDashboard />
-        )}
-        {userRole == 'user' && (
-          <UserDashboard />
-        )}
+        {userRole == "admin" && <AdminDashboard />}
+        {userRole == "doctor" && <DoctorDashboard />}
+        {userRole == "receptionist" && <ReceptionistDashboard />}
+        {userRole == "user" && <UserDashboard />}
       </SidebarContent>
       <SidebarFooter />
     </CSidebar>

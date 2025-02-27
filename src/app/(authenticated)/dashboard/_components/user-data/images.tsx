@@ -66,7 +66,7 @@ export default function Images({ files }: { files: MedicalFile[] }) {
           height: 1080,
           alt: "test",
         })),
-    [files]
+    [files],
   );
 
   return (

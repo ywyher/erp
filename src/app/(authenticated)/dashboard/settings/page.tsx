@@ -6,29 +6,29 @@ import { headers } from "next/headers";
 import { forbidden } from "next/navigation";
 
 const getCurrentSettings = async () => {
-  const { name } = await getOperationDocument()
+  const { name } = await getOperationDocument();
   return {
-    operationDocument: name || ""
-  }
-}
+    operationDocument: name || "",
+  };
+};
 
 export default async function Settings() {
   const { data } = await getSession({
     fetchOptions: {
-      headers: await headers()
-    }
-  })
-  
+      headers: await headers(),
+    },
+  });
+
   if (!data) return forbidden();
-  
+
   const { operationDocument } = await getCurrentSettings();
-  
+
   return (
     <CardLayout>
-      <SettingsSidebar 
+      <SettingsSidebar
         userId={data.user.id}
         operationDocument={operationDocument}
       />
     </CardLayout>
-  )
+  );
 }

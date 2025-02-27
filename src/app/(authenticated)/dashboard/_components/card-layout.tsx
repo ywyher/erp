@@ -7,12 +7,18 @@ type CardLayoutProps = {
   className?: string;
 };
 
-export default function CardLayout({ children, title, className = "" }: CardLayoutProps) {
+export default function CardLayout({
+  children,
+  title,
+  className = "",
+}: CardLayoutProps) {
   return (
-    <Card className={`
+    <Card
+      className={`
       relative shadow-md rounded-lg w-full m-2 flex flex-col gap-3
       ${className}
-    `}>
+    `}
+    >
       {title && (
         <CardHeader className="pb-0">
           <CardTitle className="text-lg font-semibold">{title}</CardTitle>

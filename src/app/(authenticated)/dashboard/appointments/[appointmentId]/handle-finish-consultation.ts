@@ -1,39 +1,47 @@
-import { createConsultation, createPrescription, updateConsultation, updatePrescription } from "@/app/(authenticated)/dashboard/appointments/[appointmentId]/actions"
-import { updateAppointmentEndTime, updateAppointmentStatus } from "@/app/(authenticated)/dashboard/appointments/actions"
-import { toast } from "sonner"
-import { redirect } from "next/navigation"
-import { Prescription, User } from "@/lib/db/schema"
-import { createOperation } from "@/app/(authenticated)/dashboard/operations/actions"
+import {
+  createConsultation,
+  createPrescription,
+  updateConsultation,
+  updatePrescription,
+} from "@/app/(authenticated)/dashboard/appointments/[appointmentId]/actions";
+import {
+  updateAppointmentEndTime,
+  updateAppointmentStatus,
+} from "@/app/(authenticated)/dashboard/appointments/actions";
+import { toast } from "sonner";
+import { redirect } from "next/navigation";
+import { Prescription, User } from "@/lib/db/schema";
+import { createOperation } from "@/app/(authenticated)/dashboard/operations/actions";
 
 type HandleFinishParams = {
-  history: string
-  diagnosis: string
-  laboratories: string[]
-  radiologies: string[]
-  medicines: string[]
-  laboratory: string | null
-  radiology: string | null
-  medicine: string | null
-  appointmentId: string
-  doctorId: string
-  patientId: string
-  isCreateOperation: boolean
-  operationDate: Date | null
-  reset: () => void
-  setIsLoading: (loading: boolean) => void
-  creatorId?: User['id']
-}
+  history: string;
+  diagnosis: string;
+  laboratories: string[];
+  radiologies: string[];
+  medicines: string[];
+  laboratory: string | null;
+  radiology: string | null;
+  medicine: string | null;
+  appointmentId: string;
+  doctorId: string;
+  patientId: string;
+  isCreateOperation: boolean;
+  operationDate: Date | null;
+  reset: () => void;
+  setIsLoading: (loading: boolean) => void;
+  creatorId?: User["id"];
+};
 
 type HandlePrescriptionParams = {
-  prescriptions?: Prescription[]
-  appointmentId: string
-  doctorId: string
-  patientId: string
-  consultationId: string
-  laboratory: string | null
-  radiology: string | null
-  medicine: string | null
-}
+  prescriptions?: Prescription[];
+  appointmentId: string;
+  doctorId: string;
+  patientId: string;
+  consultationId: string;
+  laboratory: string | null;
+  radiology: string | null;
+  medicine: string | null;
+};
 
 const handlePrescriptions = async ({
   prescriptions,
@@ -43,14 +51,17 @@ const handlePrescriptions = async ({
   consultationId,
   laboratory,
   radiology,
-  medicine
+  medicine,
 }: HandlePrescriptionParams) => {
   const prescriptionPromises = [];
 
-  const processPrescription = async (type: "laboratory" | "radiology" | "medicine", content: string | null) => {
+  const processPrescription = async (
+    type: "laboratory" | "radiology" | "medicine",
+    content: string | null,
+  ) => {
     if (!content) return;
-    const existingPrescription = prescriptions?.find(p => p.type === type);
-    
+    const existingPrescription = prescriptions?.find((p) => p.type === type);
+
     if (existingPrescription) {
       return updatePrescription({
         content,
@@ -73,13 +84,13 @@ const handlePrescriptions = async ({
   prescriptionPromises.push(processPrescription("medicine", medicine));
 
   const results = await Promise.all(prescriptionPromises);
-  const errors = results.filter(res => res?.error);
+  const errors = results.filter((res) => res?.error);
 
   if (errors.length > 0) {
     toast.error("Some prescriptions failed to be created or updated!");
     return false;
   }
-  
+
   return true;
 };
 
@@ -102,23 +113,33 @@ export const handleFinishConsultation = async ({
   prescriptions,
   isCreateOperation,
   operationDate,
-  creatorId
-}: HandleFinishParams & { operation: 'create' | 'update', consultationId?: string, prescriptions?: Prescription[] }) => {
+  creatorId,
+}: HandleFinishParams & {
+  operation: "create" | "update";
+  consultationId?: string;
+  prescriptions?: Prescription[];
+}) => {
   if (!history || !diagnosis) return;
 
   setIsLoading(true);
 
-  const consultationData = { history, diagnosis, laboratories, radiologies, medicines };
+  const consultationData = {
+    history,
+    diagnosis,
+    laboratories,
+    radiologies,
+    medicines,
+  };
 
   let consultationResult;
-  if (operation === 'create') {
+  if (operation === "create") {
     consultationResult = await createConsultation({
       data: consultationData,
       appointmentId,
       doctorId,
       patientId,
     });
-  } else if (operation === 'update' && consultationId) {
+  } else if (operation === "update" && consultationId) {
     consultationResult = await updateConsultation({
       data: consultationData,
       consultationId,
@@ -140,7 +161,7 @@ export const handleFinishConsultation = async ({
     consultationId: consultationResult.id,
     laboratory,
     radiology,
-    medicine
+    medicine,
   });
 
   if (!prescriptionsSuccess) {
@@ -167,15 +188,20 @@ export const handleFinishConsultation = async ({
   }
 
   // Create an operation if applicable
-  if (operation === 'create' && isCreateOperation && operationDate && creatorId) {
-    const createdOperation = await createOperation({ 
-      createdBy: 'doctor',
+  if (
+    operation === "create" &&
+    isCreateOperation &&
+    operationDate &&
+    creatorId
+  ) {
+    const createdOperation = await createOperation({
+      createdBy: "doctor",
       creatorId,
       doctorId,
       patientId,
       date: operationDate,
-      status: 'pending',
-      appointmentId
+      status: "pending",
+      appointmentId,
     });
 
     if (createdOperation?.error) {
@@ -188,5 +214,5 @@ export const handleFinishConsultation = async ({
   toast.success("Consultation and prescriptions processed successfully!");
   reset();
   setIsLoading(false);
-  redirect('/dashboard/appointments');
+  redirect("/dashboard/appointments");
 };

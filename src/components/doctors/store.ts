@@ -1,10 +1,10 @@
-import { Appointment, Doctor, Schedule, User } from '@/lib/db/schema';
-import { create } from 'zustand';
+import { Appointment, Doctor, Schedule, User } from "@/lib/db/schema";
+import { create } from "zustand";
 
 type ReservedState = {
   reserved: boolean | null;
-  appointmentId: Appointment['id'] | null;
-  patientId: User['id'] | null
+  appointmentId: Appointment["id"] | null;
+  patientId: User["id"] | null;
 };
 
 type AppointmentReservationStore = {
@@ -12,25 +12,27 @@ type AppointmentReservationStore = {
   setReserved: (partialReserved: Partial<ReservedState>) => void; // Accepts partial updates
 };
 
-export const useAppointmentReservationStore = create<AppointmentReservationStore>((set) => ({
-  reserved: {
-    reserved: false,
-    appointmentId: null,
-    patientId: null
-  },
-  setReserved: (reserved) => set({
+export const useAppointmentReservationStore =
+  create<AppointmentReservationStore>((set) => ({
     reserved: {
-      reserved: reserved.reserved ?? null,
-      appointmentId: reserved.appointmentId ?? null,
-      patientId: reserved.patientId ?? null
-    }
-  }),
-}));
+      reserved: false,
+      appointmentId: null,
+      patientId: null,
+    },
+    setReserved: (reserved) =>
+      set({
+        reserved: {
+          reserved: reserved.reserved ?? null,
+          appointmentId: reserved.appointmentId ?? null,
+          patientId: reserved.patientId ?? null,
+        },
+      }),
+  }));
 
 type DoctorIdStore = {
-  doctorId: Doctor['id'] | null;
-  setDoctorId: (doctorId: Doctor['id'] | null) => void;
-}
+  doctorId: Doctor["id"] | null;
+  setDoctorId: (doctorId: Doctor["id"] | null) => void;
+};
 
 export const useDoctorIdStore = create<DoctorIdStore>((set) => ({
   doctorId: null,
@@ -40,7 +42,7 @@ export const useDoctorIdStore = create<DoctorIdStore>((set) => ({
 type TDate = {
   date: Date | null;
   setDate: (date: Date | null) => void;
-}
+};
 
 export const useDateStore = create<TDate>((set) => ({
   date: null,

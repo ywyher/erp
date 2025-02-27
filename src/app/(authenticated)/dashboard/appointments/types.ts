@@ -6,4 +6,4 @@ export const consultationSchema = z.object({
   laboratories: z.array(z.string()),
   radiologies: z.array(z.string()),
   medicines: z.array(z.string()),
-})
+});

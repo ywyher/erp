@@ -48,6 +48,9 @@ export async function POST(req: NextRequest) {
     });
   } catch (error) {
     console.error("Error converting DOCX to PDF:", error);
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 },
+    );
   }
 }

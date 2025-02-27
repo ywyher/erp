@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import { FormFieldWrapper } from "@/components/form-field-wrapper";
 import { Button } from "@/components/ui/button";
@@ -23,134 +23,155 @@ import { toast } from "sonner";
 import DialogWrapper from "@/app/(authenticated)/dashboard/_components/dialog-wrapper";
 import { updateReceptionistSchema } from "@/app/(authenticated)/dashboard/(admins)/receptionists/types";
 
-export default function UpdateReceptionist(
-    {
-        setPopOpen,
-        userId
-    }: {
-        setPopOpen: Dispatch<SetStateAction<boolean>>,
-        userId: string
+export default function UpdateReceptionist({
+  setPopOpen,
+  userId,
+}: {
+  setPopOpen: Dispatch<SetStateAction<boolean>>;
+  userId: string;
+}) {
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [open, setOpen] = useState<boolean>(false);
+  const router = useRouter();
+
+  const { data: user, isLoading: isPending } = useQuery({
+    queryKey: ["userById", userId],
+    queryFn: async () => {
+      const data = await getUserById(userId, "receptionist");
+      return data as { user: User; receptionist: Receptionist };
+    },
+  });
+
+  const form = useForm<z.infer<typeof updateReceptionistSchema>>({
+    resolver: zodResolver(updateReceptionistSchema),
+  });
+
+  useEffect(() => {
+    if (user) {
+      form.reset({
+        name: user.user.name || "",
+        username: user.user.username || "",
+        email: isFakeEmail(user.user.email) ? "" : user.user.email || "",
+        phoneNumber: user.user.phoneNumber || "",
+        nationalId: user.user.nationalId || "",
+        department: user.receptionist.department || "",
+      });
     }
-) {
-    const [isLoading, setIsLoading] = useState<boolean>(false)
-    const [open, setOpen] = useState<boolean>(false)
-    const router = useRouter();
+  }, [user]);
 
-    const { data: user, isLoading: isPending } = useQuery({
-        queryKey: ['userById', userId],
-        queryFn: async () => {
-            const data = await getUserById(userId, 'receptionist');
-            return data as { user: User, receptionist: Receptionist };
-        }
-    })
+  const onCheckChangedFields = async (
+    data: z.infer<typeof updateReceptionistSchema>,
+  ) => {
+    if (!user) return;
 
-    const form = useForm<z.infer<typeof updateReceptionistSchema>>({
-        resolver: zodResolver(updateReceptionistSchema),
-    })
-
-    useEffect(() => {
-        if (user) {
-            form.reset({
-                name: user.user.name || '',
-                username: user.user.username || '',
-                email: isFakeEmail(user.user.email) ? '' : user.user.email || '',
-                phoneNumber: user.user.phoneNumber || '',
-                nationalId: user.user.nationalId || '',
-                department: user.receptionist.department || '',
-            })
-        }
-    }, [user])
-
-    const onCheckChangedFields = async (data: z.infer<typeof updateReceptionistSchema>) => {
-        if (!user) return;
-
-        const sessionData = {
-            name: user.user.name,
-            email: isFakeEmail(user.user.email) ? '' : user.user.email,
-            username: user.user.username || "",
-            phoneNumber: user.user.phoneNumber || "",
-            nationalId: user.user.nationalId || "",
-            department: user.receptionist.department
-        };
-        
-        const changedFields = getChangedFields(sessionData, data);
-
-        if (Object.keys(changedFields).length === 0) {
-            toast.error('No fields chagned thus no fields or schedules were updated.')
-            return;
-        }
-
-        await onSubmit(changedFields as z.infer<typeof updateReceptionistSchema>);
+    const sessionData = {
+      name: user.user.name,
+      email: isFakeEmail(user.user.email) ? "" : user.user.email,
+      username: user.user.username || "",
+      phoneNumber: user.user.phoneNumber || "",
+      nationalId: user.user.nationalId || "",
+      department: user.receptionist.department,
     };
 
+    const changedFields = getChangedFields(sessionData, data);
 
-    const onSubmit = async (data: z.infer<typeof updateReceptionistSchema>) => {
-        if (!user) return;
+    if (Object.keys(changedFields).length === 0) {
+      toast.error(
+        "No fields chagned thus no fields or schedules were updated.",
+      );
+      return;
+    }
 
-        try{ 
-            setIsLoading(true)
-            const result = await updateReceptionist({ data, userId: user.user.id });
-    
-            if (result.error) {
-                toast.error(result.error)
-                setIsLoading(false)
-                return;
-            }
-    
-            toast(result.message)
-            setIsLoading(false)
-            setOpen(false)
-        } finally {
-            setIsLoading(false)
-        }
-    };
+    await onSubmit(changedFields as z.infer<typeof updateReceptionistSchema>);
+  };
 
-    return (
-        <DialogWrapper open={open} setOpen={setOpen} label="receptionist" operation="update">
-            <Tabs defaultValue="account">
-                <TabsList>
-                    <TabsTrigger value="account">Account</TabsTrigger>
-                    <TabsTrigger value="schedules">Schedules</TabsTrigger>
-                    <TabsTrigger value="password">Password</TabsTrigger>
-                </TabsList>
-                <TabsContent value="account">
-                    <Form {...form}>
-                        <form onSubmit={form.handleSubmit(onCheckChangedFields)} className="flex flex-col gap-3">
-                            <div className="flex flex-col gap-2">
-                                <div className="flex flex-row gap-2">
-                                    <FormFieldWrapper form={form} name="name" label="Name" />
-                                    <FormFieldWrapper form={form} name="username" label="Username" />
-                                </div>
-                                <div className="flex flex-row gap-2">
-                                    <FormFieldWrapper form={form} name="email" label="Email" />
-                                    <FormFieldWrapper form={form} name="phoneNumber" label="Phone Number" />
-                                </div>
-                                <FormFieldWrapper form={form}
-                                    name="nationalId"
-                                    label="National Id"
-                                />
-                                <div className="flex flex-row gap-2">
-                                    <FormFieldWrapper form={form}
-                                        name="department"
-                                        label="Department"
-                                        type="select"
-                                        options={departments}
-                                    />
-                                </div>
-                            </div>
-                            <LoadingBtn isLoading={isLoading}>
-                                Update
-                            </LoadingBtn>
-                        </form>
-                    </Form>
-                </TabsContent>
-                <TabsContent value="schedules">
-                    <UpdateSchedule userId={userId} setOpen={setOpen} />
-                </TabsContent>
-                <TabsContent value="password">
-                    <UpdatePassword userId={userId} setOpen={setOpen} revalidatePath="/dashboard" />
-                </TabsContent>
-            </Tabs>
-        </DialogWrapper>
-    );
+  const onSubmit = async (data: z.infer<typeof updateReceptionistSchema>) => {
+    if (!user) return;
+
+    try {
+      setIsLoading(true);
+      const result = await updateReceptionist({ data, userId: user.user.id });
+
+      if (result.error) {
+        toast.error(result.error);
+        setIsLoading(false);
+        return;
+      }
+
+      toast(result.message);
+      setIsLoading(false);
+      setOpen(false);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  return (
+    <DialogWrapper
+      open={open}
+      setOpen={setOpen}
+      label="receptionist"
+      operation="update"
+    >
+      <Tabs defaultValue="account">
+        <TabsList>
+          <TabsTrigger value="account">Account</TabsTrigger>
+          <TabsTrigger value="schedules">Schedules</TabsTrigger>
+          <TabsTrigger value="password">Password</TabsTrigger>
+        </TabsList>
+        <TabsContent value="account">
+          <Form {...form}>
+            <form
+              onSubmit={form.handleSubmit(onCheckChangedFields)}
+              className="flex flex-col gap-3"
+            >
+              <div className="flex flex-col gap-2">
+                <div className="flex flex-row gap-2">
+                  <FormFieldWrapper form={form} name="name" label="Name" />
+                  <FormFieldWrapper
+                    form={form}
+                    name="username"
+                    label="Username"
+                  />
+                </div>
+                <div className="flex flex-row gap-2">
+                  <FormFieldWrapper form={form} name="email" label="Email" />
+                  <FormFieldWrapper
+                    form={form}
+                    name="phoneNumber"
+                    label="Phone Number"
+                  />
+                </div>
+                <FormFieldWrapper
+                  form={form}
+                  name="nationalId"
+                  label="National Id"
+                />
+                <div className="flex flex-row gap-2">
+                  <FormFieldWrapper
+                    form={form}
+                    name="department"
+                    label="Department"
+                    type="select"
+                    options={departments}
+                  />
+                </div>
+              </div>
+              <LoadingBtn isLoading={isLoading}>Update</LoadingBtn>
+            </form>
+          </Form>
+        </TabsContent>
+        <TabsContent value="schedules">
+          <UpdateSchedule userId={userId} setOpen={setOpen} />
+        </TabsContent>
+        <TabsContent value="password">
+          <UpdatePassword
+            userId={userId}
+            setOpen={setOpen}
+            revalidatePath="/dashboard"
+          />
+        </TabsContent>
+      </Tabs>
+    </DialogWrapper>
+  );
 }

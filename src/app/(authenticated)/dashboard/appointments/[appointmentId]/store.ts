@@ -1,12 +1,12 @@
-import { Consultation } from '@/lib/db/schema';
-import { create } from 'zustand';
-import { persist, createJSONStorage } from 'zustand/middleware';
+import { Consultation } from "@/lib/db/schema";
+import { create } from "zustand";
+import { persist, createJSONStorage } from "zustand/middleware";
 
 type ConsultationStore = {
-  diagnosis: Consultation['diagnosis'] | null;
-  setDiagnosis: (diagnosis: Consultation['diagnosis'] | null) => void;
-  history: Consultation['history'] | null;
-  setHistory: (history: Consultation['history'] | null) => void;
+  diagnosis: Consultation["diagnosis"] | null;
+  setDiagnosis: (diagnosis: Consultation["diagnosis"] | null) => void;
+  history: Consultation["history"] | null;
+  setHistory: (history: Consultation["history"] | null) => void;
   laboratories: string[];
   setLaboratories: (laboratories: string[]) => void;
   radiologies: string[];
@@ -30,7 +30,7 @@ type ConsultationStore = {
 const stores: Record<string, ReturnType<typeof createConsultationStore>> = {};
 
 // Function to create the Zustand store
-const createConsultationStore = (appointmentId: string) => 
+const createConsultationStore = (appointmentId: string) =>
   create<ConsultationStore>()(
     persist(
       (set) => ({
@@ -45,7 +45,8 @@ const createConsultationStore = (appointmentId: string) =>
         setLaboratories: (laboratories) => set({ laboratories }),
         setRadiologies: (radiologies) => set({ radiologies }),
         setMedicines: (medicines) => set({ medicines }),
-        setSelectedPrescriptions: (selectedPrescriptions) => set({ selectedPrescriptions }),
+        setSelectedPrescriptions: (selectedPrescriptions) =>
+          set({ selectedPrescriptions }),
 
         // Prescriptions
         laboratory: null,
@@ -56,25 +57,25 @@ const createConsultationStore = (appointmentId: string) =>
         setMedicine: (medicine: string) => set({ medicine }),
         reset: () => {
           sessionStorage.removeItem(`consultation-store-${appointmentId}`);
-          
-            set({
-              diagnosis: null,
-              history: null,
-              laboratories: [],
-              radiologies: [],
-              medicines: [],
-              selectedPrescriptions: [],
-              laboratory: null,
-              medicine: null,
-              radiology: null,
-            })
+
+          set({
+            diagnosis: null,
+            history: null,
+            laboratories: [],
+            radiologies: [],
+            medicines: [],
+            selectedPrescriptions: [],
+            laboratory: null,
+            medicine: null,
+            radiology: null,
+          });
         },
       }),
       {
         name: `consultation-store-${appointmentId}`, // Unique storage per appointment
         storage: createJSONStorage(() => sessionStorage),
-      }
-    )
+      },
+    ),
   );
 
 // Zustand hook that ensures isolated state per appointment

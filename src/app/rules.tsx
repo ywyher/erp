@@ -1,4 +1,4 @@
-'use client'
+"use client";
 
 import { useRouter, usePathname } from "next/navigation";
 import { useEffect } from "react";
@@ -17,10 +17,10 @@ export default function Rules() {
   const setOperation = useAuthStore((state) => state.setOperation);
 
   const { data: user, isLoading } = useQuery({
-    queryKey: ['session', 'rules'],
+    queryKey: ["session", "rules"],
     queryFn: async () => {
       const { data } = await getSession();
-      return data?.user as User || null;
+      return (data?.user as User) || null;
     },
   });
 
@@ -35,18 +35,18 @@ export default function Rules() {
       try {
         const verificationNeeded = checkVerificationNeeded(user);
 
-        if(verificationNeeded) {
+        if (verificationNeeded) {
           // Store the verification type & value and redirect to /verify
           setValue(verificationNeeded.value);
           setContext(verificationNeeded.type);
           setOperation("verify");
           router.replace("/verify");
-          return; 
+          return;
         }
-        
+
         if (user.onBoarding) {
           router.replace("/onboarding");
-          return; 
+          return;
         }
       } catch (error) {
         toast.error(`Error in handleRules: ${error}`);

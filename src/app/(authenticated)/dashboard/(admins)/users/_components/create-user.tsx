@@ -1,12 +1,12 @@
-'use client';
+"use client";
 
 import { FormFieldWrapper } from "@/components/form-field-wrapper";
 import { Form } from "@/components/ui/form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { createUser } from "@/lib/db/mutations"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { createUser } from "@/lib/db/mutations";
 import LoadingBtn from "@/components/loading-btn";
 import { z } from "zod";
 import { createUserSchema } from "@/app/types";
@@ -15,79 +15,112 @@ import { revalidate } from "@/app/actions";
 import DialogWrapper from "@/app/(authenticated)/dashboard/_components/dialog-wrapper";
 
 export default function CreateUser() {
-    const [open, setOpen] = useState<boolean>(false)
-    const [tab, setTab] = useState<'account' | 'password'>('account')
-    const [isLoading, setIsLoading] = useState<boolean>(false)
+  const [open, setOpen] = useState<boolean>(false);
+  const [tab, setTab] = useState<"account" | "password">("account");
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
-    const form = useForm<z.infer<typeof createUserSchema>>({
-        resolver: zodResolver(createUserSchema),
-    });
+  const form = useForm<z.infer<typeof createUserSchema>>({
+    resolver: zodResolver(createUserSchema),
+  });
 
-    const onSubmit = async (data: z.infer<typeof createUserSchema>) => {
-        setIsLoading(true)
-        const result = await createUser({ data, role: 'user', verified: true })
+  const onSubmit = async (data: z.infer<typeof createUserSchema>) => {
+    setIsLoading(true);
+    const result = await createUser({ data, role: "user", verified: true });
 
-        if (result?.error) {
-            toast.error(result?.error)
-            setIsLoading(false)
-            return;
-        }
-
-        toast.message(result?.message)
-
-        await revalidate('/dashboard/users')
-        form.reset({
-            name: "",
-            email: "",
-            username: "",
-            phoneNumber: "",
-            nationalId: "",
-            password: "",
-            confirmPassword: "",
-        });
-        setTab("account");
-        setIsLoading(false);
-        setOpen(false);
-    };
-
-    const onError = () => {
-        toast.error(`Please check all tabs for potential errors`)
+    if (result?.error) {
+      toast.error(result?.error);
+      setIsLoading(false);
+      return;
     }
 
-    return (
-        <DialogWrapper open={open} setOpen={setOpen} label="user" operation="create">
-            <Form {...form}>
-                <form onSubmit={form.handleSubmit(onSubmit, onError)} className="flex flex-col gap-3">
-                    <Tabs value={tab} onValueChange={(value) => setTab(value as 'account' | 'password')}>
-                        <TabsList>
-                            <TabsTrigger value="account">Account</TabsTrigger>
-                            <TabsTrigger value="password">Password</TabsTrigger>
-                        </TabsList>
-                        <TabsContent value="account" className="flex flex-col gap-2">
-                            <div className="flex flex-col gap-3">
-                                <div className="flex flex-row gap-2">
-                                    <FormFieldWrapper form={form} name="name" label="Name" />
-                                    <FormFieldWrapper form={form} name="username" label="Username" />
-                                </div>
-                                <div className="flex flex-row gap-2">
-                                    <FormFieldWrapper form={form} name="email" label="Email" />
-                                    <FormFieldWrapper form={form} type="number" name="phoneNumber" label="Phone Number" />
-                                </div>
-                                <FormFieldWrapper form={form} type="number" name="nationalId" label="National Id" />
-                            </div>
-                        </TabsContent>
-                        <TabsContent value="password">
-                            <div className="flex flex-row gap-2">
-                                <FormFieldWrapper form={form} type="password" name="password" label="Password" />
-                                <FormFieldWrapper form={form} type="password" name="confirmPassword" label="Confirm Password" />
-                            </div>
-                        </TabsContent>
-                    </Tabs>
-                    <LoadingBtn isLoading={isLoading}>
-                        Create
-                    </LoadingBtn>
-                </form>
-            </Form>
-        </DialogWrapper>
-    );
+    toast.message(result?.message);
+
+    await revalidate("/dashboard/users");
+    form.reset({
+      name: "",
+      email: "",
+      username: "",
+      phoneNumber: "",
+      nationalId: "",
+      password: "",
+      confirmPassword: "",
+    });
+    setTab("account");
+    setIsLoading(false);
+    setOpen(false);
+  };
+
+  const onError = () => {
+    toast.error(`Please check all tabs for potential errors`);
+  };
+
+  return (
+    <DialogWrapper
+      open={open}
+      setOpen={setOpen}
+      label="user"
+      operation="create"
+    >
+      <Form {...form}>
+        <form
+          onSubmit={form.handleSubmit(onSubmit, onError)}
+          className="flex flex-col gap-3"
+        >
+          <Tabs
+            value={tab}
+            onValueChange={(value) => setTab(value as "account" | "password")}
+          >
+            <TabsList>
+              <TabsTrigger value="account">Account</TabsTrigger>
+              <TabsTrigger value="password">Password</TabsTrigger>
+            </TabsList>
+            <TabsContent value="account" className="flex flex-col gap-2">
+              <div className="flex flex-col gap-3">
+                <div className="flex flex-row gap-2">
+                  <FormFieldWrapper form={form} name="name" label="Name" />
+                  <FormFieldWrapper
+                    form={form}
+                    name="username"
+                    label="Username"
+                  />
+                </div>
+                <div className="flex flex-row gap-2">
+                  <FormFieldWrapper form={form} name="email" label="Email" />
+                  <FormFieldWrapper
+                    form={form}
+                    type="number"
+                    name="phoneNumber"
+                    label="Phone Number"
+                  />
+                </div>
+                <FormFieldWrapper
+                  form={form}
+                  type="number"
+                  name="nationalId"
+                  label="National Id"
+                />
+              </div>
+            </TabsContent>
+            <TabsContent value="password">
+              <div className="flex flex-row gap-2">
+                <FormFieldWrapper
+                  form={form}
+                  type="password"
+                  name="password"
+                  label="Password"
+                />
+                <FormFieldWrapper
+                  form={form}
+                  type="password"
+                  name="confirmPassword"
+                  label="Confirm Password"
+                />
+              </div>
+            </TabsContent>
+          </Tabs>
+          <LoadingBtn isLoading={isLoading}>Create</LoadingBtn>
+        </form>
+      </Form>
+    </DialogWrapper>
+  );
 }

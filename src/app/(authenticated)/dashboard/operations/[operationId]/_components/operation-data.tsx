@@ -1,16 +1,23 @@
-'use client'
+"use client";
 
-import { createOperationData, extractPlaceholders, updateOperationData } from "@/app/(authenticated)/dashboard/operations/actions"
-import { FormFieldWrapper } from "@/components/form-field-wrapper"
-import LoadingBtn from "@/components/loading-btn"
-import { Form } from "@/components/ui/form"
-import { Operation, OperationData as TOperationData } from "@/lib/db/schema"
-import { Dispatch, SetStateAction, useEffect, useState, useMemo } from "react"
-import { useForm } from "react-hook-form"
-import { toast } from "sonner"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Skeleton } from "@/components/ui/skeleton"
-import { placeholdersCache, useDocumentStore } from "@/app/(authenticated)/dashboard/operations/[operationId]/store"
+import {
+  createOperationData,
+  extractPlaceholders,
+  updateOperationData,
+} from "@/app/(authenticated)/dashboard/operations/actions";
+import { FormFieldWrapper } from "@/components/form-field-wrapper";
+import LoadingBtn from "@/components/loading-btn";
+import { Form } from "@/components/ui/form";
+import { Operation, OperationData as TOperationData } from "@/lib/db/schema";
+import { Dispatch, SetStateAction, useEffect, useState, useMemo } from "react";
+import { useForm } from "react-hook-form";
+import { toast } from "sonner";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
+import {
+  placeholdersCache,
+  useDocumentStore,
+} from "@/app/(authenticated)/dashboard/operations/[operationId]/store";
 
 export default function OperationData({
   operationId,
@@ -19,17 +26,21 @@ export default function OperationData({
   operationDocument,
   operationData,
 }: {
-  operationId: Operation['id'],
-  setActiveTab: Dispatch<SetStateAction<"patient-data" | "operation-data" | "document-viewer">>
-  editable: boolean
-  operationDocument: string
-  operationData?: TOperationData
+  operationId: Operation["id"];
+  setActiveTab: Dispatch<
+    SetStateAction<"patient-data" | "operation-data" | "document-viewer">
+  >;
+  editable: boolean;
+  operationDocument: string;
+  operationData?: TOperationData;
 }) {
-  const [isLoading, setIsLoading] = useState(false)
-  const [task] = useState<'create' | 'update'>(operationData && operationData.id ? 'update' : 'create')
-  const [placeholders, setPlaceholders] = useState<string[]>()
-  const [isLoadingPlaceholders, setIsLoadingPlaceholders] = useState(true)
-  const { setOperationData ,setNeedsRegeneration } = useDocumentStore()
+  const [isLoading, setIsLoading] = useState(false);
+  const [task] = useState<"create" | "update">(
+    operationData && operationData.id ? "update" : "create",
+  );
+  const [placeholders, setPlaceholders] = useState<string[]>();
+  const [isLoadingPlaceholders, setIsLoadingPlaceholders] = useState(true);
+  const { setOperationData, setNeedsRegeneration } = useDocumentStore();
 
   // Generate a cache key from the operationDocument
   const cacheKey = useMemo(() => {
@@ -39,20 +50,20 @@ export default function OperationData({
   useEffect(() => {
     const fetchPlaceholders = async () => {
       setIsLoadingPlaceholders(true);
-      
+
       // Check if we have a cached version first
       if (placeholdersCache.has(cacheKey)) {
         setPlaceholders(placeholdersCache.get(cacheKey));
         setIsLoadingPlaceholders(false);
         return;
       }
-      
+
       try {
         const result = await extractPlaceholders(operationDocument);
-        
+
         // Store in cache
         placeholdersCache.set(cacheKey, result);
-        
+
         setPlaceholders(result);
       } catch (error) {
         console.error("Failed to extract placeholders:", error);
@@ -66,35 +77,39 @@ export default function OperationData({
   }, [cacheKey]);
 
   const form = useForm({
-    defaultValues: task === 'update' && operationData?.data ? operationData.data : {}
-  })
+    defaultValues:
+      task === "update" && operationData?.data ? operationData.data : {},
+  });
 
   const handleOperationData = async (data: any) => {
-    setIsLoading(true)
+    setIsLoading(true);
     let result;
-    if(task == 'create') {
-      result = await createOperationData({ data, operationId })
+    if (task == "create") {
+      result = await createOperationData({ data, operationId });
     } else {
-      result = await updateOperationData({ data, operationDataId: operationData?.id as string })
+      result = await updateOperationData({
+        data,
+        operationDataId: operationData?.id as string,
+      });
     }
-    
-    if(!result.data || result.error) {
-      toast.error(result.error)
-      setIsLoading(false)
+
+    if (!result.data || result.error) {
+      toast.error(result.error);
+      setIsLoading(false);
       return;
     }
-    
-    setNeedsRegeneration(true)
-    setOperationData(result.data.data)
-    setActiveTab('document-viewer')
-    toast.message(result.message)
-    setIsLoading(false)
-  }
+
+    setNeedsRegeneration(true);
+    setOperationData(result.data.data);
+    setActiveTab("document-viewer");
+    toast.message(result.message);
+    setIsLoading(false);
+  };
 
   return (
     <Card>
       <CardHeader>
-        <CardTitle>{task === 'create' ? 'Insert' : 'Update'} Data</CardTitle>
+        <CardTitle>{task === "create" ? "Insert" : "Update"} Data</CardTitle>
       </CardHeader>
       <CardContent>
         <Form {...form}>
@@ -121,18 +136,15 @@ export default function OperationData({
                 No placeholders found in document
               </div>
             )}
-            
+
             {editable && (
-              <LoadingBtn 
-                isLoading={isLoading} 
-                className="mt-4" 
-              >
-                {task === 'create' ? 'Create' : 'Update'} Operation Data
+              <LoadingBtn isLoading={isLoading} className="mt-4">
+                {task === "create" ? "Create" : "Update"} Operation Data
               </LoadingBtn>
             )}
           </form>
         </Form>
       </CardContent>
     </Card>
-  )
+  );
 }

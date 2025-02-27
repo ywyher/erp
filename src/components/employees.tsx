@@ -13,27 +13,35 @@ import CardLayout from "@/app/(authenticated)/dashboard/_components/card-layout"
 import { format, isToday } from "date-fns";
 
 export default function Employees() {
-  const [role, setRole] = useQueryState('role', 
-    parseAsStringEnum(['doctor', 'receptionist']).withDefault('doctor')
+  const [role, setRole] = useQueryState(
+    "role",
+    parseAsStringEnum(["doctor", "receptionist"]).withDefault("doctor"),
   );
 
   const [date, setDate] = useQueryState(
-      'date',
-      parseAsJson<{ from: string; to?: string } | undefined>(z.object({
+    "date",
+    parseAsJson<{ from: string; to?: string } | undefined>(
+      z
+        .object({
           from: z.string(),
           to: z.string().optional(),
-      }).optional().parse).withDefault({ from: new Date().toISOString().split("T")[0] })
+        })
+        .optional().parse,
+    ).withDefault({ from: new Date().toISOString().split("T")[0] }),
   );
 
   // Type for our query response based on the selected role
-  type EmployeeData = 
+  type EmployeeData =
     | { user: User; doctor: Doctor; schedules: Schedule[] }
     | { user: User; receptionist: Receptionist; schedules: Schedule[] };
 
   const { data, isLoading } = useQuery({
     queryKey: ["employees", role, date],
     queryFn: async () => {
-      return await getEmployees({ date: date || undefined, role: role || 'doctor' }) as EmployeeData[];
+      return (await getEmployees({
+        date: date || undefined,
+        role: role || "doctor",
+      })) as EmployeeData[];
     },
   });
 
@@ -82,38 +90,51 @@ export default function Employees() {
           </Button>
         </div>
         <div className="flex flex-col gap-3 w-full">
-            <div className="text-lg font-semibold">
-              {role === "doctor" ? "Listed Doctors" : "Listed Receptionists"}
-            </div>
-            <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
-                {!isLoading ? (
-                    data && data.length > 0 ? (
-                        data.map((employee) => (
-                            role === "doctor" ? (
-                              <DoctorCard
-                                  key={(employee as any).user.id}
-                                  data={employee as { user: User; doctor: Doctor; schedules: Schedule[] }}
-                              />
-                            ) : (
-                              <ReceptionistCard
-                                  key={(employee as any).user.id}
-                                  data={employee as { user: User; receptionist: Receptionist; schedules: Schedule[] }}
-                              />
-                            )
-                        ))
-                    ) : (
-                        <div className="flex justify-center items-center w-full col-span-full">
-                            <span className="text-center text-gray-500">
-                              No {role === "doctor" ? "doctors" : "receptionists"} found, try adjusting the filters.
-                            </span>
-                        </div>
-                    )
-                ) : (
-                    Array.from({ length: 3 }).map((_, index) => (
-                        <Skeleton key={index} className="w-full h-[300px]" />
-                    ))
-                )}
-            </div>
+          <div className="text-lg font-semibold">
+            {role === "doctor" ? "Listed Doctors" : "Listed Receptionists"}
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+            {!isLoading ? (
+              data && data.length > 0 ? (
+                data.map((employee) =>
+                  role === "doctor" ? (
+                    <DoctorCard
+                      key={(employee as any).user.id}
+                      data={
+                        employee as {
+                          user: User;
+                          doctor: Doctor;
+                          schedules: Schedule[];
+                        }
+                      }
+                    />
+                  ) : (
+                    <ReceptionistCard
+                      key={(employee as any).user.id}
+                      data={
+                        employee as {
+                          user: User;
+                          receptionist: Receptionist;
+                          schedules: Schedule[];
+                        }
+                      }
+                    />
+                  ),
+                )
+              ) : (
+                <div className="flex justify-center items-center w-full col-span-full">
+                  <span className="text-center text-gray-500">
+                    No {role === "doctor" ? "doctors" : "receptionists"} found,
+                    try adjusting the filters.
+                  </span>
+                </div>
+              )
+            ) : (
+              Array.from({ length: 3 }).map((_, index) => (
+                <Skeleton key={index} className="w-full h-[300px]" />
+              ))
+            )}
+          </div>
         </div>
       </div>
     </CardLayout>
