@@ -283,7 +283,7 @@ export async function getWorkerUserId(
 export const getOperationDocument = async ({
   dbInstance = db,
 }: {
-  dbInstance: typeof db;
+  dbInstance?: typeof db;
 }) => {
   try {
     const [operationDocument] = await dbInstance
@@ -401,14 +401,14 @@ export async function getQuantityByDay({
   conditions?: {
     [tableName in Tables]?: {
       field: string;
-      operator: 'eq' | 'neq' | 'gt' | 'gte' | 'lt' | 'lte' | 'in' | 'like';
+      operator: "eq" | "neq" | "gt" | "gte" | "lt" | "lte" | "in" | "like";
       value: string | number | boolean | string[] | number[];
     }[];
   };
 }) {
   // Convert single table name to array for consistent handling
   const tables = Array.isArray(tableNames) ? tableNames : [tableNames];
-  
+
   // Fetch data for each table
   const allResults = await Promise.all(
     tables.map(async (tableName) => {
@@ -416,62 +416,66 @@ export async function getQuantityByDay({
       if (!table) {
         throw new Error(`Invalid table name: ${tableName}`);
       }
-      
+
       // Create an array to hold SQL condition objects
       const whereClauses = [];
-      
+
       // Add date range conditions only if provided
       if (startDate) {
-        whereClauses.push(sql`${table.createdAt} >= ${startDate.toISOString()}`);
+        whereClauses.push(
+          sql`${table.createdAt} >= ${startDate.toISOString()}`,
+        );
       }
       if (endDate) {
         whereClauses.push(sql`${table.createdAt} <= ${endDate.toISOString()}`);
       }
-      
+
       // Add table-specific conditions if provided
       const tableConditions = conditions?.[tableName] || [];
-      tableConditions.forEach(condition => {
+      tableConditions.forEach((condition) => {
         // Get the field from the table schema
         const field = table[condition.field];
         if (!field) {
-          throw new Error(`Invalid field name for table ${tableName}: ${condition.field}`);
+          throw new Error(
+            `Invalid field name for table ${tableName}: ${condition.field}`,
+          );
         }
-        
+
         // Build the condition based on the operator
         switch (condition.operator) {
-          case 'eq':
+          case "eq":
             whereClauses.push(sql`${field} = ${condition.value}`);
             break;
-          case 'neq':
+          case "neq":
             whereClauses.push(sql`${field} <> ${condition.value}`);
             break;
-          case 'gt':
+          case "gt":
             whereClauses.push(sql`${field} > ${condition.value}`);
             break;
-          case 'gte':
+          case "gte":
             whereClauses.push(sql`${field} >= ${condition.value}`);
             break;
-          case 'lt':
+          case "lt":
             whereClauses.push(sql`${field} < ${condition.value}`);
             break;
-          case 'lte':
+          case "lte":
             whereClauses.push(sql`${field} <= ${condition.value}`);
             break;
-          case 'in':
+          case "in":
             if (Array.isArray(condition.value)) {
               whereClauses.push(sql`${field} IN ${condition.value}`);
             } else {
               throw new Error('Value must be an array for "in" operator');
             }
             break;
-          case 'like':
+          case "like":
             whereClauses.push(sql`${field} LIKE ${condition.value}`);
             break;
           default:
             throw new Error(`Unsupported operator: ${condition.operator}`);
         }
       });
-      
+
       // Format the result in the shape you need - using PostgreSQL's TO_CHAR function
       const baseQuery = db
         .select({
@@ -479,12 +483,13 @@ export async function getQuantityByDay({
           [pluralize(tableName)]: sql`COUNT(*)`.as(`${pluralize(tableName)}`),
         })
         .from(table);
-      
+
       // Add WHERE clauses if any exist
       let result;
       if (whereClauses.length > 0) {
         // Combine with AND using drizzle's approach
-        result = await baseQuery.where(sql.join(whereClauses, sql` AND `))
+        result = await baseQuery
+          .where(sql.join(whereClauses, sql` AND `))
           .groupBy(sql`TO_CHAR(${table.createdAt}, 'YYYY-MM-DD')`)
           .orderBy(sql`date`);
       } else {
@@ -493,19 +498,19 @@ export async function getQuantityByDay({
           .groupBy(sql`TO_CHAR(${table.createdAt}, 'YYYY-MM-DD')`)
           .orderBy(sql`date`);
       }
-      
+
       return { tableName, data: result };
     }),
   );
-  
+
   // If only one table was queried, return its data directly
   if (allResults.length === 1) {
     return allResults[0].data;
   }
-  
+
   // Otherwise, merge all the data by date
   const dateMap = new Map();
-  
+
   // Process each table's results
   allResults.forEach(({ tableName, data }) => {
     const tablePlural = pluralize(tableName);
@@ -526,12 +531,14 @@ export async function getQuantityByDay({
       }
     });
   });
-  
+
   // Convert map to array and sort by date
   const combinedResults = Array.from(dateMap.values()).sort(
-    (a, b) => new Date(a.date as string).getTime() - new Date(b.date as string).getTime(),
+    (a, b) =>
+      new Date(a.date as string).getTime() -
+      new Date(b.date as string).getTime(),
   );
-  
+
   return combinedResults;
 }
 
@@ -544,16 +551,23 @@ export async function getSchedules(userId: User["id"]) {
   return schedules;
 }
 
-export async function getEmployeeId(userId: User['id'], role: 'doctor' | 'receptionist') {
-  if(role == 'doctor') {
-    const [doctorData] = await db.select().from(doctor)
-      .where(eq(doctor.userId, userId))
+export async function getEmployeeId(
+  userId: User["id"],
+  role: "doctor" | "receptionist",
+) {
+  if (role == "doctor") {
+    const [doctorData] = await db
+      .select()
+      .from(doctor)
+      .where(eq(doctor.userId, userId));
 
-      return doctorData.id
-  }else if (role == 'receptionist') {
-    const [receptionistData] = await db.select().from(receptionist)
-      .where(eq(receptionist.userId, userId))
+    return doctorData.id;
+  } else if (role == "receptionist") {
+    const [receptionistData] = await db
+      .select()
+      .from(receptionist)
+      .where(eq(receptionist.userId, userId));
 
-    return receptionistData.id
+    return receptionistData.id;
   }
 }

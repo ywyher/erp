@@ -6,17 +6,26 @@ import { getQuantityByDay } from "@/lib/db/queries";
 import { User } from "@/lib/db/schema";
 import { useQuery } from "@tanstack/react-query";
 
-export default function OperationChart({ userId, role }: { userId?: User['id'], role?: User['role'] }) {
+export default function OperationChart({
+  userId,
+  role,
+}: {
+  userId?: User["id"];
+  role?: User["role"];
+}) {
   const { data: chartData, isLoading } = useQuery({
     queryKey: ["chart", "operation", userId],
     queryFn: async () => {
       return await getQuantityByDay({
         tableNames: ["operation"], // Now passing an array of tables
-        conditions: (userId && role) ? {
-          operation: [
-            { field: `${role}Id`, operator: 'eq', value: userId }
-          ],
-        } : undefined
+        conditions:
+          userId && role
+            ? {
+                operation: [
+                  { field: `${role}Id`, operator: "eq", value: userId },
+                ],
+              }
+            : undefined,
       });
     },
   });

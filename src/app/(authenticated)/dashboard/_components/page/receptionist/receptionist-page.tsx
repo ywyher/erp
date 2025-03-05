@@ -10,13 +10,17 @@ import OperationChart from "@/app/(authenticated)/dashboard/_components/page/_co
 import AppointmentChart from "@/app/(authenticated)/dashboard/_components/page/_components/appointment-chart";
 
 export default function ReceptionistPage({ userId }: { userId: string }) {
-  const { data: receptionistId, isLoading: isReceptionistIdLoading } = useQuery({
-    queryKey: ["receptionistId", userId],
-    queryFn: async () => {      
-      return (await getEmployeeId(userId, 'receptionist')) as Receptionist['id'];
+  const { data: receptionistId, isLoading: isReceptionistIdLoading } = useQuery(
+    {
+      queryKey: ["receptionistId", userId],
+      queryFn: async () => {
+        return (await getEmployeeId(
+          userId,
+          "receptionist",
+        )) as Receptionist["id"];
+      },
     },
-  });
-
+  );
 
   const { data: schedules, isLoading } = useQuery({
     queryKey: ["work-schedule", userId],
@@ -26,7 +30,7 @@ export default function ReceptionistPage({ userId }: { userId: string }) {
   });
 
   if (!schedules || isLoading) return <>Loading</>;
-  if ((!receptionistId || isReceptionistIdLoading)) return <>Loading</>;
+  if (!receptionistId || isReceptionistIdLoading) return <>Loading</>;
 
   return (
     <Tabs defaultValue="analysis" className="flex flex-col gap-3">
@@ -34,7 +38,10 @@ export default function ReceptionistPage({ userId }: { userId: string }) {
         <TabsTrigger value="overall">Overall</TabsTrigger>
         <TabsTrigger value="analysis">Analysis</TabsTrigger>
       </TabsList>
-      <TabsContent value="overall" className="p-4 flex flex-col xl:flex-row gap-4">
+      <TabsContent
+        value="overall"
+        className="p-4 flex flex-col xl:flex-row gap-4"
+      >
         <div className="flex-1">
           <Employees />
         </div>
@@ -47,7 +54,7 @@ export default function ReceptionistPage({ userId }: { userId: string }) {
         className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-2 gap-6 p-4"
       >
         <OperationChart userId={receptionistId} role="receptionist" />
-        <AppointmentChart userId={receptionistId} role='receptionist' />
+        <AppointmentChart userId={receptionistId} role="receptionist" />
       </TabsContent>
     </Tabs>
   );

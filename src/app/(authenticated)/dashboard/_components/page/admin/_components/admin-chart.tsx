@@ -12,10 +12,8 @@ export default function AdminChart() {
       return await getQuantityByDay({
         tableNames: ["user"],
         conditions: {
-          user: [
-            { field: 'role', operator: 'eq', value: 'admin' }
-          ]
-        }
+          user: [{ field: "role", operator: "eq", value: "admin" }],
+        },
       });
     },
   });

@@ -98,7 +98,7 @@ export default async function Operation({
 
   let operationDocument: { name: string; error: string | null };
   if (!operationData?.documentName) {
-    operationDocument = (await getOperationDocument()) as {
+    operationDocument = (await getOperationDocument({ dbInstance: db })) as {
       name: string;
       error: string | null;
     };

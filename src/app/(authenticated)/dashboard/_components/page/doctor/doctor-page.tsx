@@ -11,20 +11,20 @@ import { ScheduleDisplay } from "@/components/schedule-display";
 export default function DoctortPage({ userId }: { userId: string }) {
   const { data: doctorId, isLoading: isDoctorIdLoading } = useQuery({
     queryKey: ["doctorId", userId],
-    queryFn: async () => {      
-      return (await getEmployeeId(userId, 'doctor')) as Doctor['id'];
+    queryFn: async () => {
+      return (await getEmployeeId(userId, "doctor")) as Doctor["id"];
     },
   });
 
   const { data: schedules, isLoading: isScheduleLoading } = useQuery({
     queryKey: ["work-schedule", userId],
-    queryFn: async () => {      
+    queryFn: async () => {
       return (await getSchedules(userId)) as Schedule[];
     },
   });
 
-  if ((!schedules || isScheduleLoading)) return <>Loading</>;
-  if ((!doctorId || isDoctorIdLoading)) return <>Loading</>;
+  if (!schedules || isScheduleLoading) return <>Loading</>;
+  if (!doctorId || isDoctorIdLoading) return <>Loading</>;
 
   return (
     <Tabs defaultValue="analysis" className="flex flex-col gap-3">
@@ -42,7 +42,7 @@ export default function DoctortPage({ userId }: { userId: string }) {
         className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-2 gap-6 p-4"
       >
         <OperationChart userId={doctorId} role="doctor" />
-        <AppointmentChart userId={doctorId} role='doctor' />
+        <AppointmentChart userId={doctorId} role="doctor" />
       </TabsContent>
     </Tabs>
   );

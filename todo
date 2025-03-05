@@ -13,3 +13,33 @@
 # Notification system for when an appoinment/operation or completed or something not sure yet (priorty -> 0)
 
 # check if drizzle-studio have a way to make records appears as if they arent there and maybe make a request for it if not
+
+<!-- ASDASDASD -->
+
+# Ability for the doctor to upload his certificates
+
+# home page
+
+# laboratories/radiologies/medicines real data
+
+# defaults values for document placeholders with presets
+
+# for operation document there should be default datas despite the document content example:
+
+# {
+
+# column - value
+
+# user: userName,
+
+# age: userAge,
+
+# // so on
+
+# }
+
+# so if the document has these columns in it it should be set if not who cares
+
+# for operation document there should be the ability to upload a different document for each role (doctor/nurse/receptionist)
+
+# https://github.com/react-grid-layout/react-grid-layout?tab=readme-ov-file
