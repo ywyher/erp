@@ -10,6 +10,7 @@ import { Menu } from "@/components/header/menu";
 import Links from "@/components/header/links";
 import Logo from "@/components/logo";
 import { Button } from "@/components/ui/button";
+import { useEffect } from "react";
 
 export default function Header() {
   const { data: user } = useQuery({

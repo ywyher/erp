@@ -44,6 +44,8 @@ export async function seed() {
         phoneNumberVerified: true,
         emailVerified: true,
         role: "doctor",
+        gender: 'male',
+        dateOfBirth: '2003-01-20',
         onBoarding: false,
         createdAt: new Date(),
         updatedAt: new Date(),
@@ -86,7 +88,20 @@ export async function seed() {
         phoneNumberVerified: true,
         emailVerified: true,
         role: "admin",
+        gender: 'male',
+        dateOfBirth: '1971-07-14',
         onBoarding: false,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      })
+      .returning();
+
+      // Create an admin
+      const admin = await db
+      .insert(schema.admin)
+      .values({
+        id: generateId(),
+        userId: adminUser[0].id,
         createdAt: new Date(),
         updatedAt: new Date(),
       })
@@ -105,6 +120,8 @@ export async function seed() {
         phoneNumberVerified: true,
         emailVerified: true,
         role: "receptionist",
+        gender: 'female',
+        dateOfBirth: '2008-01-20',
         onBoarding: false,
         createdAt: new Date(),
         updatedAt: new Date(),
@@ -147,6 +164,8 @@ export async function seed() {
         phoneNumberVerified: true,
         emailVerified: true,
         role: "user",
+        gender: 'female',
+        dateOfBirth: '205-02-25',
         onBoarding: false,
         createdAt: new Date(),
         updatedAt: new Date(),
@@ -159,7 +178,7 @@ export async function seed() {
         id: generateId(),
         patientId: normalUser[0].id,
         doctorId: doctor[0].id,
-        receptionistId: receptionist[0].id,
+        creatorId: receptionistUser[0].id,
         startTime: new Date(`2023-06-${15 + i}T10:00:00`),
         endTime: new Date(`2023-06-${15 + i}T11:00:00`),
         status: "pending",

@@ -1,21 +1,16 @@
-import { relations } from "drizzle-orm";
-import { pgTable, text, timestamp, boolean, pgEnum } from "drizzle-orm/pg-core";
+import { or, relations } from "drizzle-orm";
+import { pgTable, text, timestamp, boolean, pgEnum, date } from "drizzle-orm/pg-core";
 import { schedule } from "./schedule";
 import { appointment } from "./appointment";
 import { medicalFile } from "./medical-file";
 import { consultation } from "./consultation";
 import { prescription } from "@/lib/db/schema/prescription";
 import { operation } from "@/lib/db/schema/operation";
-
-export const roleEnum = pgEnum("role", [
-  "user",
-  "admin",
-  "doctor",
-  "receptionist",
-]);
+import { roleEnum } from "./enums";
+import { service } from "@/lib/db/schema/service";
+import { news } from "@/lib/db/schema/news";
 
 // User
-
 export const user = pgTable("user", {
   id: text("id").primaryKey(),
   name: text("name").notNull(),
@@ -23,6 +18,8 @@ export const user = pgTable("user", {
   email: text("email").unique(),
   phoneNumber: text("phoneNumber").unique(),
   nationalId: text("nationalId").unique(),
+  gender: text("gender").notNull(),
+  dateOfBirth: date("dateOfBirth").notNull(),
   phoneNumberVerified: boolean("phoneNumberVerified").default(false).notNull(),
   emailVerified: boolean("emailVerified").default(false).notNull(),
   onBoarding: boolean("onBoarding").default(true).notNull(),
@@ -47,6 +44,24 @@ export const userRelation = relations(user, ({ one, many }) => ({
   consultations: many(consultation),
   prescriptions: many(prescription),
   operation: many(operation),
+}));
+
+export const admin = pgTable("admin", {
+  id: text("id").primaryKey(),
+  userId: text("userId")
+    .references(() => user.id, { onDelete: "cascade", onUpdate: "cascade" })
+    .notNull(),
+  createdAt: timestamp("createdAt").notNull().defaultNow(),
+  updatedAt: timestamp("updatedAt").notNull().defaultNow(),
+});
+
+export const adminRelation = relations(admin, ({ one, many }) => ({
+  user: one(user, {
+    fields: [admin.userId],
+    references: [user.id],
+  }),
+  services: many(service),
+  news: many(news)
 }));
 
 // Doctor

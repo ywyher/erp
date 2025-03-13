@@ -14,6 +14,7 @@ import { FormFieldWrapper } from "@/components/form-field-wrapper";
 import { getUserRegistrationType } from "@/lib/db/queries";
 import { toast } from "sonner";
 import { updateUser } from "@/lib/db/mutations";
+import { genders } from "@/lib/constants";
 
 export default function SettingsForm() {
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -37,18 +38,20 @@ export default function SettingsForm() {
 
   useEffect(() => {
     async () => {
-      if (user) {
+      if (user && !isPending) {
         const context = await getUserRegistrationType(user.id);
         setRegisteredWith(context);
       }
     };
-    if (user) {
+    if (user && !isPending) {
       form.reset({
         name: user.name || "",
         username: user.username || "",
         email: isFakeEmail(user.email) ? "" : user.email || "",
         phoneNumber: user.phoneNumber || "",
         nationalId: user.nationalId || "",
+        gender: user.gender || "",
+        dateOfBirth: new Date(user.dateOfBirth) || "",
       });
     }
   }, [user]);
@@ -56,7 +59,7 @@ export default function SettingsForm() {
   const onCheckChangedFields = async (
     data: z.infer<typeof updateUserSchema>,
   ) => {
-    if (!user) return;
+    if (!user || isPending) return;
 
     const sessionData = {
       name: user.name,
@@ -64,6 +67,8 @@ export default function SettingsForm() {
       username: user.username || "",
       phoneNumber: user.phoneNumber || "",
       nationalId: user.nationalId || "",
+      gender: user.gender || "",
+      dateOfBirth: new Date(user.dateOfBirth) || "",
     };
 
     const changedFields = getChangedFields(sessionData, data);
@@ -105,37 +110,56 @@ export default function SettingsForm() {
     <Form {...form}>
       <form
         onSubmit={form.handleSubmit(onCheckChangedFields)}
-        className="flex flex-col gap-2"
+        className="flex flex-col gap-3"
       >
-        <FormFieldWrapper form={form} name="name" label="Display Name" />
-        <FormFieldWrapper form={form} name="username" label="Username" />
+        <div className="flex flex-row gap-2">
+          <FormFieldWrapper form={form} name="name" label="Display Name" />
+          <FormFieldWrapper form={form} name="username" label="Username" />
+        </div>
         <FormFieldWrapper
           form={form}
           name="email"
           label={`
-                            Email
-                            ${user.email && user.emailVerified ? "(verified)" : "(Unverified)"}
-                        `}
+            Email
+            ${user.email && user.emailVerified ? "(verified)" : "(Unverified)"}
+          `}
           optional={
             registeredWith != "email" && isFakeEmail(user.email) ? true : false
           }
           disabled={user.emailVerified}
         />
-        <FormFieldWrapper
-          form={form}
-          name="phoneNumber"
-          label={`
-                            PhoneNumber
-                            ${user.phoneNumber && user.phoneNumberVerified ? `(verified)` : "(Unverified)"}
-                        `}
-          optional={
-            registeredWith != "phoneNumber" && isFakeEmail(user.phoneNumber)
-              ? true
-              : false
-          }
-          disabled={user.phoneNumberVerified ? true : false}
-        />
-        <FormFieldWrapper form={form} name="nationalId" label="National Id" />
+        <div className="flex flex-row gap-2">
+          <FormFieldWrapper
+            form={form}
+            name="dateOfBirth"
+            label="Date of birth"
+            type="date"
+          />
+          <FormFieldWrapper 
+            form={form}
+            name="gender"
+            label="gender"
+            type="select"
+            options={genders}
+          />
+        </div>
+        <div className="flex flex-row gap-2">
+          <FormFieldWrapper
+            form={form}
+            name="phoneNumber"
+            label={`
+                PhoneNumber
+                ${user.phoneNumber && user.phoneNumberVerified ? `(verified)` : "(Unverified)"}
+            `}
+            optional={
+              registeredWith != "phoneNumber" && isFakeEmail(user.phoneNumber)
+                ? true
+                : false
+            }
+            disabled={user.phoneNumberVerified ? true : false}
+          />
+          <FormFieldWrapper form={form} name="nationalId" label="National Id" />
+        </div>
         <LoadingBtn className="mt-2" isLoading={isLoading}>
           Update
         </LoadingBtn>

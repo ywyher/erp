@@ -6,6 +6,8 @@
 
 # Error: Route "/dashboard/operations/[operationId]" used `params.operationId`. `params` should be awaited before using its properties. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis
 
+# Check https://floating-ui.com/docs clean transition through pages
+
 <!-- Priorty 0 -->
 
 # add the ability for the patient to add personal data like whiehg height and so onn

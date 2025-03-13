@@ -17,7 +17,7 @@ import { format } from "date-fns";
 import { Button } from "@/components/ui/button";
 import { CalendarIcon, ChevronLeft, ChevronRight } from "lucide-react";
 import { Dispatch, SetStateAction, useState } from "react";
-import CardLayout from "@/app/(authenticated)/dashboard/_components/card-layout";
+import CardLayout from "@/components/card-layout";
 
 export function ScheduleDisplay({
   schedules,

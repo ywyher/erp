@@ -1,7 +1,7 @@
 "use client";
 
 import Delete from "@/app/(authenticated)/dashboard/_components/delete";
-import UpdateUser from "@/app/(authenticated)/dashboard/(admins)/users/_components/update-user";
+import UpdateUser from "@/app/(authenticated)/dashboard/(admin)/users/_components/update-user";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -69,11 +69,6 @@ export default function AppointmentActions({
               Start
             </Button>
           )}
-          {/* {(status == 'pending' && (role == 'user' || role == 'receptionist')) && (
-                        <Button onClick={() => handleAttachFiles()}>
-                            Attach Files
-                        </Button>
-                    )} */}
           {(status == "pending" || status == "ongoing") && (
             <>
               <Button onClick={() => handleAttachFiles()}>Attach Files</Button>

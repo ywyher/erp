@@ -254,9 +254,17 @@ export function getChangedFields<T extends Record<string, any>>(
     : newData;
 
   return Object.fromEntries(
-    Object.entries(normalizedNew).filter(
-      ([key, newValue]) => newValue !== normalizedOriginal[key],
-    ),
+    Object.entries(normalizedNew).filter(([key, newValue]) => {
+      // Special handling for Date objects
+      if (
+        normalizedOriginal[key] instanceof Date && 
+        newValue instanceof Date
+      ) {
+        return normalizedOriginal[key].getTime() !== newValue.getTime();
+      }
+      // Regular comparison for other types
+      return newValue !== normalizedOriginal[key];
+    }),
   ) as Partial<T>;
 }
 
@@ -280,3 +288,68 @@ export function getDaysInRange(start: Date, end: Date): string[] {
 
   return [...new Set(result)]; // Remove duplicates
 }
+
+const generateRandomDefaultValues = () => {
+  const generateEgyptianNationalId = () => {
+    const century = "2"; // Assuming 21st century, change to "1" for 20th century
+    const year = String(Math.floor(Math.random() * 100)).padStart(2, "0"); // Last 2 digits of birth year
+    const month = String(Math.floor(Math.random() * 12) + 1).padStart(2, "0"); // 01-12
+    const day = String(Math.floor(Math.random() * 28) + 1).padStart(2, "0"); // 01-28 (safe range)
+    const govCode = String(Math.floor(Math.random() * 30) + 1).padStart(2, "0"); // Random governorate code
+    const randomDigits = String(Math.floor(Math.random() * 1000)).padStart(3, "0"); // Serial number
+    const genderDigit = Math.random() < 0.5 ? "1" : "2"; // 1 for male, 2 for female
+    const checkDigit = Math.floor(Math.random() * 10); // Random check digit
+
+    return `${century}${year}${month}${day}${govCode}${randomDigits}${genderDigit}${checkDigit}`;
+  };
+
+  const generateEgyptianPhoneNumber = () => {
+    const prefixes = ["010", "011", "012", "015"]; // Common Egyptian mobile prefixes
+    const number = String(Math.floor(Math.random() * 1e7)).padStart(7, "0"); // 7-digit random number
+    return `${prefixes[Math.floor(Math.random() * prefixes.length)]}${number}`;
+  };
+
+  const getRandomElement = (arr: string[]) => arr[Math.floor(Math.random() * arr.length)];
+
+  const generateRandomName = () => {
+    const firstNames = ["Ahmed", "Mohamed", "Omar", "Kareem", "Youssef", "Ali", "Hassan"];
+    const lastNames = ["El-Sayed", "Ibrahim", "Mahmoud", "Fathy", "Taha", "Gamal", "Mostafa"];
+    return `${getRandomElement(firstNames)} ${getRandomElement(lastNames)}`;
+  };
+
+  const generateRandomUsername = (name: string) => {
+    return name.toLowerCase().replace(/\s/g, "") + Math.floor(Math.random() * 1000);
+  };
+
+  const generateRandomEmail = (username: string) => {
+    const domains = ["gmail.com", "yahoo.com", "hotmail.com", "outlook.com"];
+    return `${username}@${getRandomElement(domains)}`;
+  };
+
+  const generateRandomDateOfBirth = () => {
+    const year = Math.floor(Math.random() * (2005 - 1970) + 1970); // Random year between 1970 and 2005
+    const month = String(Math.floor(Math.random() * 12) + 1).padStart(2, "0");
+    const day = String(Math.floor(Math.random() * 28) + 1).padStart(2, "0"); // Avoiding 29-31 for simplicity
+    return `${year}-${month}-${day}`;
+  };
+
+  const genders = ["male", "female"];
+
+  const name = generateRandomName();
+  const username = generateRandomUsername(name);
+  const email = generateRandomEmail(username);
+  const gender = getRandomElement(genders);
+  const dateOfBirth = generateRandomDateOfBirth();
+  const phoneNumber = generateEgyptianPhoneNumber();
+  const nationalId = generateEgyptianNationalId();
+
+  return {
+    name,
+    username,
+    email,
+    gender,
+    dateOfBirth,
+    phoneNumber,
+    nationalId,
+  };
+};

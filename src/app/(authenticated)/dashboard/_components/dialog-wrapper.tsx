@@ -91,7 +91,7 @@ export default function DialogWrapper({
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle className="capitalize">Create New {label}</DialogTitle>
+            <DialogTitle className="capitalize">Create A New {label}</DialogTitle>
             <DialogDescription>
               Fill out the form below to create a new user. All fields are
               required.

@@ -16,9 +16,19 @@ import {
   SelectValue,
   SelectContent,
 } from "@/components/ui/select";
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover"
 import { Textarea } from "@/components/ui/textarea";
 import MultipleSelector from "@/components/ui/multi-select";
-import { Eye, EyeOff } from "lucide-react";
+import { CalendarIcon, Check, ChevronsUpDown, Eye, EyeOff } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Calendar } from "@/components/ui/calendar";
+import { cn } from "@/lib/utils";
+import { format } from "date-fns";
 
 interface FormFieldWrapperProps {
   form: {
@@ -39,8 +49,13 @@ interface FormFieldWrapperProps {
     | "textarea"
     | "multi-select"
     | "password"
-    | "number";
+    | "number"
+    | "date"
+    | "file";
   options?: { value: string; label: string }[] | string[] | readonly string[];
+  disableSearch?: boolean
+  maxLength?: number; // Add this line
+  onFileChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
   // className?: string;
 }
 
@@ -54,8 +69,11 @@ export const FormFieldWrapper: React.FC<FormFieldWrapperProps> = ({
   placeholder = "",
   type = "text",
   options = [],
-  // className,
+  disableSearch = true,
+  maxLength = 250,
+  onFileChange
 }) => {
+  const [open, setOpen] = useState<boolean>(false);
   const [showPassword, setShowPassword] = useState<boolean>(false);
   const error = form.formState.errors[name]?.message;
 
@@ -113,6 +131,42 @@ export const FormFieldWrapper: React.FC<FormFieldWrapperProps> = ({
                   }}
                 />
               )}
+              {type === "date" && (
+                <Popover modal open={open} onOpenChange={setOpen}>
+                  <PopoverTrigger asChild>
+                    <FormControl>
+                      <Button
+                        variant={"outline"}
+                        className={cn(
+                          "w-full pl-3 text-left font-normal",
+                          !field.value && "text-muted-foreground"
+                        )}
+                      >
+                        {field.value ? (
+                          format(field.value, "PPP")
+                        ) : (
+                          <span>{placeholder}</span>
+                        )}
+                        <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                      </Button>
+                    </FormControl>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="start">
+                    <Calendar
+                      mode="single"
+                      selected={field.value}
+                      onSelect={(value) => {
+                        field.onChange(value);
+                        setOpen(false);
+                      }}
+                      disabled={(date) =>
+                        date > new Date() || date < new Date("1900-01-01")
+                      }
+                      initialFocus
+                    />
+                  </PopoverContent>
+                </Popover>
+              )}
               {type === "password" && (
                 <div className="relative w-full">
                   <Input
@@ -132,34 +186,81 @@ export const FormFieldWrapper: React.FC<FormFieldWrapperProps> = ({
                 </div>
               )}
               {type === "textarea" && (
-                <Textarea
-                  {...field}
-                  placeholder={placeholder}
-                  disabled={disabled}
-                />
+                <div className="w-full">
+                  <Textarea
+                    {...field}
+                    placeholder={placeholder}
+                    disabled={disabled}
+                    maxLength={maxLength}
+                    onChange={(e) => {
+                      field.onChange(e.target.value);
+                    }}
+                  />
+                  {maxLength && (
+                    <div className="text-xs text-muted-foreground text-right mt-1">
+                      {field.value?.length || 0}/{maxLength}
+                    </div>
+                  )}
+                </div>
               )}
               {type === "select" && (
-                <Select
-                  onValueChange={(value) => field.onChange(value)}
-                  defaultValue={field.value}
-                  disabled={disabled}
-                >
-                  <SelectTrigger className="w-full">
-                    <SelectValue placeholder={placeholder} />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {options.map((option) => {
-                      const isString = typeof option === "string";
-                      const value = isString ? option : option.value;
-                      const label = isString ? option : option.label;
-                      return (
-                        <SelectItem key={value} value={value}>
-                          {label}
-                        </SelectItem>
-                      );
-                    })}
-                  </SelectContent>
-                </Select>
+                <Popover open={open} onOpenChange={setOpen}>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="outline"
+                      role="combobox"
+                      className="w-full justify-between capitalize"
+                      disabled={disabled}
+                    >
+                      {field.value
+                      ? (() => {
+                          const option = options.find(option =>
+                            typeof option === "object" ? option.value === field.value : option === field.value
+                          );
+                          return typeof option === "object" ? option.label : option ?? field.value;
+                        })()
+                      : placeholder}
+                      <div className="w-full flex justify-end">
+                        <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                      </div>
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="m-0 p-1">
+                    <Command>
+                      {!disableSearch && (
+                        <CommandInput placeholder="Search..." />
+                      )}
+                      <CommandList>
+                        <CommandEmpty>No option found.</CommandEmpty>
+                        <CommandGroup>
+                            {options.map((option) => {
+                              const isString = typeof option === "string";
+                              const value = isString ? option : option.value;
+                              const label = isString ? option : option.label;
+                              return (
+                                <CommandItem 
+                                  key={value}
+                                  value={value}
+                                  onSelect={(value) => {
+                                    field.onChange(value)
+                                    setOpen(false)
+                                  }}
+                                  className="capitalize"
+                                >
+                                  <Check
+                                    className={cn(
+                                      field.value === value ? "opacity-100" : "opacity-0"
+                                    )}
+                                  />
+                                  {label}
+                                </CommandItem>
+                              );
+                            })}
+                        </CommandGroup>
+                      </CommandList>
+                    </Command>
+                  </PopoverContent>
+                </Popover>
               )}
               {type === "multi-select" && (
                 <MultipleSelector
@@ -187,6 +288,14 @@ export const FormFieldWrapper: React.FC<FormFieldWrapperProps> = ({
                     return option ? option : { value, label: value };
                   })}
                 />
+              )}
+              {type === 'file' && (
+                  <Input
+                    {...field}
+                    disabled={disabled}
+                    type="file"
+                    onChange={onFileChange}
+                  />
               )}
             </div>
           </FormControl>

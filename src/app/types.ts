@@ -1,14 +1,17 @@
 import { specialties } from "@/app/(authenticated)/dashboard/constants";
+import { genders } from "@/lib/constants";
 import {
   account,
   appointment,
   doctor,
+  news,
   operation,
   receptionist,
   schedule,
   session,
   user,
 } from "@/lib/db/schema";
+import { service } from "@/lib/db/schema/service";
 import { z } from "zod";
 
 export type Roles = "admin" | "user" | "doctor" | "receptionist";
@@ -64,6 +67,8 @@ export const baseUserSchema = z.object({
   username: z.string().toLowerCase().trim().min(2, {
     message: "Username must be at least 2 characters.",
   }),
+  gender: z.enum(genders),
+  dateOfBirth: z.date(),
   phoneNumber: z.string().optional(),
   nationalId: z.string().min(1, {
     message: "National id is required",
@@ -162,4 +167,6 @@ export const tableMap: Record<string, any> = {
   account,
   appointment,
   operation,
+  service,
+  news
 };

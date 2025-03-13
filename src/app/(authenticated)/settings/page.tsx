@@ -51,14 +51,14 @@ export default function Settings() {
                 </TabsTrigger>
               </TabsList>
               <TabsContent value="settings" className="flex flex-col gap-3">
-                <p className="text-2xl font-medium text-white">
+                <p className="text-2xl font-medium">
                   Update Profile Settings
                 </p>
                 <UploadPfp />
                 <SettingsForm />
               </TabsContent>
               <TabsContent value="password" className="flex flex-col gap-3">
-                <p className="text-2xl font-medium text-white">
+                <p className="text-2xl font-medium">
                   Update Profile Settings
                 </p>
                 <UpdatePassword userId={user.id} />
@@ -66,7 +66,7 @@ export default function Settings() {
             </Tabs>
           ) : (
             <div className="flex flex-col gap-2">
-              <p className="text-2xl font-medium text-white">
+              <p className="text-2xl font-medium">
                 Update Profile Settings
               </p>
               <UploadPfp />

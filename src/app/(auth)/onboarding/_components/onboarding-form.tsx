@@ -7,6 +7,7 @@ import { useEffect } from "react";
 import { FormFieldWrapper } from "@/components/form-field-wrapper";
 import { z } from "zod";
 import { updateUserSchema } from "@/app/types";
+import { genders } from "@/lib/constants";
 
 export default function OnboardingForm({
   form,
@@ -44,6 +45,19 @@ export default function OnboardingForm({
           label="Email"
         />
         <FormFieldWrapper form={form} name="username" label="username" />
+        <FormFieldWrapper
+         form={form}
+         name="dateOfBirth"
+         label="Date of birth"
+         type="date"
+        />
+        <FormFieldWrapper 
+          form={form}
+          name="gender"
+          label="gender"
+          type="select"
+          options={genders}
+        />
         <FormFieldWrapper
           form={form}
           name="phoneNumber"

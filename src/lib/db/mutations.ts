@@ -9,7 +9,9 @@ import {
   appointment,
   doctor,
   medicalFile,
+  news,
   schedule,
+  service,
   session,
   User,
   user,
@@ -86,6 +88,8 @@ export async function createUser({
           emailVerified: createPayload.email && verified,
           phoneNumberVerified: createPayload.phoneNumber && verified,
           nationalId: data.nationalId,
+          gender: data.gender,
+          dateOfBirth: data.dateOfBirth.toISOString().split('T')[0],
           role: role,
           onBoarding: false,
           createdAt: new Date(),
@@ -141,6 +145,7 @@ export async function updateUser({
   role: User["role"];
   dbInstance?: typeof db;
 }) {
+  console.log(data.dateOfBirth)
   try {
     const updateUserPayload: Partial<z.infer<typeof updateUserSchema>> = {};
 
@@ -199,6 +204,14 @@ export async function updateUser({
 
     if (data.name) {
       updateUserPayload.name = data.name;
+    }
+
+    if (data.gender) {
+      updateUserPayload.gender = data.gender;
+    }
+    
+    if (data.nationalId) {
+      updateUserPayload.nationalId = data.nationalId;
     }
 
     const updatedUser = await dbInstance
@@ -264,6 +277,20 @@ export async function deleteById(id: string, tableName: Tables) {
 
   if (!table) {
     throw new Error(`Invalid table name: ${tableName}`);
+  }
+
+  if(tableName === 'service') {
+    const [data] = await db.select({ thmubnail: service.thumbnail }).from(service)
+      .where(eq(service.id, id))
+
+    await deleteFile(data.thmubnail)
+  }
+
+  if(tableName === 'news') {
+    const [data] = await db.select({ thmubnail: news.thumbnail }).from(news)
+      .where(eq(news.id, id))
+
+    await deleteFile(data.thmubnail)
   }
 
   if (tableName === "appointment") {

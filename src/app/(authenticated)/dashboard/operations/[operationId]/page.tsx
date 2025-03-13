@@ -1,4 +1,4 @@
-import CardLayout from "@/app/(authenticated)/dashboard/_components/card-layout";
+import CardLayout from "@/components/card-layout";
 import OperationTabs from "@/app/(authenticated)/dashboard/operations/[operationId]/_components/operation-tabs";
 import { getSession } from "@/lib/auth-client";
 import db from "@/lib/db";

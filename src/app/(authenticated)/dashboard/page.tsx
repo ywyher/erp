@@ -1,6 +1,6 @@
 "use client";
 
-import CardLayout from "@/app/(authenticated)/dashboard/_components/card-layout";
+import CardLayout from "@/components/card-layout";
 import AdminPage from "@/app/(authenticated)/dashboard/_components/page/admin/admin-page";
 import ReceptionistPage from "@/app/(authenticated)/dashboard/_components/page/receptionist/receptionist-page";
 import DoctorPage from "@/app/(authenticated)/dashboard/_components/page/doctor/doctor-page";

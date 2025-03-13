@@ -3,6 +3,7 @@ import { SidebarProvider } from "@/components/ui/sidebar";
 import Sidebar from "@/app/(authenticated)/dashboard/_components/sidebar/sidebar";
 import { getSession } from "@/lib/auth-client";
 import { User } from "@/lib/db/schema";
+import { redirect } from "next/navigation";
 
 export default async function Layout({
   children,
@@ -18,6 +19,11 @@ export default async function Layout({
       headers: reqHeaders,
     },
   });
+
+  if(data?.user.role == 'user') {
+    redirect('/')
+    return;
+  }
 
   return (
     <SidebarProvider defaultOpen={defaultOpen}>

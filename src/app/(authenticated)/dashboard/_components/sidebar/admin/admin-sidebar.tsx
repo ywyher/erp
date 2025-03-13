@@ -4,11 +4,14 @@ import SidebarGroup from "@/app/(authenticated)/dashboard/_components/sidebar/si
 import { MenuItem } from "@/app/(authenticated)/dashboard/types";
 import { SidebarSeparator } from "@/components/ui/sidebar";
 import {
+  Bell,
   CalendarCheck,
   ConciergeBell,
   Cross,
   Home,
   Lock,
+  Newspaper,
+  Plus,
   Settings,
   Slice,
   SquarePlus,
@@ -84,11 +87,35 @@ export default function AdminSidebar() {
     },
   ];
 
+  const socialGroupItems: MenuItem[] = [
+    {
+      title: "Services",
+      url: "/dashboard/services",
+      icon: Bell,
+    },
+    {
+      title: "News",
+      url: "/dashboard/news",
+      icon: Newspaper,
+      actions: [
+        {
+          label: "Create",
+          onClick: () => {
+            router.push("/dashboard/news/create");
+          },
+          icon: Plus,
+        },
+      ],
+    },
+  ];
+
   return (
     <div className="flex flex-col gap-1">
       <SidebarGroup items={mainGroupItems} label="Main" />
       <SidebarSeparator />
       <SidebarGroup items={manageGroupItems} label="Manage" />
+      <SidebarSeparator />
+      <SidebarGroup items={socialGroupItems} label="Social" />
     </div>
   );
 }

@@ -1,15 +1,3 @@
-// export const specialties = [
-//     { value: 'cardiology', label: 'CARDIOLOGY' },
-//     { value: 'dermatology', label: 'DERMATOLOGY' },
-//     { value: 'gastroenterology', label: 'GASTROENTEROLOGY' },
-//     { value: 'neurology', label: 'NEUROLOGY' },
-//     { value: 'orthopedics', label: 'ORTHOPEDICS' },
-//     { value: 'pediatrics', label: 'PEDIATRICS' },
-//     { value: 'psychiatry', label: 'PSYCHIATRY' },
-//     { value: 'radiology', label: 'RADIOLOGY' },
-//     { value: 'urology', label: 'UROLOGY' },
-// ]
-
 export const specialties = [
   "cardiology",
   "dermatology",

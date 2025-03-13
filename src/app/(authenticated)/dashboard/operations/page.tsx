@@ -1,4 +1,4 @@
-import CardLayout from "@/app/(authenticated)/dashboard/_components/card-layout";
+import CardLayout from "@/components/card-layout";
 import { operationTableColumns } from "@/app/(authenticated)/dashboard/operations/columns";
 import ToastWrapper from "@/components/toast-wrapper";
 import { Button } from "@/components/ui/button";

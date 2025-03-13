@@ -9,7 +9,7 @@ import { z } from "zod";
 import { Doctor, Receptionist, Schedule, User } from "@/lib/db/schema";
 import { Skeleton } from "@/components/ui/skeleton";
 import DateFilters from "@/components/date-filters";
-import CardLayout from "@/app/(authenticated)/dashboard/_components/card-layout";
+import CardLayout from "@/components/card-layout";
 import { format, isToday } from "date-fns";
 
 export default function Employees() {

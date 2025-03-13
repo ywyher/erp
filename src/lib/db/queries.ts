@@ -3,19 +3,23 @@
 import { Roles, tableMap } from "@/app/types";
 import { auth } from "@/lib/auth";
 import pluralize from "pluralize"; // Install with: npm install pluralize
-import { signIn, User } from "@/lib/auth-client";
 import db from "@/lib/db";
 import {
+  appointment,
   Doctor,
   doctor,
+  news,
+  News,
   receptionist,
   Receptionist,
   Schedule,
   schedule,
+  Service,
   session,
   settings,
   Tables,
   user,
+  User
 } from "@/lib/db/schema";
 import { deleteFile } from "@/lib/s3";
 import {
@@ -36,6 +40,7 @@ import { getDaysInRange, getFileUrl } from "@/lib/funcs";
 import { operationDocumentKey } from "@/app/(authenticated)/dashboard/settings/keys";
 import { DateRange } from "react-day-picker";
 import { format } from "date-fns";
+import { service } from "./schema/service";
 
 export async function getUserProvider(
   userId: string,
@@ -570,4 +575,86 @@ export async function getEmployeeId(
 
     return receptionistData.id;
   }
+}
+
+
+export const listAppointments = async (userId: User["id"], role: User["role"]) => {
+  let appointments;
+
+  if (role == "admin") {
+    appointments = await db.select().from(appointment);
+  }
+
+  if (role == "user") {
+    appointments = await db
+      .select()
+      .from(appointment)
+      .where(eq(appointment.patientId, userId));
+  }
+
+  if (role == "doctor") {
+    const [doctorData] = await db
+      .select()
+      .from(doctor)
+      .where(eq(doctor.userId, userId));
+
+    appointments = await db
+      .select()
+      .from(appointment)
+      .where(eq(appointment.doctorId, doctorData.id));
+  }
+
+  if (role == "receptionist") {
+    const [receptionistData] = await db
+      .select()
+      .from(user)
+      .where(eq(user.id, userId));
+
+    appointments = await db
+      .select()
+      .from(appointment)
+      .where(eq(appointment.creatorId, receptionistData.id));
+  }
+
+  if (!appointments) throw new Error("Couldn't get appointmnets");
+
+  return appointments.map((appointment) => ({
+    id: appointment.id,
+    date: format(appointment.startTime, "EEEE, d MMMM"), // Example format
+    startTime: format(appointment.startTime, "HH:mm"),
+    endTime: appointment.endTime
+      ? format(appointment.endTime, "HH:mm")
+      : "None",
+    status: appointment.status,
+    patientId: appointment.patientId,
+    doctorId: appointment.doctorId,
+    createdBy: appointment.createdBy,
+    role: role,
+  }));
+};
+
+export const listServices = async () => {
+  const services = await db.select().from(service)
+
+  return services
+}
+
+export const queryServiceData = async (serviceId: Service['id']) => {
+  const [serviceData] = await db.select().from(service)
+    .where(eq(service.id, serviceId))
+
+  return serviceData
+}
+
+export const listNews = async () => {
+  const listedNews = await db.select().from(news)
+
+  return listedNews
+}
+
+export const queryNewsData = async (newId: News['id']) => {
+  const [newData] = await db.select().from(news)
+    .where(eq(news.id, newId))
+
+  return newData
 }

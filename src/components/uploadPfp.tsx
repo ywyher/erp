@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect } from "react";
 import { getSession } from "@/lib/auth-client";
 import { Input } from "@/components/ui/input";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -9,7 +9,6 @@ import Pfp from "@/components/pfp";
 import { useImageStore } from "@/app/store";
 import { toast } from "sonner";
 import { useFileUpload } from "@/hooks/use-upload-file";
-import { Button } from "@/components/ui/button";
 import LoadingBtn from "@/components/loading-btn";
 
 export default function UploadPfp() {

@@ -7,9 +7,10 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { isFakeEmail } from "@/lib/funcs";
+import { getFileUrl, isFakeEmail } from "@/lib/funcs";
 import { ScheduleDisplay } from "@/components/schedule-display";
 import UserDataDialog from "@/app/(authenticated)/dashboard/_components/user-data-dialog";
+import Image from "next/image";
 
 interface TableCellProps {
   row: Row<any>;
@@ -60,6 +61,32 @@ export default function TableCell({
     } else {
       return <span className="text-muted-foreground">Empty</span>;
     }
+  }
+
+  if (value === "thumbnail") {
+    return (
+      <Dialog>
+        <DialogTrigger asChild>
+          <Button variant="outline" size="sm">
+            View
+          </Button>
+        </DialogTrigger>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{header}</DialogTitle>
+          </DialogHeader>
+          <Image
+            src={getFileUrl(cellValue as string)}
+            alt={getFileUrl(cellValue as string)}
+            layout="responsive"
+            width={0}
+            height={0}
+            sizes="100vw"
+            className="w-full h-auto"
+          />
+        </DialogContent>
+      </Dialog>
+    )
   }
 
   return dialog ? (

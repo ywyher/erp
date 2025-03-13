@@ -1,6 +1,6 @@
 import { StyledLink } from "@/components/header/styled-link";
 import { User } from "@/lib/db/schema";
-import { CalendarCheck, Home, LayoutDashboard } from "lucide-react";
+import { CalendarCheck, FileHeart, Home, LayoutDashboard } from "lucide-react";
 
 export default function Links({
   user,
@@ -13,10 +13,11 @@ export default function Links({
 }) {
   const links = [
     { href: "/", icon: Home, label: "Home" },
-    ...(user
+    { href: "/booking", icon: CalendarCheck, label: "Booking" },
+    ...(user ? [{ href: "/appointments", icon: FileHeart, label: "My Appointments" }] : []),
+    ...(user && user.role != 'user'
       ? [{ href: "/dashboard", icon: LayoutDashboard, label: "Dashboard" }]
       : []),
-    { href: "/booking", icon: CalendarCheck, label: "Booking" },
   ];
 
   return (

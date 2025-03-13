@@ -32,7 +32,7 @@ export default function Auth() {
   return (
     <AuthLayout>
       <div className="space-y-2">
-        <h1 className="text-2xl font-semibold tracking-tight text-white">
+        <h1 className="text-2xl font-semibold tracking-tight">
           Authentication
         </h1>
       </div>
