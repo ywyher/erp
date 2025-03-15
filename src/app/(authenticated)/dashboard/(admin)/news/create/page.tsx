@@ -1,4 +1,5 @@
 "use client";
+
 import { FormFieldWrapper } from "@/components/form-field-wrapper";
 import { Form } from "@/components/ui/form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -9,23 +10,24 @@ import { z } from "zod";
 import { toast } from "sonner";
 import { revalidate } from "@/app/actions";
 import DialogWrapper from "@/app/(authenticated)/dashboard/_components/dialog-wrapper";
-import { servicSchema } from "@/app/(authenticated)/dashboard/(admin)/services/types";
-import { createService } from "@/app/(authenticated)/dashboard/(admin)/services/actions";
+import { newsSchema } from "@/app/(authenticated)/dashboard/(admin)/news/types";
+import { createNews } from "@/app/(authenticated)/dashboard/(admin)/news/actions";
 import { useFileUpload } from "@/hooks/use-upload-file";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { X } from "lucide-react";
 import { deleteFile } from "@/lib/s3";
 import { socialStatuses } from "@/lib/constants";
+import CardLayout from "@/components/card-layout";
 
-export default function CreateService() {
+export default function CreateNews() {
   const [open, setOpen] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [previewUrl, setPreviewUrl] = useState<string>();
   const { handleUpload } = useFileUpload();
   
-  const form = useForm<z.infer<typeof servicSchema>>({
-    resolver: zodResolver(servicSchema),
+  const form = useForm<z.infer<typeof newsSchema>>({
+    resolver: zodResolver(newsSchema),
   });
   
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -45,7 +47,7 @@ export default function CreateService() {
     form.clearErrors("thumbnail");
   };
   
-  const onSubmit = async (data: z.infer<typeof servicSchema>) => {
+  const onSubmit = async (data: z.infer<typeof newsSchema>) => {
     setIsLoading(true);
 
     const fileName = await handleUpload(data.thumbnail);
@@ -57,7 +59,7 @@ export default function CreateService() {
 
     const { title, content, status } = data;
 
-    const result = await createService({ 
+    const result = await createNews({ 
       title,
       content,
       status,
@@ -74,7 +76,7 @@ export default function CreateService() {
     }
 
     toast.message(result?.message);
-    await revalidate("/dashboard/services");
+    await revalidate("/dashboard/newss");
     form.reset({
       title: "",
       content: "",
@@ -85,12 +87,7 @@ export default function CreateService() {
   };
   
   return (
-    <DialogWrapper
-      open={open}
-      setOpen={setOpen}
-      label="service"
-      operation="create"
-    >
+    <CardLayout title="Create news">
       <Form {...form}>
         <form
           onSubmit={form.handleSubmit(onSubmit)}
@@ -99,10 +96,10 @@ export default function CreateService() {
           <div className="flex flex-col gap-3">
             {previewUrl ? (
               <div className="relative rounded-md overflow-hidden border border-gray-200">
-                <div className="relative w-full h-48">
+                <div className="relative w-full h-96">
                   <Image 
                     src={previewUrl}
-                    alt="Service thumbnail preview"
+                    alt="News thumbnail preview"
                     fill
                     className="object-cover"
                   />
@@ -133,6 +130,6 @@ export default function CreateService() {
           <LoadingBtn isLoading={isLoading}>Create</LoadingBtn>
         </form>
       </Form>
-    </DialogWrapper>
+    </CardLayout>
   );
 }

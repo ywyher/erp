@@ -1,17 +1,17 @@
-'use server'
+"use server";
 
-import { ServiceStatus, servicSchema } from "@/app/(authenticated)/dashboard/(admin)/services/types"
+import { NewsStatus } from "@/app/(authenticated)/dashboard/(admin)/news/types"
 import { getSession } from "@/lib/auth-client"
 import db from "@/lib/db"
-import { admin, Service, service } from "@/lib/db/schema"
+import { admin, News, news } from "@/lib/db/schema"
 import { generateId } from "@/lib/funcs"
 import { eq } from "drizzle-orm"
 import { headers } from "next/headers"
 
-export async function createService({ title, content, status, fileName }: { 
+export async function createNews({ title, content, status, fileName }: { 
      title: string,
      content: string,
-     status: ServiceStatus,
+     status: NewsStatus,
      fileName: string 
     }) {
     try {
@@ -28,63 +28,63 @@ export async function createService({ title, content, status, fileName }: {
             where: eq(admin.userId, userData.data.user.id)
         });
         
-        if (!adminRecord) throw new Error("You don't have permission to create services");
+        if (!adminRecord) throw new Error("You don't have permission to create newss");
         
-        const serviceId = generateId();
-        const creatorId = adminRecord.id;
+        const newsId = generateId();
+        const authorId = adminRecord.id;
         
-        const [createdService] = await db.insert(service).values({
-            id: serviceId,
+        const [createdNews] = await db.insert(news).values({
+            id: newsId,
             title,
             content,
             thumbnail: fileName,
             status,
-            creatorId,
+            authorId,
             createdAt: new Date(),
             updatedAt: new Date(),
-        }).returning({ id: service.id })
+        }).returning({ id: news.id })
 
-        if(!createdService.id) throw new Error("Couldn't create the service");
+        if(!createdNews.id) throw new Error("Couldn't create the news");
 
         return {
             error: null,
-            message: "Service created successfully!"
+            message: "News created successfully!"
         }
     } catch (error: any) {
         return {
-          error: error.message || "Couldn't create the service",
+          error: error.message || "Couldn't create the news",
           message: null,
         };
-      }
+    }
 }
 
-export async function updateService({ title, content, status, fileName, serviceId }: { 
+export async function updateNews({ title, content, status, fileName, newsId }: { 
      title: string,
      content: string,
-     status: ServiceStatus,
+     status: NewsStatus,
      fileName: string,
-     serviceId: Service['id'] 
+     newsId: News['id'] 
     }) {
     try {
-        const [updatedService] = await db.update(service).set({
+        const [updatedNews] = await db.update(news).set({
             title,
             content,
             status,
             thumbnail: fileName,
             updatedAt: new Date(),
         })
-        .where(eq(service.id, serviceId))
-        .returning({ id: service.id });
+        .where(eq(news.id, newsId))
+        .returning({ id: news.id });
 
-        if(!updatedService.id) throw new Error("Couldn't create the service");
+        if(!updatedNews.id) throw new Error("Couldn't create the news");
 
         return {
             error: null,
-            message: "Service created successfully!"
+            message: "News created successfully!"
         }
     } catch (error: any) {
         return {
-          error: error.message || "Couldn't create the service",
+          error: error.message || "Couldn't create the news",
           message: null,
         };
       }
