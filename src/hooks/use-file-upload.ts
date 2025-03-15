@@ -1,4 +1,7 @@
+import { getFileUrl } from "@/lib/funcs";
 import { useState } from "react";
+import { toast } from "sonner";
+import { UploadedFile } from "types/file";
 
 async function computeSHA256(file: File): Promise<string> {
   const arrayBuffer = await file.arrayBuffer();
@@ -30,28 +33,32 @@ export function useFileUpload() {
       },
     );
 
-    console.log(response);
-
     if (!response.ok) {
-      throw new Error("Failed to get pre-signed URL");
+      // Extract error info from response
+      const errorData = await response.json().catch(() => ({ message: "Unknown error occurred" }));
+      const errorMessage = errorData.message || `Request failed with status: ${response.status}`;
+      
+      // Show toast error
+      toast.error(errorMessage);
+      
+      // Throw error to stop execution
+      throw new Error(errorMessage);
     }
 
-    return response.json();
+    return response.json() as Promise<UploadedFile>;
   };
 
-  const handleUpload = async (file: File): Promise<string | null> => {
+  const handleUpload = async (file: File): Promise<UploadedFile & { error?: string }> => {
     setIsUploading(true);
 
     try {
       const checksum = await computeSHA256(file);
 
-      const { url, fileName } = await getPreSignedUrl(
+      const { url, name, size, key, type } = await getPreSignedUrl(
         file.type,
         file.size,
         checksum,
       );
-
-      console.log(url, fileName);
 
       const xhr = new XMLHttpRequest();
       xhr.open("PUT", url);
@@ -69,17 +76,37 @@ export function useFileUpload() {
             setProgresses((prev) => ({ ...prev, [file.name]: 100 }));
             resolve();
           } else {
-            reject(new Error(`Upload failed with status ${xhr.status}`));
+            const errorMessage = `Upload failed with status ${xhr.status}`;
+            toast.error(errorMessage);
+            reject(new Error(errorMessage));
           }
         };
-        xhr.onerror = () => reject(new Error("Upload failed"));
+        xhr.onerror = () => {
+          const errorMessage = "Network error occurred during upload";
+          toast.error(errorMessage);
+          reject(new Error(errorMessage));
+        };
         xhr.send(file);
       });
 
-      return fileName;
-    } catch (error) {
-      console.error("Upload error:", error);
-      return null;
+      return {
+        key,    
+        url: getFileUrl(name),
+        name,   
+        size,
+        type,   
+      };
+    } catch (error: any) {
+      // Error will already be shown via toast in the catch blocks above
+      // We just need to return the error data
+      return {
+        key: '',
+        url: '',
+        name: file.name,
+        size: file.size,
+        type: file.type,
+        error: error.message || "Failed to upload file"
+      };
     } finally {
       setIsUploading(false);
     }
@@ -87,7 +114,7 @@ export function useFileUpload() {
 
   return {
     handleUpload,
-    progresses,
+    progresses, // if uploading multiple files
     isUploading,
     setProgresses,
     setIsUploading,

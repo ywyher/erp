@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Controller } from "react-hook-form";
 import {
   FormItem,
@@ -29,6 +29,19 @@ import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
+import { DndProvider } from "react-dnd";
+import { Plate } from "@udecode/plate/react";
+import { HTML5Backend } from "react-dnd-html5-backend";
+import { useCreateEditor } from "@/components/editor/use-create-editor";
+import { Editor, EditorContainer } from "@/components/plate-ui/editor";
+import { Tag, TagInput } from "emblor";
+
+type AcceptMimeType =
+  | "image/*"
+  | "video/*"
+  | "audio/*"
+  | "application/pdf"
+  | "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
 
 interface FormFieldWrapperProps {
   form: {
@@ -43,6 +56,7 @@ interface FormFieldWrapperProps {
   disabled?: boolean;
   optional?: boolean;
   placeholder?: string;
+  accept?: AcceptMimeType;
   type?:
     | "text"
     | "select"
@@ -51,7 +65,9 @@ interface FormFieldWrapperProps {
     | "password"
     | "number"
     | "date"
-    | "file";
+    | "file"
+    | "editor"
+    | "tags";
   options?: { value: string; label: string }[] | string[] | readonly string[];
   disableSearch?: boolean
   maxLength?: number; // Add this line
@@ -67,6 +83,7 @@ export const FormFieldWrapper: React.FC<FormFieldWrapperProps> = ({
   disabled = false,
   optional = false,
   placeholder = "",
+  accept,
   type = "text",
   options = [],
   disableSearch = true,
@@ -75,7 +92,16 @@ export const FormFieldWrapper: React.FC<FormFieldWrapperProps> = ({
 }) => {
   const [open, setOpen] = useState<boolean>(false);
   const [showPassword, setShowPassword] = useState<boolean>(false);
+  
   const error = form.formState.errors[name]?.message;
+  
+  let editor = null;
+  if(type === 'editor') {
+    editor = useCreateEditor();
+  }
+  
+  const [tags, setTags] = useState<Tag[]>([]);
+  const [activeTagIndex, setActiveTagIndex] = useState<number | null>(null);
 
   return (
     <Controller
@@ -294,8 +320,42 @@ export const FormFieldWrapper: React.FC<FormFieldWrapperProps> = ({
                     {...field}
                     disabled={disabled}
                     type="file"
+                    accept={accept}
                     onChange={onFileChange}
                   />
+              )}
+              {type === 'editor' && (
+                <>
+                  {editor && (
+                    <DndProvider backend={HTML5Backend}>
+                      <Plate
+                        editor={editor}
+                      >
+                        <EditorContainer className="border rounded-md">
+                          <Editor
+                            variant={'fullWidth'}
+                            onBlur={() => {
+                              console.log(editor.children)
+                              field.onChange(editor.children);
+                            }}
+                            placeholder="Type..." 
+                          />
+                        </EditorContainer>
+                      </Plate>
+                    </DndProvider>
+                  )}
+                </>
+              )}
+              {type === 'tags' && (
+                <TagInput
+                    placeholder="Enter a tag"
+                    tags={tags}
+                    setTags={(newTags) => {
+                        setTags(newTags)
+                    }}
+                    activeTagIndex={activeTagIndex}
+                    setActiveTagIndex={setActiveTagIndex}
+                />
               )}
             </div>
           </FormControl>

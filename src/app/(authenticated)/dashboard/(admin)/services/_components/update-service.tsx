@@ -15,7 +15,7 @@ import { updateService } from "@/app/(authenticated)/dashboard/(admin)/services/
 import { Service } from "@/lib/db/schema";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { queryServiceData } from "@/lib/db/queries";
-import { useFileUpload } from "@/hooks/use-upload-file";
+import { useFileUpload } from "@/hooks/use-file-upload";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { X } from "lucide-react";
@@ -120,14 +120,14 @@ export default function UpdateService({ serviceId }: { serviceId: Service['id'] 
         await deleteFile(serviceData.thumbnail);
       }
       
-      const uploadedFileName = await handleUpload(data.thumbnail);
+      const { name, error } = await handleUpload(data.thumbnail);
       
-      if (!uploadedFileName) {
+      if (!name || error) {
         setIsLoading(false);
-        throw new Error("Failed to upload file");
+        throw new Error(error);
       }
       
-      fileName = uploadedFileName;
+      fileName = name;
     } else if (!hasExistingThumbnail && !data.thumbnail) {
       // If there's no existing thumbnail and no new thumbnail, use empty string
       fileName = '';
@@ -139,7 +139,7 @@ export default function UpdateService({ serviceId }: { serviceId: Service['id'] 
       title,
       content,
       status,
-      fileName,
+      thumbnail: fileName,
       serviceId
     });
 

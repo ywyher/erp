@@ -24,9 +24,9 @@ import {
 import { AudioLines, FileUp, Film, ImageIcon } from 'lucide-react';
 import { useFilePicker } from 'use-file-picker';
 
-import { useUploadFile } from '@/lib/uploadthing';
-
 import { Spinner } from './spinner';
+import { formatBytes } from '@/lib/utils';
+import { useFileUpload } from '@/hooks/use-file-upload';
 
 const CONTENT: Record<
   string,
@@ -67,8 +67,9 @@ export const MediaPlaceholderElement = withHOC(
 
       const { api } = useEditorPlugin(PlaceholderPlugin);
 
-      const { isUploading, progress, uploadedFile, uploadFile, uploadingFile } =
-        useUploadFile();
+      const { handleUpload, isUploading, progresses } = useFileUpload();
+      const [uploadedFile, setUploadedFile] = useState<any>(null);
+      const [uploadingFile, setUploadingFile] = useState<File | null>(null);
 
       const loading = isUploading && uploadingFile;
 
@@ -92,11 +93,20 @@ export const MediaPlaceholderElement = withHOC(
       });
 
       const replaceCurrentPlaceholder = useCallback(
-        (file: File) => {
-          void uploadFile(file);
+        async (file: File) => {
+          setUploadingFile(file);
           api.placeholder.addUploadingFile(element.id as string, file);
+          
+          const result = await handleUpload(file);
+          if (!result.error) {
+            setUploadedFile(result);
+          } else {
+            // Clean up the UI state
+            api.placeholder.removeUploadingFile(element.id as string);
+            setUploadingFile(null);
+          }
         },
-        [api.placeholder, element.id, uploadFile]
+        [api.placeholder, element.id, handleUpload]
       );
 
       useEffect(() => {
@@ -112,7 +122,8 @@ export const MediaPlaceholderElement = withHOC(
             initialHeight: imageRef.current?.height,
             initialWidth: imageRef.current?.width,
             isUpload: true,
-            name: element.mediaType === FilePlugin.key ? uploadedFile.name : '',
+            // name: element.mediaType === FilePlugin.key ? uploadedFile.name : '',
+            name: uploadedFile.name,
             placeholderId: element.id as string,
             type: element.mediaType!,
             url: uploadedFile.url,
@@ -124,6 +135,7 @@ export const MediaPlaceholderElement = withHOC(
         });
 
         api.placeholder.removeUploadingFile(element.id as string);
+        setUploadingFile(null);
         // eslint-disable-next-line react-hooks/exhaustive-deps
       }, [uploadedFile, element.id]);
 
@@ -145,6 +157,9 @@ export const MediaPlaceholderElement = withHOC(
 
         // eslint-disable-next-line react-hooks/exhaustive-deps
       }, [isReplaced]);
+
+      // Get progress for the current file
+      const progress = uploadingFile ? progresses[uploadingFile.name] || 0 : 0;
 
       return (
         <PlateElement ref={ref} className={cn(className, 'my-1')} {...props}>
@@ -170,7 +185,7 @@ export const MediaPlaceholderElement = withHOC(
                     <div>–</div>
                     <div className="flex items-center">
                       <Spinner className="mr-1 size-3.5" />
-                      {progress ?? 0}%
+                      {Math.round(progress)}%
                     </div>
                   </div>
                 )}
@@ -180,7 +195,7 @@ export const MediaPlaceholderElement = withHOC(
 
           {isImage && loading && (
             <ImageProgress
-              file={uploadingFile}
+              file={uploadingFile!}
               imageRef={imageRef}
               progress={progress}
             />
@@ -237,27 +252,4 @@ export function ImageProgress({
       )}
     </div>
   );
-}
-
-export function formatBytes(
-  bytes: number,
-  opts: {
-    decimals?: number;
-    sizeType?: 'accurate' | 'normal';
-  } = {}
-) {
-  const { decimals = 0, sizeType = 'normal' } = opts;
-
-  const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
-  const accurateSizes = ['Bytes', 'KiB', 'MiB', 'GiB', 'TiB'];
-
-  if (bytes === 0) return '0 Byte';
-
-  const i = Math.floor(Math.log(bytes) / Math.log(1024));
-
-  return `${(bytes / Math.pow(1024, i)).toFixed(decimals)} ${
-    sizeType === 'accurate'
-      ? (accurateSizes[i] ?? 'Bytest')
-      : (sizes[i] ?? 'Bytes')
-  }`;
 }

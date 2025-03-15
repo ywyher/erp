@@ -4,16 +4,19 @@ import { Plate } from '@udecode/plate/react';
 
 import { useCreateEditor } from '@/components/editor/use-create-editor';
 import { Editor, EditorContainer } from '@/components/plate-ui/editor';
-import { Toolbar } from '@/components/plate-ui/toolbar';
+import { DndProvider } from 'react-dnd';
+import { HTML5Backend } from 'react-dnd-html5-backend';
 
 export function PlateEditor() {
   const editor = useCreateEditor();
 
   return (
-    <Plate editor={editor}>
-      <EditorContainer>
-        <Editor placeholder="Type..." />
-      </EditorContainer>
-    </Plate>
+    <DndProvider backend={HTML5Backend}>
+      <Plate editor={editor}>
+        <EditorContainer>
+          <Editor placeholder="Type..." />
+        </EditorContainer>
+      </Plate>
+    </DndProvider>
   );
 }

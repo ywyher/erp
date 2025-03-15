@@ -18,7 +18,7 @@ export const mediaPlugins = [
     options: { disableUploadInsert: true },
     render: { afterEditable: ImagePreview },
   }),
-  MediaEmbedPlugin,
+  // MediaEmbedPlugin,
   VideoPlugin,
   AudioPlugin,
   FilePlugin,

@@ -14,7 +14,8 @@ import {
 import { cva } from 'class-variance-authority';
 
 const editorContainerVariants = cva(
-  'relative w-full cursor-text overflow-y-auto caret-primary select-text selection:bg-brand/25 focus-visible:outline-none [&_.slate-selection-area]:z-50 [&_.slate-selection-area]:border [&_.slate-selection-area]:border-brand/25 [&_.slate-selection-area]:bg-brand/15',
+  // selection:bg-brand/25
+  'relative w-full cursor-text overflow-y-auto caret-primary select-text focus-visible:outline-none [&_.slate-selection-area]:z-50 [&_.slate-selection-area]:border [&_.slate-selection-area]:border-brand/25 [&_.slate-selection-area]:bg-brand/15',
   {
     defaultVariants: {
       variant: 'default',
@@ -63,7 +64,7 @@ export const EditorContainer = ({
 
 EditorContainer.displayName = 'EditorContainer';
 
-const editorVariants = cva(
+export const editorVariants = cva(
   cn(
     'group/editor',
     'relative w-full cursor-text overflow-x-hidden break-words whitespace-pre-wrap select-text',
@@ -102,10 +103,11 @@ export type EditorProps = PlateContentProps &
   VariantProps<typeof editorVariants>;
 
 export const Editor = React.forwardRef<HTMLDivElement, EditorProps>(
-  ({ className, disabled, focused, variant, ...props }, ref) => {
+  ({ className, onBlur, disabled, focused, variant, ...props }, ref) => {
     return (
       <PlateContent
         ref={ref}
+        onBlur={onBlur}
         className={cn(
           editorVariants({
             disabled,

@@ -25,6 +25,7 @@ import { CaptionButton } from './caption';
 import { inputVariants } from './input';
 import { Popover, PopoverAnchor, PopoverContent } from './popover';
 import { Separator } from './separator';
+import { deleteFile } from '@/lib/s3';
 
 export interface MediaPopoverProps {
   children: React.ReactNode;
@@ -54,6 +55,19 @@ export function MediaPopover({ children, plugin }: MediaPopoverProps) {
 
   const element = useElement();
   const { props: buttonProps } = useRemoveNodeButton({ element });
+
+  // Create a combined handler that does both operations
+  const handleCombinedRemove = async () => {
+    // First delete the file from S3
+    if (element.name) {
+      await deleteFile(element.name as string);
+    }
+    
+    // Then trigger the original onClick handler from useRemoveNodeButton
+    if (buttonProps.onClick) {
+      buttonProps.onClick();
+    }
+  };
 
   if (readOnly) return <>{children}</>;
 
@@ -91,7 +105,12 @@ export function MediaPopover({ children, plugin }: MediaPopoverProps) {
 
             <Separator orientation="vertical" className="mx-1 h-6" />
 
-            <Button size="icon" variant="ghost" {...buttonProps}>
+            <Button 
+              size="icon"
+              variant="ghost"
+              {...buttonProps}
+              onClick={handleCombinedRemove}
+            >
               <Trash2Icon />
             </Button>
           </div>

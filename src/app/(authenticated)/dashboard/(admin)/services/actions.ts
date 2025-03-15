@@ -1,6 +1,5 @@
 'use server'
 
-import { ServiceStatus, servicSchema } from "@/app/(authenticated)/dashboard/(admin)/services/types"
 import { getSession } from "@/lib/auth-client"
 import db from "@/lib/db"
 import { admin, Service, service } from "@/lib/db/schema"
@@ -8,11 +7,11 @@ import { generateId } from "@/lib/funcs"
 import { eq } from "drizzle-orm"
 import { headers } from "next/headers"
 
-export async function createService({ title, content, status, fileName }: { 
-     title: string,
-     content: string,
-     status: ServiceStatus,
-     fileName: string 
+export async function createService({ title, content, status, thumbnail }: { 
+     title: Service['title'],
+     content: Service['content'],
+     status: Service['status'],
+     thumbnail: Service['thumbnail']
     }) {
     try {
         const userData = await getSession({
@@ -37,7 +36,7 @@ export async function createService({ title, content, status, fileName }: {
             id: serviceId,
             title,
             content,
-            thumbnail: fileName,
+            thumbnail,
             status,
             creatorId,
             createdAt: new Date(),
@@ -58,11 +57,11 @@ export async function createService({ title, content, status, fileName }: {
       }
 }
 
-export async function updateService({ title, content, status, fileName, serviceId }: { 
-     title: string,
-     content: string,
-     status: ServiceStatus,
-     fileName: string,
+export async function updateService({ title, content, status, thumbnail, serviceId }: { 
+     title: Service['title'],
+     content: Service['content'],
+     status: Service['status'],
+     thumbnail: Service['thumbnail']
      serviceId: Service['id'] 
     }) {
     try {
@@ -70,7 +69,7 @@ export async function updateService({ title, content, status, fileName, serviceI
             title,
             content,
             status,
-            thumbnail: fileName,
+            thumbnail,
             updatedAt: new Date(),
         })
         .where(eq(service.id, serviceId))

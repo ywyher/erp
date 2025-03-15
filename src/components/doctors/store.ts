@@ -15,9 +15,9 @@ type AppointmentReservationStore = {
 export const useAppointmentReservationStore =
   create<AppointmentReservationStore>((set) => ({
     reserved: {
-      reserved: false,
-      appointmentId: null,
-      patientId: null,
+      reserved: true,
+      appointmentId: 'mg2xc7qt84m9IEQM_WKpv',
+      patientId: 'yFONcP1bcmKvtGKhFEDEg',
     },
     setReserved: (reserved) =>
       set({

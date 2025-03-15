@@ -9,10 +9,9 @@ import LoadingBtn from "@/components/loading-btn";
 import { z } from "zod";
 import { toast } from "sonner";
 import { revalidate } from "@/app/actions";
-import DialogWrapper from "@/app/(authenticated)/dashboard/_components/dialog-wrapper";
 import { newsSchema } from "@/app/(authenticated)/dashboard/(admin)/news/types";
 import { createNews } from "@/app/(authenticated)/dashboard/(admin)/news/actions";
-import { useFileUpload } from "@/hooks/use-upload-file";
+import { useFileUpload } from "@/hooks/use-file-upload";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { X } from "lucide-react";
@@ -28,6 +27,9 @@ export default function CreateNews() {
   
   const form = useForm<z.infer<typeof newsSchema>>({
     resolver: zodResolver(newsSchema),
+    defaultValues: {
+      status: 'draft'
+    }
   });
   
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -48,13 +50,15 @@ export default function CreateNews() {
   };
   
   const onSubmit = async (data: z.infer<typeof newsSchema>) => {
+    console.log(data)
+    return;
     setIsLoading(true);
 
-    const fileName = await handleUpload(data.thumbnail);
+    const { name, error } = await handleUpload(data.thumbnail);
     
-    if (!fileName) {
+    if (!name) {
       setIsLoading(false);
-      throw new Error("Failed to upload file");
+      throw new Error(error);
     }
 
     const { title, content, status } = data;
@@ -63,23 +67,23 @@ export default function CreateNews() {
       title,
       content,
       status,
-      fileName
+      thumbnail: name
     });
     
     if (result?.error) {
       toast.error(result?.error);
 
-      await deleteFile(fileName);
+      await deleteFile(name);
 
       setIsLoading(false);
       return;
     }
 
     toast.message(result?.message);
-    await revalidate("/dashboard/newss");
+    await revalidate("/dashboard/news");
     form.reset({
       title: "",
-      content: "",
+      content: [],
       thumbnail: undefined,
     });
     setIsLoading(false);
@@ -93,7 +97,7 @@ export default function CreateNews() {
           onSubmit={form.handleSubmit(onSubmit)}
           className="flex flex-col gap-5"
         >
-          <div className="flex flex-col gap-3">
+          <div className="flex flex-col gap-3 max-w-[95%]">
             {previewUrl ? (
               <div className="relative rounded-md overflow-hidden border border-gray-200">
                 <div className="relative w-full h-96">
@@ -120,12 +124,14 @@ export default function CreateNews() {
                 name="thumbnail"
                 label="Thumbnail"
                 type="file"
+                accept="image/*"
                 onFileChange={handleFileChange}
               />
             )}
             <FormFieldWrapper form={form} name="title" label="Title" />
             <FormFieldWrapper form={form} name="status" label="Status" type="select" options={socialStatuses} />
-            <FormFieldWrapper form={form} name="content" label="Content" type="textarea" />
+            <FormFieldWrapper form={form} name="tags" label="Tags" type="tags" />
+            <FormFieldWrapper form={form} name="content" label="Editor" type="editor" />
           </div>
           <LoadingBtn isLoading={isLoading}>Create</LoadingBtn>
         </form>

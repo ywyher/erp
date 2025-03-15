@@ -2,10 +2,9 @@ import { socialStatuses } from "@/lib/constants";
 import { string, z } from "zod";
 
 export const newsSchema = z.object({
-  title: string().min(1, "Title is required"),
-  content: string().min(1, "Content is required"),
+  title: z.string(),
+  content: z.array(z.any()),
   status: z.enum(socialStatuses),
+  tags: z.array(z.string()),
   thumbnail: z.instanceof(File, { message: "Invalid file type" }),
 });
-
-export type NewsStatus = "draft" |"published" | "inactive" | "archived";

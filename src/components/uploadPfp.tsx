@@ -8,7 +8,7 @@ import { uploadPfp } from "@/app/actions";
 import Pfp from "@/components/pfp";
 import { useImageStore } from "@/app/store";
 import { toast } from "sonner";
-import { useFileUpload } from "@/hooks/use-upload-file";
+import { useFileUpload } from "@/hooks/use-file-upload";
 import LoadingBtn from "@/components/loading-btn";
 
 export default function UploadPfp() {
@@ -50,15 +50,15 @@ export default function UploadPfp() {
     if (!user || !file) return;
     setIsLoading(true);
 
-    const fileName = await handleUpload(file);
+    const { name, error } = await handleUpload(file);
 
-    if (!fileName) {
+    if (!name) {
       setIsLoading(false);
-      throw new Error("Failed to upload file");
+      throw new Error(error);
     }
 
     const pfpResult = await uploadPfp({
-      fileName,
+      fileName: name,
       userId: user.id,
       oldFileName: user.image || "",
     });

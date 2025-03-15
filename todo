@@ -1,3 +1,5 @@
+# Rather than your junky formFieldWrapper component make it just have the form skeleton and accept children and for each field u want make a seperate component dumbass
+
 # redirect to onboarding from verify page yet doesnt work as expected
 
 # basic pagination for booking/employees components (real one not just slicing them)

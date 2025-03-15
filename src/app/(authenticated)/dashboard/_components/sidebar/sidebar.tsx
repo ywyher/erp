@@ -21,7 +21,7 @@ export default function Sidebar({ userRole }: { userRole: User["role"] }) {
   const { state, isMobile } = useSidebar();
 
   return (
-    <CSidebar collapsible="icon" variant="floating">
+    <CSidebar collapsible="icon" className="z-[100]" variant="floating">
       <SidebarHeader
         className={`
           flex justify-between items-center

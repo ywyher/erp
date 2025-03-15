@@ -29,7 +29,7 @@ import { HighlightPlugin } from '@udecode/plate-highlight/react';
 import { HighlightLeaf } from '@/components/plate-ui/highlight-leaf';
 import { HrElement } from '@/components/plate-ui/hr-element';
 import { ImageElement } from '@/components/plate-ui/image-element';
-import { AudioPlugin, ImagePlugin, PlaceholderPlugin, VideoPlugin } from '@udecode/plate-media/react';
+import { AudioPlugin, FilePlugin, ImagePlugin, MediaEmbedPlugin, PlaceholderPlugin, VideoPlugin } from '@udecode/plate-media/react';
 import { HorizontalRulePlugin } from '@udecode/plate-horizontal-rule/react';
 import { LinkPlugin } from '@udecode/plate-link/react';
 import { LinkElement } from '@/components/plate-ui/link-element';
@@ -70,6 +70,22 @@ import { ToggleElement } from '@/components/plate-ui/toggle-element';
 import { DeletePlugin, SelectOnBackspacePlugin } from '@udecode/plate-select';
 import { mediaPlugins } from '@/components/editor/plugins/media-plugins';
 import { MediaPlaceholderElement } from '@/components/plate-ui/media-placeholder-element';
+import { MediaAudioElement } from '@/components/plate-ui/media-audio-element';
+import { MediaFileElement } from '@/components/plate-ui/media-file-element';
+import { MediaEmbedElement } from '@/components/plate-ui/media-embed-element';
+import { FontBackgroundColorPlugin, FontColorPlugin, FontSizePlugin } from '@udecode/plate-font/react';
+import { ColumnPlugin } from '@udecode/plate-layout/react';
+import { CursorOverlayPlugin } from '@udecode/plate-selection/react';
+import { CursorOverlay } from '@/components/plate-ui/cursor-overlay';
+import { cursorOverlayPlugin } from '@/components/editor/plugins/cursor-overlay-plugin';
+import { DndPlugin } from '@udecode/plate-dnd';
+import { dndPlugins } from '@/components/editor/plugins/dnd-plugins';
+import { indentListPlugins } from '@/components/editor/plugins/indent-list-plugins';
+import { Value } from '@udecode/plate';
+import { JuicePlugin } from '@udecode/plate-juice';
+import { DocxPlugin } from '@udecode/plate-docx';
+import { CsvPlugin } from '@udecode/plate-csv';
+import { MarkdownPlugin } from '@udecode/plate-markdown';
 
 const components = {
   [BlockquotePlugin.key]: BlockquoteElement,
@@ -99,12 +115,10 @@ const components = {
 
   [ImagePlugin.key]: ImageElement,
   [PlaceholderPlugin.key]: MediaPlaceholderElement,
-
-  // [VideoPlugin.key]: VideoElement,
-  // [AudioPlugin.key]: AudioElement,
-  // [FilePlugin.key]: FileElement,
-  // [MediaEmbedPlugin.key]: MediaEmbedElement,
-
+  [VideoPlugin.key]: MediaVideoElement,
+  [AudioPlugin.key]: MediaAudioElement,
+  [FilePlugin.key]: MediaFileElement,
+  [MediaEmbedPlugin.key]: MediaEmbedElement,
 
   // [TableCellHeaderPlugin.key]: TableCellHeaderElement,
   // [TableCellPlugin.key]: TableCellElement,
@@ -132,49 +146,38 @@ export const plugins = [
   tablePlugin,
   HighlightPlugin,
 
-  HeadingPlugin,
-  ListPlugin,
-  IndentPlugin.configure({
-    inject: {
-      targetPlugins: [ParagraphPlugin.key, HEADING_KEYS.h1],
-    }
-  }),
-  IndentListPlugin.configure({
-    inject: {
-      targetPlugins: [ParagraphPlugin.key, HEADING_KEYS.h1],
-    }
-  }),
-  lineHeightPlugin,
+  ...indentListPlugins,
+
   NodeIdPlugin,
   TogglePlugin,
-
   ...mediaPlugins,
+  ColumnPlugin,
+  cursorOverlayPlugin,
 
-  // ...mediaPlugins,
-  // ...equationPlugins,
-  // CalloutPlugin,
-  // ColumnPlugin,
+  lineHeightPlugin,
+  FontColorPlugin,
+  FontBackgroundColorPlugin,
+  FontSizePlugin,
+  HighlightPlugin,
+  ...dndPlugins,
 
-  // // Marks
-  // FontColorPlugin,
-  // FontBackgroundColorPlugin,
-  // FontSizePlugin,
-  // HighlightPlugin,
-  // KbdPlugin,
-  // skipMarkPlugin,
+  DocxPlugin,
+  JuicePlugin,
+  CsvPlugin,
+  MarkdownPlugin,
 
-  // // Block Style
-  // alignPlugin,
-  // ...indentListPlugins,
-  // lineHeightPlugin,
-
-  // // Collaboration
-  // commentsPlugin.configure({
-  //   render: { aboveNodes: BlockDiscussion as any },
-  // }),
-  // suggestionPlugin.configure({
-  //   render: { belowNodes: SuggestionBelowNodes as any },
-  // }),
+  FixedToolbarPlugin,
+  FloatingToolbarPlugin,
+  ParagraphPlugin,
+  AlignPlugin.configure({
+    inject: {
+      targetPlugins: [
+        ParagraphPlugin.key,
+        HeadingPlugin.key,
+      ],
+    }
+   }),
+   autoformatPlugin,
 ] as const;
 
 export const useCreateEditor = () => {
@@ -186,22 +189,6 @@ export const useCreateEditor = () => {
     },
     plugins: [
       ...plugins,
-      
-       FixedToolbarPlugin,
-       FloatingToolbarPlugin,
-       ParagraphPlugin,
-       
-       AlignPlugin.configure({
-        inject: {
-          targetPlugins: [
-            ParagraphPlugin.key,
-            HeadingPlugin.key,
-          ],
-        }
-       }),
-
-       autoformatPlugin,
-
     ],
   });
 };

@@ -17,7 +17,7 @@ import { saveMedicalFilesInDb } from "@/app/booking/reservation/actions";
 import { useAppointmentReservationStore } from "@/components/doctors/store";
 import { useRouter } from "next/navigation";
 import LoadingBtn from "@/components/loading-btn";
-import { useFileUpload } from "@/hooks/use-upload-file";
+import { useFileUpload } from "@/hooks/use-file-upload";
 import { toast } from "sonner";
 import { deleteFile } from "@/lib/s3";
 
@@ -43,6 +43,14 @@ export default function ReservationAttatchFiles() {
     },
   });
 
+  React.useEffect(() => {
+    console.log(progresses)
+  }, [progresses])
+
+  React.useEffect(() => {
+    console.log(reservation)
+  }, [reservation])
+
   async function onSubmit(input: Schema) {
     if (!input.files.length) {
       toast.error("Please upload at least one file");
@@ -57,16 +65,16 @@ export default function ReservationAttatchFiles() {
 
     try {
       const uploadPromises = input.files.map(async (file) => {
-        const fileName = await handleUpload(file);
+        const { name, error } = await handleUpload(file);
 
-        if (!fileName) {
+        if (!name || error) {
           setIsLoading(false);
-          throw new Error("Failed to upload file");
+          throw new Error(error);
         }
 
         try {
           await saveMedicalFilesInDb({
-            name: fileName,
+            name: name,
             type: file.type,
             appointmentId: reservation.appointmentId as string,
             patientId: reservation.patientId as string,
@@ -74,7 +82,7 @@ export default function ReservationAttatchFiles() {
         } catch (dbError) {
           console.error("Database error:", dbError);
 
-          await deleteFile(fileName);
+          await deleteFile(name);
           throw new Error(
             `Failed to save file ${file.name} to the database. It has been deleted.`,
           );
@@ -88,7 +96,7 @@ export default function ReservationAttatchFiles() {
       });
       form.reset();
       setReserved({ reserved: false, appointmentId: null, patientId: null });
-      router.replace("/dashboard/appointments");
+      router.replace("/appointments");
       setIsLoading(false);
     } catch (err) {
       const errorMessage = toast.error(err as string);

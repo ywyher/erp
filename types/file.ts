@@ -1,7 +1,7 @@
 export interface UploadedFile {
-  name: string;
-  size: number;
-  type: string;
+  key: string;    // Unique identifier
+  url: string;    // Public URL of the uploaded file
+  name: string;   // Original filename
+  size: number;   // File size in bytes
+  type: string;   // MIME type
 }
-
-export type UploadProgress = Record<string, number>;

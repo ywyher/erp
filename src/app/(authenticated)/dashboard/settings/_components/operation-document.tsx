@@ -22,7 +22,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { FileUploader } from "@/components/file-uploader";
-import { useFileUpload } from "@/hooks/use-upload-file";
+import { useFileUpload } from "@/hooks/use-file-upload";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useState } from "react";
 import {

@@ -1,4 +1,4 @@
-import { pgTable, text, timestamp } from "drizzle-orm/pg-core";
+import { jsonb, pgTable, text, timestamp } from "drizzle-orm/pg-core";
 import { admin } from "./roles";
 import { relations } from "drizzle-orm";
 import { socialStatusEnum } from "@/lib/db/schema/enums";
@@ -6,8 +6,9 @@ import { socialStatusEnum } from "@/lib/db/schema/enums";
 export const news = pgTable("news", {
   id: text("id").primaryKey(),
   title: text("title").notNull(),
-  content: text("content").notNull(),
+  content: jsonb("content").notNull(),
   thumbnail: text("thumbnail").notNull(),
+  tags: text('tags'),
   authorId: text("authorId")
     .references(() => admin.id, { onDelete: "cascade" })
     .notNull(),

@@ -10,25 +10,25 @@ import { z } from "zod";
 import { toast } from "sonner";
 import { revalidate } from "@/app/actions";
 import DialogWrapper from "@/app/(authenticated)/dashboard/_components/dialog-wrapper";
-import { servicSchema } from "@/app/(authenticated)/dashboard/(admin)/services/types";
-import { updateService } from "@/app/(authenticated)/dashboard/(admin)/services/actions";
-import { Service } from "@/lib/db/schema";
+import { News } from "@/lib/db/schema";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { queryServiceData } from "@/lib/db/queries";
-import { useFileUpload } from "@/hooks/use-upload-file";
+import { queryNewsData } from "@/lib/db/queries";
+import { useFileUpload } from "@/hooks/use-file-upload";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { X } from "lucide-react";
 import { deleteFile } from "@/lib/s3";
 import { socialStatuses } from "@/lib/constants";
 import { getChangedFields, getFileUrl } from "@/lib/funcs";
+import { updateNews } from "@/app/(authenticated)/dashboard/(admin)/news/actions";
+import { newsSchema } from "@/app/(authenticated)/dashboard/(admin)/news/types";
 
 // Create a modified schema for updates where thumbnail is optional
-const updateServiceSchema = servicSchema.extend({
+const updateNewsSchema = newsSchema.extend({
   thumbnail: z.instanceof(File, { message: "Invalid file type" }).optional(),
 });
 
-export default function UpdateService({ serviceId }: { serviceId: Service['id'] }) {
+export default function UpdateNews({ newsId }: { newsId: News['id'] }) {
   const [open, setOpen] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [previewUrl, setPreviewUrl] = useState<string | undefined>(undefined);
@@ -37,35 +37,35 @@ export default function UpdateService({ serviceId }: { serviceId: Service['id'] 
   const queryClient = useQueryClient();
   const { handleUpload } = useFileUpload();
 
-  const form = useForm<z.infer<typeof updateServiceSchema>>({
-    resolver: zodResolver(updateServiceSchema),
+  const form = useForm<z.infer<typeof updateNewsSchema>>({
+    resolver: zodResolver(updateNewsSchema),
     defaultValues: {
       title: "",
-      content: "",
+      content: [],
       status: "draft",
     }
   });
 
-  const { data: serviceData, isLoading: isServiceDataLoading } = useQuery({
-    queryKey: ['service-data', serviceId],
+  const { data: newsData, isLoading: isNewsDataLoading } = useQuery({
+    queryKey: ['news-data', newsId],
     queryFn: async () => {
-      return await queryServiceData(serviceId);
+      return await queryNewsData(newsId);
     }
   });
 
   useEffect(() => {
-    if (serviceData) {
+    if (newsData) {
       form.reset({
-        title: serviceData.title,
-        content: serviceData.content,
-        status: serviceData.status,
+        title: newsData.title,
+        content: newsData.content as [],
+        status: newsData.status,
       });
       
-      if (serviceData.thumbnail) {
+      if (newsData.thumbnail) {
         setHasExistingThumbnail(true);
       }
     }
-  }, [serviceData, form]);
+  }, [newsData, form]);
   
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = e.target.files?.[0] ?? null;
@@ -84,23 +84,23 @@ export default function UpdateService({ serviceId }: { serviceId: Service['id'] 
     form.clearErrors("thumbnail");
   };
 
-  const onSubmit = async (data: z.infer<typeof updateServiceSchema>) => {
-    if (!serviceData) return;
+  const onSubmit = async (data: z.infer<typeof updateNewsSchema>) => {
+    if (!newsData) return;
     
     setIsLoading(true);
 
     const sessionData = {
-      title: serviceData.title,
-      content: serviceData.content,
-      thumbnail: serviceData.thumbnail,
-      status: serviceData.status,
+      title: newsData.title,
+      content: newsData.content,
+      thumbnail: newsData.thumbnail,
+      status: newsData.status,
     }
 
     const localData = {
       title: data.title,
       content: data.content,
       status: data.status,
-      thumbnail: data.thumbnail ? 'updated' : serviceData.thumbnail,
+      thumbnail: data.thumbnail ? 'updated' : newsData.thumbnail,
     }
 
     const changedFields = getChangedFields(sessionData, localData);
@@ -111,23 +111,23 @@ export default function UpdateService({ serviceId }: { serviceId: Service['id'] 
       return;
     }
 
-    let fileName: string = serviceData.thumbnail || '';
+    let fileName: string = newsData.thumbnail || '';
     
     // Only upload new file if thumbnail is changed
     if (data.thumbnail) {
       // Delete the old file if it exists
-      if (serviceData.thumbnail) {
-        await deleteFile(serviceData.thumbnail);
+      if (newsData.thumbnail) {
+        await deleteFile(newsData.thumbnail);
       }
       
-      const uploadedFileName = await handleUpload(data.thumbnail);
+      const { name, error } = await handleUpload(data.thumbnail);
       
-      if (!uploadedFileName) {
+      if (!name || error) {
         setIsLoading(false);
-        throw new Error("Failed to upload file");
+        throw new Error(error);
       }
       
-      fileName = uploadedFileName;
+      fileName = name;
     } else if (!hasExistingThumbnail && !data.thumbnail) {
       // If there's no existing thumbnail and no new thumbnail, use empty string
       fileName = '';
@@ -135,19 +135,19 @@ export default function UpdateService({ serviceId }: { serviceId: Service['id'] 
 
     const { title, content, status } = data;
     
-    const result = await updateService({ 
+    const result = await updateNews({ 
       title,
       content,
       status,
-      fileName,
-      serviceId
+      thumbnail: fileName,
+      newsId,
     });
 
     if (result?.error) {
       toast.error(result?.error);
       
       // If we uploaded a new file but the update failed, delete it
-      if (data.thumbnail && fileName !== serviceData.thumbnail) {
+      if (data.thumbnail && fileName !== newsData.thumbnail) {
         await deleteFile(fileName);
       }
       
@@ -157,8 +157,8 @@ export default function UpdateService({ serviceId }: { serviceId: Service['id'] 
 
     toast.message(result?.message);
 
-    await revalidate("/dashboard/services");
-    queryClient.invalidateQueries({ queryKey: ['service-data', serviceId] })
+    await revalidate("/dashboard/newss");
+    queryClient.invalidateQueries({ queryKey: ['news-data', newsId] })
     setIsLoading(false);
     setOpen(false);
   };
@@ -167,7 +167,7 @@ export default function UpdateService({ serviceId }: { serviceId: Service['id'] 
     <DialogWrapper
       open={open}
       setOpen={setOpen}
-      label="service"
+      label="news"
       operation="update"
     >
       <Form {...form}>
@@ -176,7 +176,7 @@ export default function UpdateService({ serviceId }: { serviceId: Service['id'] 
           className="flex flex-col gap-5"
         >
           <div className="flex flex-col gap-3">
-            {isServiceDataLoading ? (
+            {isNewsDataLoading ? (
               <div>Loading...</div>
             ) : (
               <>
@@ -185,7 +185,7 @@ export default function UpdateService({ serviceId }: { serviceId: Service['id'] 
                     <div className="relative w-full h-48">
                       <Image 
                         src={previewUrl}
-                        alt="Service thumbnail preview"
+                        alt="News thumbnail preview"
                         fill
                         className="object-cover"
                       />
@@ -200,12 +200,12 @@ export default function UpdateService({ serviceId }: { serviceId: Service['id'] 
                       <X className="h-4 w-4" />
                     </Button>
                   </div>
-                ) : serviceData?.thumbnail && hasExistingThumbnail ? (
+                ) : newsData?.thumbnail && hasExistingThumbnail ? (
                   <div className="relative rounded-md overflow-hidden border border-gray-200">
                     <div className="relative w-full h-48">
                       <Image 
-                        src={getFileUrl(serviceData.thumbnail)}
-                        alt="Service thumbnail"
+                        src={getFileUrl(newsData.thumbnail)}
+                        alt="News thumbnail"
                         fill
                         className="object-cover"
                       />
@@ -225,13 +225,14 @@ export default function UpdateService({ serviceId }: { serviceId: Service['id'] 
                     form={form}
                     name="thumbnail"
                     label="Thumbnail"
+                    accept="image/*"
                     type="file"
                     onFileChange={handleFileChange}
                   />
                 )}
                 <FormFieldWrapper form={form} name="title" label="Title" />
                 <FormFieldWrapper form={form} name="status" label="Status" type="select" options={socialStatuses} />
-                <FormFieldWrapper form={form} name="content" label="Content" type="textarea" />
+                <FormFieldWrapper form={form} name="content" label="Editor" type="editor" />
               </>
             )}
           </div>

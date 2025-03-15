@@ -1,6 +1,5 @@
 "use server";
 
-import { NewsStatus } from "@/app/(authenticated)/dashboard/(admin)/news/types"
 import { getSession } from "@/lib/auth-client"
 import db from "@/lib/db"
 import { admin, News, news } from "@/lib/db/schema"
@@ -8,11 +7,11 @@ import { generateId } from "@/lib/funcs"
 import { eq } from "drizzle-orm"
 import { headers } from "next/headers"
 
-export async function createNews({ title, content, status, fileName }: { 
-     title: string,
-     content: string,
-     status: NewsStatus,
-     fileName: string 
+export async function createNews({ title, content, status, thumbnail }: { 
+     title: News['title'],
+     content: News['content'],
+     status: News['status'],
+     thumbnail: News['thumbnail']
     }) {
     try {
         const userData = await getSession({
@@ -37,7 +36,7 @@ export async function createNews({ title, content, status, fileName }: {
             id: newsId,
             title,
             content,
-            thumbnail: fileName,
+            thumbnail,
             status,
             authorId,
             createdAt: new Date(),
@@ -58,19 +57,19 @@ export async function createNews({ title, content, status, fileName }: {
     }
 }
 
-export async function updateNews({ title, content, status, fileName, newsId }: { 
-     title: string,
-     content: string,
-     status: NewsStatus,
-     fileName: string,
-     newsId: News['id'] 
+export async function updateNews({ title, content, status, thumbnail, newsId }: { 
+      title: News['title'],
+      content: News['content'],
+      status: News['status'],
+      thumbnail: News['thumbnail']
+      newsId: News['id']
     }) {
     try {
         const [updatedNews] = await db.update(news).set({
             title,
             content,
             status,
-            thumbnail: fileName,
+            thumbnail,
             updatedAt: new Date(),
         })
         .where(eq(news.id, newsId))

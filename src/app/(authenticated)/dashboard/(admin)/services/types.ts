@@ -7,5 +7,3 @@ export const servicSchema = z.object({
   status: z.enum(socialStatuses),
   thumbnail: z.instanceof(File, { message: "Invalid file type" }),
 });
-
-export type ServiceStatus = "draft" |"published" | "inactive" | "archived" 

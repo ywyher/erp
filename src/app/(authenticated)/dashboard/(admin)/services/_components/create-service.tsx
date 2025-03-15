@@ -11,7 +11,7 @@ import { revalidate } from "@/app/actions";
 import DialogWrapper from "@/app/(authenticated)/dashboard/_components/dialog-wrapper";
 import { servicSchema } from "@/app/(authenticated)/dashboard/(admin)/services/types";
 import { createService } from "@/app/(authenticated)/dashboard/(admin)/services/actions";
-import { useFileUpload } from "@/hooks/use-upload-file";
+import { useFileUpload } from "@/hooks/use-file-upload";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { X } from "lucide-react";
@@ -48,11 +48,11 @@ export default function CreateService() {
   const onSubmit = async (data: z.infer<typeof servicSchema>) => {
     setIsLoading(true);
 
-    const fileName = await handleUpload(data.thumbnail);
+    const { name, error } = await handleUpload(data.thumbnail);
     
-    if (!fileName) {
+    if (!name || error) {
       setIsLoading(false);
-      throw new Error("Failed to upload file");
+      throw new Error(error);
     }
 
     const { title, content, status } = data;
@@ -61,13 +61,13 @@ export default function CreateService() {
       title,
       content,
       status,
-      fileName
+      thumbnail: name
     });
     
     if (result?.error) {
       toast.error(result?.error);
 
-      await deleteFile(fileName);
+      await deleteFile(name);
 
       setIsLoading(false);
       return;
