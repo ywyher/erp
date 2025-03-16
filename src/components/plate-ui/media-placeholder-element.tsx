@@ -27,6 +27,7 @@ import { useFilePicker } from 'use-file-picker';
 import { Spinner } from './spinner';
 import { formatBytes } from '@/lib/utils';
 import { useFileUpload } from '@/hooks/use-file-upload';
+import { useProcessStore } from '@/components/editor/store';
 
 const CONTENT: Record<
   string,
@@ -73,6 +74,22 @@ export const MediaPlaceholderElement = withHOC(
 
       const loading = isUploading && uploadingFile;
 
+      // Inside MediaPlaceholderElement
+      const { 
+        setIsProcessing, 
+        setProgresses, 
+        setOperation, 
+        addProcessingFile, 
+        removeProcessingFile 
+      } = useProcessStore();
+
+      // When starting an upload
+      useEffect(() => {
+        setIsProcessing(isUploading);
+        setOperation(isUploading ? 'upload' : undefined);
+      }, [isUploading, progresses, uploadingFile, setIsProcessing, setProgresses, setOperation, addProcessingFile]);
+
+
       const currentContent = CONTENT[element.mediaType];
 
       const isImage = element.mediaType === ImagePlugin.key;
@@ -94,6 +111,7 @@ export const MediaPlaceholderElement = withHOC(
 
       const replaceCurrentPlaceholder = useCallback(
         async (file: File) => {
+          console.log('testing')
           setUploadingFile(file);
           api.placeholder.addUploadingFile(element.id as string, file);
           

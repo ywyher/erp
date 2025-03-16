@@ -9,7 +9,7 @@ import {
   appointment,
   doctor,
   medicalFile,
-  news,
+  post,
   schedule,
   service,
   session,
@@ -286,9 +286,9 @@ export async function deleteById(id: string, tableName: Tables) {
     await deleteFile(data.thmubnail)
   }
 
-  if(tableName === 'news') {
-    const [data] = await db.select({ thmubnail: news.thumbnail }).from(news)
-      .where(eq(news.id, id))
+  if(tableName === 'post') {
+    const [data] = await db.select({ thmubnail: post.thumbnail }).from(post)
+      .where(eq(post.id, id))
 
     await deleteFile(data.thmubnail)
   }

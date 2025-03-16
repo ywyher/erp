@@ -2,7 +2,7 @@ services:
   postgres:
     restart: always
     image: postgres:latest
-    container_name: postgres_erp
+    container_name: erp
     ports:
       - 5432:5432
     environment:

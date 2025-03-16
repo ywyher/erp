@@ -8,8 +8,8 @@ import {
   appointment,
   Doctor,
   doctor,
-  news,
-  News,
+  post,
+  Post,
   receptionist,
   Receptionist,
   Schedule,
@@ -646,15 +646,15 @@ export const queryServiceData = async (serviceId: Service['id']) => {
   return serviceData
 }
 
-export const listNews = async () => {
-  const listedNews = await db.select().from(news)
+export const listPosts = async () => {
+  const listedPost = await db.select().from(post)
 
-  return listedNews
+  return listedPost
 }
 
-export const queryNewsData = async (newId: News['id']) => {
-  const [newData] = await db.select().from(news)
-    .where(eq(news.id, newId))
+export const queryPostData = async (slug: Post['slug']) => {
+  const [postData] = await db.select().from(post)
+    .where(eq(post.slug, slug))
 
-  return newData
+  return postData
 }

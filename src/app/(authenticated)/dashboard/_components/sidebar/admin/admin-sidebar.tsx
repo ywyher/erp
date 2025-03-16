@@ -94,14 +94,14 @@ export default function AdminSidebar() {
       icon: Bell,
     },
     {
-      title: "News",
-      url: "/dashboard/news",
+      title: "posts",
+      url: "/dashboard/posts",
       icon: Newspaper,
       actions: [
         {
           label: "Create",
           onClick: () => {
-            router.push("/dashboard/news/create");
+            router.push("/dashboard/posts/create");
           },
           icon: Plus,
         },

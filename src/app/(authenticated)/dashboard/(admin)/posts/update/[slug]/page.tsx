@@ -9,36 +9,43 @@ import LoadingBtn from "@/components/loading-btn";
 import { z } from "zod";
 import { toast } from "sonner";
 import { revalidate } from "@/app/actions";
-import DialogWrapper from "@/app/(authenticated)/dashboard/_components/dialog-wrapper";
-import { News } from "@/lib/db/schema";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { queryNewsData } from "@/lib/db/queries";
+import { queryPostData } from "@/lib/db/queries";
 import { useFileUpload } from "@/hooks/use-file-upload";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { X } from "lucide-react";
 import { deleteFile } from "@/lib/s3";
-import { socialStatuses } from "@/lib/constants";
 import { getChangedFields, getFileUrl } from "@/lib/funcs";
-import { updateNews } from "@/app/(authenticated)/dashboard/(admin)/news/actions";
-import { newsSchema } from "@/app/(authenticated)/dashboard/(admin)/news/types";
+import { useParams, useRouter } from "next/navigation";
+import CardLayout from "@/components/card-layout";
+import { Value } from "@udecode/plate";
+import { postCategoryStatuses, postSchema } from "@/app/(authenticated)/dashboard/(admin)/posts/types";
+import { updatePost } from "@/app/(authenticated)/dashboard/(admin)/posts/actions";
+import { socialStatuses } from "@/lib/constants";
+import { useProcessStore } from "@/components/editor/store";
 
 // Create a modified schema for updates where thumbnail is optional
-const updateNewsSchema = newsSchema.extend({
+const updatePostSchema = postSchema.extend({
   thumbnail: z.instanceof(File, { message: "Invalid file type" }).optional(),
 });
 
-export default function UpdateNews({ newsId }: { newsId: News['id'] }) {
+export default function UpdatePost() {
   const [open, setOpen] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [previewUrl, setPreviewUrl] = useState<string | undefined>(undefined);
   const [hasExistingThumbnail, setHasExistingThumbnail] = useState<boolean>(false);
 
   const queryClient = useQueryClient();
+  const router = useRouter();
   const { handleUpload } = useFileUpload();
+  const { isProcessing } = useProcessStore();
 
-  const form = useForm<z.infer<typeof updateNewsSchema>>({
-    resolver: zodResolver(updateNewsSchema),
+  const params = useParams();
+  const slug = params.slug as string; // Ensure it's treated as a string
+
+  const form = useForm<z.infer<typeof updatePostSchema>>({
+    resolver: zodResolver(updatePostSchema),
     defaultValues: {
       title: "",
       content: [],
@@ -46,26 +53,28 @@ export default function UpdateNews({ newsId }: { newsId: News['id'] }) {
     }
   });
 
-  const { data: newsData, isLoading: isNewsDataLoading } = useQuery({
-    queryKey: ['news-data', newsId],
+  const { data: postData, isLoading: isPostDataLoading } = useQuery({
+    queryKey: ['post', 'date', 'update', slug],
     queryFn: async () => {
-      return await queryNewsData(newsId);
+      return await queryPostData(slug);
     }
   });
 
   useEffect(() => {
-    if (newsData) {
+    if (postData) {
       form.reset({
-        title: newsData.title,
-        content: newsData.content as [],
-        status: newsData.status,
+        title: postData.title,
+        content: postData.content as [],
+        status: postData.status,
+        tags: postData.tags ? postData.tags.split(",") : [],
+        category: postData.category,
       });
       
-      if (newsData.thumbnail) {
+      if (postData.thumbnail) {
         setHasExistingThumbnail(true);
       }
     }
-  }, [newsData, form]);
+  }, [postData, form]);
   
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = e.target.files?.[0] ?? null;
@@ -77,30 +86,34 @@ export default function UpdateNews({ newsId }: { newsId: News['id'] }) {
     }
   };
   
-  const handleRemoveImage = () => {
+  const handleRemoveImage = async () => {
+    // !form.getValues('thumbnail') -> means that a file exists but from the database
+    if(postData?.thumbnail && !form.getValues('thumbnail')) {
+      await deleteFile(postData?.thumbnail)
+    }
+
     setPreviewUrl(undefined);
     form.setValue("thumbnail", undefined);
     setHasExistingThumbnail(false);
     form.clearErrors("thumbnail");
   };
 
-  const onSubmit = async (data: z.infer<typeof updateNewsSchema>) => {
-    if (!newsData) return;
-    
+  const onSubmit = async (data: z.infer<typeof updatePostSchema>) => {
+    if (!postData) return;
     setIsLoading(true);
 
     const sessionData = {
-      title: newsData.title,
-      content: newsData.content,
-      thumbnail: newsData.thumbnail,
-      status: newsData.status,
+      title: postData.title,
+      content: postData.content,
+      thumbnail: postData.thumbnail,
+      status: postData.status,
     }
 
     const localData = {
       title: data.title,
       content: data.content,
       status: data.status,
-      thumbnail: data.thumbnail ? 'updated' : newsData.thumbnail,
+      thumbnail: data.thumbnail ? 'updated' : postData.thumbnail,
     }
 
     const changedFields = getChangedFields(sessionData, localData);
@@ -111,13 +124,13 @@ export default function UpdateNews({ newsId }: { newsId: News['id'] }) {
       return;
     }
 
-    let fileName: string = newsData.thumbnail || '';
+    let fileName: string = postData.thumbnail || '';
     
     // Only upload new file if thumbnail is changed
     if (data.thumbnail) {
       // Delete the old file if it exists
-      if (newsData.thumbnail) {
-        await deleteFile(newsData.thumbnail);
+      if (postData.thumbnail) {
+        await deleteFile(postData.thumbnail);
       }
       
       const { name, error } = await handleUpload(data.thumbnail);
@@ -133,21 +146,23 @@ export default function UpdateNews({ newsId }: { newsId: News['id'] }) {
       fileName = '';
     }
 
-    const { title, content, status } = data;
+    const { title, content, status, tags, category } = data;
     
-    const result = await updateNews({ 
+    const result = await updatePost({ 
       title,
       content,
       status,
+      category,
       thumbnail: fileName,
-      newsId,
+      tags: tags.join(','),
+      slug,
     });
 
     if (result?.error) {
       toast.error(result?.error);
       
       // If we uploaded a new file but the update failed, delete it
-      if (data.thumbnail && fileName !== newsData.thumbnail) {
+      if (data.thumbnail && fileName !== postData.thumbnail) {
         await deleteFile(fileName);
       }
       
@@ -157,26 +172,24 @@ export default function UpdateNews({ newsId }: { newsId: News['id'] }) {
 
     toast.message(result?.message);
 
-    await revalidate("/dashboard/newss");
-    queryClient.invalidateQueries({ queryKey: ['news-data', newsId] })
+    await revalidate("/dashboard/posts");
+    queryClient.invalidateQueries({ queryKey: ['post', 'data', 'update', slug] })
+    router.push('/dashboard/posts')
     setIsLoading(false);
     setOpen(false);
   };
 
+  if(!postData || isPostDataLoading) return <>Loading...</>;
+
   return (
-    <DialogWrapper
-      open={open}
-      setOpen={setOpen}
-      label="news"
-      operation="update"
-    >
+    <CardLayout title="Update a post">
       <Form {...form}>
         <form
           onSubmit={form.handleSubmit(onSubmit)}
           className="flex flex-col gap-5"
         >
           <div className="flex flex-col gap-3">
-            {isNewsDataLoading ? (
+            {isPostDataLoading ? (
               <div>Loading...</div>
             ) : (
               <>
@@ -185,9 +198,9 @@ export default function UpdateNews({ newsId }: { newsId: News['id'] }) {
                     <div className="relative w-full h-48">
                       <Image 
                         src={previewUrl}
-                        alt="News thumbnail preview"
+                        alt="Post thumbnail preview"
                         fill
-                        className="object-cover"
+                        className="object-contain"
                       />
                     </div>
                     <Button
@@ -200,14 +213,14 @@ export default function UpdateNews({ newsId }: { newsId: News['id'] }) {
                       <X className="h-4 w-4" />
                     </Button>
                   </div>
-                ) : newsData?.thumbnail && hasExistingThumbnail ? (
+                ) : postData?.thumbnail && hasExistingThumbnail ? (
                   <div className="relative rounded-md overflow-hidden border border-gray-200">
-                    <div className="relative w-full h-48">
+                    <div className="relative w-full h-96">
                       <Image 
-                        src={getFileUrl(newsData.thumbnail)}
-                        alt="News thumbnail"
+                        src={getFileUrl(postData.thumbnail)}
+                        alt="Post thumbnail"
                         fill
-                        className="object-cover"
+                        className="object-contain"
                       />
                     </div>
                     <Button
@@ -232,13 +245,15 @@ export default function UpdateNews({ newsId }: { newsId: News['id'] }) {
                 )}
                 <FormFieldWrapper form={form} name="title" label="Title" />
                 <FormFieldWrapper form={form} name="status" label="Status" type="select" options={socialStatuses} />
-                <FormFieldWrapper form={form} name="content" label="Editor" type="editor" />
+                <FormFieldWrapper form={form} name="category" label="Category" type="select" options={postCategoryStatuses} />
+                <FormFieldWrapper form={form} name="tags" label="Tags" type="tags" defaultValue={postData.tags as string} />
+                <FormFieldWrapper form={form} name="content" label="Editor" type="editor" defaultValue={postData.content as Value} />
               </>
             )}
           </div>
-          <LoadingBtn isLoading={isLoading}>Update</LoadingBtn>
+          <LoadingBtn isLoading={isLoading || isProcessing}>Update</LoadingBtn>
         </form>
       </Form>
-    </DialogWrapper>
+    </CardLayout>
   );
 }

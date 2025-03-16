@@ -8,7 +8,7 @@ import { prescription } from "@/lib/db/schema/prescription";
 import { operation } from "@/lib/db/schema/operation";
 import { roleEnum } from "./enums";
 import { service } from "@/lib/db/schema/service";
-import { news } from "@/lib/db/schema/news";
+import { post } from "@/lib/db/schema/post";
 
 // User
 export const user = pgTable("user", {
@@ -61,7 +61,7 @@ export const adminRelation = relations(admin, ({ one, many }) => ({
     references: [user.id],
   }),
   services: many(service),
-  news: many(news)
+  post: many(post)
 }));
 
 // Doctor

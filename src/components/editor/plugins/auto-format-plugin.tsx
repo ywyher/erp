@@ -227,7 +227,6 @@ const autoformatIndentLists: AutoformatRule[] = [
 
 export const autoformatPlugin = AutoformatPlugin.configure({
   options: {
-    enableUndoOnDelete: true,
     rules: [
       ...autoformatBlocks,
       ...autoformatMarks,

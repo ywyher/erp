@@ -8,7 +8,7 @@ import { prescription } from "./prescription";
 import { operation, operationData } from "./operation";
 import { settings } from "./settings";
 import { service } from "./service";
-import { news } from "./news";
+import { post } from "./post";
 export * from "./enums";
 export * from "./roles";
 export * from "./auth";
@@ -20,9 +20,9 @@ export * from "./prescription";
 export * from "./operation";
 export * from "./settings";
 export * from "./service";
-export * from "./news";
+export * from "./post";
 
-export type News = InferSelectModel<typeof news>;
+export type Post = InferSelectModel<typeof post>;
 export type Service = InferSelectModel<typeof service>;
 export type Settings = InferSelectModel<typeof settings>;
 export type OperationData = InferSelectModel<typeof operationData>;
@@ -45,4 +45,4 @@ export type Tables =
   | "appointment"
   | "operation"
   | "service"
-  | "news";
+  | "post";

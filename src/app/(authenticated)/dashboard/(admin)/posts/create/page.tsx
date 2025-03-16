@@ -3,35 +3,41 @@
 import { FormFieldWrapper } from "@/components/form-field-wrapper";
 import { Form } from "@/components/ui/form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import LoadingBtn from "@/components/loading-btn";
 import { z } from "zod";
 import { toast } from "sonner";
 import { revalidate } from "@/app/actions";
-import { newsSchema } from "@/app/(authenticated)/dashboard/(admin)/news/types";
-import { createNews } from "@/app/(authenticated)/dashboard/(admin)/news/actions";
 import { useFileUpload } from "@/hooks/use-file-upload";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { X } from "lucide-react";
 import { deleteFile } from "@/lib/s3";
-import { socialStatuses } from "@/lib/constants";
 import CardLayout from "@/components/card-layout";
+import { useRouter } from "next/navigation";
+import { postCategoryStatuses, postSchema } from "@/app/(authenticated)/dashboard/(admin)/posts/types";
+import { createPost } from "@/app/(authenticated)/dashboard/(admin)/posts/actions";
+import { socialStatuses } from "@/lib/constants";
+import { useProcessStore } from "@/components/editor/store";
 
-export default function CreateNews() {
+export default function CreatePost() {
   const [open, setOpen] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [previewUrl, setPreviewUrl] = useState<string>();
+
+  const router = useRouter();
   const { handleUpload } = useFileUpload();
-  
-  const form = useForm<z.infer<typeof newsSchema>>({
-    resolver: zodResolver(newsSchema),
+  const { isProcessing } = useProcessStore();
+
+  const form = useForm<z.infer<typeof postSchema>>({
+    resolver: zodResolver(postSchema),
     defaultValues: {
       status: 'draft'
     }
   });
-  
+
+
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = e.target.files?.[0] ?? null;
     if (selectedFile) {
@@ -49,9 +55,7 @@ export default function CreateNews() {
     form.clearErrors("thumbnail");
   };
   
-  const onSubmit = async (data: z.infer<typeof newsSchema>) => {
-    console.log(data)
-    return;
+  const onSubmit = async (data: z.infer<typeof postSchema>) => {
     setIsLoading(true);
 
     const { name, error } = await handleUpload(data.thumbnail);
@@ -61,12 +65,14 @@ export default function CreateNews() {
       throw new Error(error);
     }
 
-    const { title, content, status } = data;
+    const { title, content, status, tags, category } = data;
 
-    const result = await createNews({ 
+    const result = await createPost({ 
       title,
       content,
       status,
+      tags: tags.join(','),
+      category,
       thumbnail: name
     });
     
@@ -80,18 +86,19 @@ export default function CreateNews() {
     }
 
     toast.message(result?.message);
-    await revalidate("/dashboard/news");
+    await revalidate("/dashboard/posts");
     form.reset({
       title: "",
       content: [],
       thumbnail: undefined,
     });
+    router.push('/dashboard/posts')
     setIsLoading(false);
     setOpen(false);
   };
   
   return (
-    <CardLayout title="Create news">
+    <CardLayout title="Create a post">
       <Form {...form}>
         <form
           onSubmit={form.handleSubmit(onSubmit)}
@@ -103,9 +110,9 @@ export default function CreateNews() {
                 <div className="relative w-full h-96">
                   <Image 
                     src={previewUrl}
-                    alt="News thumbnail preview"
+                    alt="Post thumbnail preview"
                     fill
-                    className="object-cover"
+                    className="object-contain"
                   />
                 </div>
                 <Button
@@ -130,10 +137,11 @@ export default function CreateNews() {
             )}
             <FormFieldWrapper form={form} name="title" label="Title" />
             <FormFieldWrapper form={form} name="status" label="Status" type="select" options={socialStatuses} />
+            <FormFieldWrapper form={form} name="category" label="Category" type="select" options={postCategoryStatuses} />
             <FormFieldWrapper form={form} name="tags" label="Tags" type="tags" />
             <FormFieldWrapper form={form} name="content" label="Editor" type="editor" />
           </div>
-          <LoadingBtn isLoading={isLoading}>Create</LoadingBtn>
+          <LoadingBtn isLoading={isLoading || isProcessing}>Create</LoadingBtn>
         </form>
       </Form>
     </CardLayout>

@@ -81,11 +81,13 @@ import { cursorOverlayPlugin } from '@/components/editor/plugins/cursor-overlay-
 import { DndPlugin } from '@udecode/plate-dnd';
 import { dndPlugins } from '@/components/editor/plugins/dnd-plugins';
 import { indentListPlugins } from '@/components/editor/plugins/indent-list-plugins';
-import { Value } from '@udecode/plate';
+import { AnyPluginConfig, Value } from '@udecode/plate';
 import { JuicePlugin } from '@udecode/plate-juice';
 import { DocxPlugin } from '@udecode/plate-docx';
 import { CsvPlugin } from '@udecode/plate-csv';
 import { MarkdownPlugin } from '@udecode/plate-markdown';
+import { TrailingBlockPlugin } from '@udecode/plate-trailing-block';
+import { deletePlugins } from '@/components/editor/plugins/delete-plugins';
 
 const components = {
   [BlockquotePlugin.key]: BlockquoteElement,
@@ -159,14 +161,16 @@ export const plugins = [
   FontBackgroundColorPlugin,
   FontSizePlugin,
   HighlightPlugin,
-  ...dndPlugins,
 
   DocxPlugin,
   JuicePlugin,
   CsvPlugin,
   MarkdownPlugin,
+  ...deletePlugins,
 
-  FixedToolbarPlugin,
+  // Needed to prevent some issues
+  TrailingBlockPlugin,
+
   FloatingToolbarPlugin,
   ParagraphPlugin,
   AlignPlugin.configure({
@@ -180,8 +184,9 @@ export const plugins = [
    autoformatPlugin,
 ] as const;
 
-export const useCreateEditor = () => {
+export const useCreateEditor = ({ value, readOnly = false }: { value?: Value, readOnly?: boolean }) => {
   return usePlateEditor({
+    value: value ? value : undefined,
     override: {
       components: {
         ...components,
@@ -189,6 +194,8 @@ export const useCreateEditor = () => {
     },
     plugins: [
       ...plugins,
-    ],
+      !readOnly ? FixedToolbarPlugin : undefined,
+      ...(!readOnly ? dndPlugins : []),
+    ].filter(Boolean) as AnyPluginConfig[],
   });
 };

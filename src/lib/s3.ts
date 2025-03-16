@@ -10,6 +10,7 @@ import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { getSession } from "@/lib/auth-client";
 import crypto from "crypto";
 import { s3 } from "@/lib/utils";
+import { error } from "console";
 
 const generateFileName = (bytes = 32) =>
   crypto.randomBytes(bytes).toString("hex");
@@ -93,8 +94,19 @@ export async function deleteFile(fileName: string) {
   });
 
   try {
-    await s3.send(deleteObjectCommand);
-  } catch (error) {
-    console.error(`Error deleting file from S3: ${name}`, error);
+    const sent = await s3.send(deleteObjectCommand);
+
+    if(!sent) throw new Error("Failed to delete file")
+
+    return {
+      message: "File deleted!",
+      error: null,
+    }
+  } catch (error: any) {
+    // console.error(`Error deleting file from S3: ${name}`, error);
+    return {
+      message: null,
+      error: error.message || "Failed to delete file!",
+    }
   }
 }

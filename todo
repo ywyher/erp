@@ -1,3 +1,11 @@
+# If a user uses the bulk table delete it wont work with out post table gotta change it later
+
+# add reading duration to posts
+
+# Update post editor content doesnt work well for the media
+
+# the editor when deleting the image with backspace it doesnt get delete from the bucket
+
 # Rather than your junky formFieldWrapper component make it just have the form skeleton and accept children and for each field u want make a seperate component dumbass
 
 # redirect to onboarding from verify page yet doesnt work as expected

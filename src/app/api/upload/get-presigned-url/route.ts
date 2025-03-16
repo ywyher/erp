@@ -64,9 +64,6 @@ export async function POST(req: NextRequest) {
 
   
   const { type, size, checksum } = await req.json();
-  
-  console.log(`#####################`)
-  console.log(type)
 
   if (!acceptedTypes.includes(type)) {
     return NextResponse.json({ message: "Invalid file type" }, { status: 400 });

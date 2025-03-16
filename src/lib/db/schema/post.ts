@@ -1,14 +1,21 @@
-import { jsonb, pgTable, text, timestamp } from "drizzle-orm/pg-core";
+import { jsonb, pgEnum, pgTable, text, timestamp } from "drizzle-orm/pg-core";
 import { admin } from "./roles";
 import { relations } from "drizzle-orm";
 import { socialStatusEnum } from "@/lib/db/schema/enums";
 
-export const news = pgTable("news", {
+export const postCategoryEnum = pgEnum("post-category", [
+  "article", // Service is created but not yet published
+  "news", // Service is live and available to users
+]);
+
+export const post = pgTable("post", {
   id: text("id").primaryKey(),
   title: text("title").notNull(),
+  slug: text("slug").notNull().unique(),
   content: jsonb("content").notNull(),
   thumbnail: text("thumbnail").notNull(),
   tags: text('tags'),
+  category: postCategoryEnum("category").notNull(),
   authorId: text("authorId")
     .references(() => admin.id, { onDelete: "cascade" })
     .notNull(),
@@ -17,9 +24,9 @@ export const news = pgTable("news", {
   updatedAt: timestamp("updatedAt").defaultNow().notNull(),
 });
 
-export const newsRelation = relations(news, ({ one }) => ({
+export const postRelation = relations(post, ({ one }) => ({
   admin: one(admin, {
-    fields: [news.authorId],
+    fields: [post.authorId],
     references: [admin.id],
   }),
 }));

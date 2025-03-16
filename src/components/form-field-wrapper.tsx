@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { Controller } from "react-hook-form";
+import { Controller, UseFormReturn } from "react-hook-form";
 import {
   FormItem,
   FormLabel,
@@ -35,6 +35,7 @@ import { HTML5Backend } from "react-dnd-html5-backend";
 import { useCreateEditor } from "@/components/editor/use-create-editor";
 import { Editor, EditorContainer } from "@/components/plate-ui/editor";
 import { Tag, TagInput } from "emblor";
+import { Value } from "@udecode/plate";
 
 type AcceptMimeType =
   | "image/*"
@@ -44,15 +45,10 @@ type AcceptMimeType =
   | "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
 
 interface FormFieldWrapperProps {
-  form: {
-    control: any; // Use a stricter type if possible.
-    formState: {
-      errors: Record<string, any>;
-    };
-  };
+  form: UseFormReturn<any, any, any>;
   name: string;
   label?: string;
-  defaultValue?: any;
+  defaultValue?: string | number | string[] | Value;
   disabled?: boolean;
   optional?: boolean;
   placeholder?: string;
@@ -93,15 +89,29 @@ export const FormFieldWrapper: React.FC<FormFieldWrapperProps> = ({
   const [open, setOpen] = useState<boolean>(false);
   const [showPassword, setShowPassword] = useState<boolean>(false);
   
-  const error = form.formState.errors[name]?.message;
+  const errorMessage = form.formState.errors[name]?.message as string | undefined;
   
   let editor = null;
   if(type === 'editor') {
-    editor = useCreateEditor();
+    editor = useCreateEditor({
+      value: (defaultValue as Value) ? (defaultValue as Value) : []
+    });
   }
   
   const [tags, setTags] = useState<Tag[]>([]);
   const [activeTagIndex, setActiveTagIndex] = useState<number | null>(null);
+
+  useEffect(() => {
+    if (defaultValue) {
+      const formattedTags = defaultValue
+        .toString()
+        .split(",")
+        .map((tag, index) => ({ id: index.toString(), text: tag.trim() }));
+
+      setTags(formattedTags);
+    }
+  }, [defaultValue]);
+
   return (
     <Controller
       control={form.control}
@@ -334,7 +344,6 @@ export const FormFieldWrapper: React.FC<FormFieldWrapperProps> = ({
                           <Editor
                             variant={'fullWidth'}
                             onBlur={() => {
-                              console.log(editor.children)
                               field.onChange(editor.children);
                             }}
                             placeholder="Type..." 
@@ -350,7 +359,10 @@ export const FormFieldWrapper: React.FC<FormFieldWrapperProps> = ({
                     placeholder="Enter a tag"
                     tags={tags}
                     setTags={(newTags) => {
-                        setTags(newTags)
+                      setTags(newTags);
+                      
+                      const tagsArray = Array.isArray(newTags) ? newTags : tags;
+                      field.onChange(tagsArray.map((tag: Tag) => tag.text));
                     }}
                     activeTagIndex={activeTagIndex}
                     setActiveTagIndex={setActiveTagIndex}
@@ -358,7 +370,7 @@ export const FormFieldWrapper: React.FC<FormFieldWrapperProps> = ({
               )}
             </div>
           </FormControl>
-          <FormMessage>{error}</FormMessage>
+          <FormMessage>{errorMessage}</FormMessage>
         </FormItem>
       )}
     />

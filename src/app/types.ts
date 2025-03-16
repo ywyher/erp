@@ -4,7 +4,7 @@ import {
   account,
   appointment,
   doctor,
-  news,
+  post,
   operation,
   receptionist,
   schedule,
@@ -168,5 +168,5 @@ export const tableMap: Record<string, any> = {
   appointment,
   operation,
   service,
-  news
+  post
 };

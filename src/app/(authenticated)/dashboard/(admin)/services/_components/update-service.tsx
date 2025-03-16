@@ -47,7 +47,7 @@ export default function UpdateService({ serviceId }: { serviceId: Service['id'] 
   });
 
   const { data: serviceData, isLoading: isServiceDataLoading } = useQuery({
-    queryKey: ['service-data', serviceId],
+    queryKey: ['service', 'data', 'update', serviceId],
     queryFn: async () => {
       return await queryServiceData(serviceId);
     }
@@ -158,7 +158,7 @@ export default function UpdateService({ serviceId }: { serviceId: Service['id'] 
     toast.message(result?.message);
 
     await revalidate("/dashboard/services");
-    queryClient.invalidateQueries({ queryKey: ['service-data', serviceId] })
+    queryClient.invalidateQueries({ queryKey: ['service', 'data', 'update', serviceId] })
     setIsLoading(false);
     setOpen(false);
   };

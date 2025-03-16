@@ -26,6 +26,7 @@ import { inputVariants } from './input';
 import { Popover, PopoverAnchor, PopoverContent } from './popover';
 import { Separator } from './separator';
 import { deleteFile } from '@/lib/s3';
+import { useProcessStore } from '@/components/editor/store';
 
 export interface MediaPopoverProps {
   children: React.ReactNode;
@@ -56,14 +57,26 @@ export function MediaPopover({ children, plugin }: MediaPopoverProps) {
   const element = useElement();
   const { props: buttonProps } = useRemoveNodeButton({ element });
 
-  // Create a combined handler that does both operations
+  // In your component with handleCombinedRemove
+  const { 
+    setIsProcessing, 
+    setOperation, 
+    reset
+  } = useProcessStore();
+
   const handleCombinedRemove = async () => {
-    // First delete the file from S3
-    if (element.name) {
-      await deleteFile(element.name as string);
+    // In your handleCombinedRemove function
+    if (element.name && typeof element.name === 'string') {
+      setIsProcessing(true);
+      setOperation('delete');
+      
+      try {
+        await deleteFile(element.name);
+      } finally {
+        reset();
+      }
     }
     
-    // Then trigger the original onClick handler from useRemoveNodeButton
     if (buttonProps.onClick) {
       buttonProps.onClick();
     }

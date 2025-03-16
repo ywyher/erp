@@ -1,29 +1,29 @@
-import { newsTableColumns } from "@/app/(authenticated)/dashboard/(admin)/news/columns";
+import { postTableColumns } from "@/app/(authenticated)/dashboard/(admin)/posts/columns";
 import CardLayout from "@/components/card-layout";
 import { Button } from "@/components/ui/button";
 import { DataTable } from "@/components/ui/data-table";
-import { listServices } from "@/lib/db/queries";
+import { listPosts } from "@/lib/db/queries";
 import Link from "next/link";
 
 export default async function Services() {
-    const news = await listServices();
+    const posts = await listPosts();
 
     return (
-    <CardLayout title="Manage News" className="flex-1">
-      {news && (
+    <CardLayout title="Manage Posts" className="flex-1">
+      {posts && (
         <div className="h-screen flex flex-col">
           <div className="flex-1">
             <DataTable
-              columns={newsTableColumns}
-              data={news}
+              columns={postTableColumns}
+              data={posts}
               filters={["title", "content"]}
-              bulkTableName="news"
-              hiddenColumns={["id"]}
+              bulkTableName="posts"
+              hiddenColumns={["id", "slug"]}
             />
           </div>
           <Button className="sticky bottom-4 p-4 shadow-md w-full">
-            <Link href="/dashboard/news/create">
-              Create News
+            <Link href="/dashboard/posts/create">
+              Create A Post
             </Link>
           </Button>
         </div>
