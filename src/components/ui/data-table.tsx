@@ -24,6 +24,7 @@ import {
 } from "@/components/ui/table";
 import { DataTablePagination } from "@/components/ui/data-table-pagination";
 import { DataTableToolbar } from "@/components/ui/data-table-toolbar";
+import { StatusConfigType } from "@/components/ui/data-table-status-filter";
 
 interface DataTableProps<TData extends { id: string }, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -31,6 +32,7 @@ interface DataTableProps<TData extends { id: string }, TValue> {
   bulkTableName: string;
   filters?: string[];
   hiddenColumns?: string[];
+  statusConfigType?: StatusConfigType
 }
 
 export function DataTable<TData extends { id: string }, TValue>({
@@ -39,6 +41,7 @@ export function DataTable<TData extends { id: string }, TValue>({
   filters = ["email"],
   bulkTableName,
   hiddenColumns = ["id"],
+  statusConfigType = 'tasks',
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
@@ -82,6 +85,7 @@ export function DataTable<TData extends { id: string }, TValue>({
           table={table}
           filters={filters}
           bulkTableName={bulkTableName}
+          statusConfigType={statusConfigType}
         />
       </div>
       <div className="rounded-md border ">

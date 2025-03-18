@@ -3,15 +3,43 @@
 import { createUser, updateUser } from "@/lib/db/mutations";
 import { Schedules } from "@/app/(authenticated)/dashboard/types";
 import db from "@/lib/db";
-import { doctor, schedule, User } from "@/lib/db/schema";
+import { doctor, schedule, user, User } from "@/lib/db/schema";
 import { generateId, transformSchedulesToRecords } from "@/lib/funcs";
-import { eq } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import {
   createDoctorSchema,
   updateDoctorSchema,
 } from "@/app/(authenticated)/dashboard/(admin)/doctors/types";
 import { z } from "zod";
+
+export async function getDoctors({ merge }: { merge: true }) {
+  const data = await db.query.user.findMany({
+    where: eq(user.role, "doctor"),
+    with: {
+      doctor: true,
+      schedules: true
+    }
+  });
+
+  if (merge) {
+    return data.map(user => {
+      // Extract the receptionist object
+      const { doctor, ...restUser } = user;
+      
+      // Create merged object with renamed fields
+      return {
+        ...restUser,
+        doctorId: doctor.id,
+        specialty: doctor.specialty,
+        // Keep schedules as is
+      };
+    });
+  }
+  
+
+  return data;
+}
 
 export async function createDoctor({
   userData,

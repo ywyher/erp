@@ -14,6 +14,11 @@ export const roleEnum = pgEnum("role", [
   "receptionist",
 ]);
 
+export const providerEnum = pgEnum("provider", [
+  "google",
+  'email'
+])
+
 export const genderEnum = pgEnum("gender", [
   'male',
   'female'

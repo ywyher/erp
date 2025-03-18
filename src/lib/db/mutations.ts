@@ -22,6 +22,7 @@ import { generateFakeField, generateId } from "../funcs";
 import { hashPassword } from "../password";
 import { deleteFile } from "@/lib/s3";
 import { revalidatePath } from "next/cache";
+import { deletePost } from "@/app/(authenticated)/dashboard/(admin)/posts/actions";
 
 export async function createUser({
   data,
@@ -92,6 +93,7 @@ export async function createUser({
           dateOfBirth: data.dateOfBirth.toISOString().split('T')[0],
           role: role,
           onBoarding: false,
+          provider: 'email',
           createdAt: new Date(),
           updatedAt: new Date(),
         })
@@ -287,10 +289,7 @@ export async function deleteById(id: string, tableName: Tables) {
   }
 
   if(tableName === 'post') {
-    const [data] = await db.select({ thmubnail: post.thumbnail }).from(post)
-      .where(eq(post.id, id))
-
-    await deleteFile(data.thmubnail)
+    await deletePost({ id })
   }
 
   if (tableName === "appointment") {
@@ -316,6 +315,8 @@ export async function deleteById(id: string, tableName: Tables) {
       await db.delete(medicalFile).where(eq(medicalFile.appointmentId, id));
     }
   }
+
+  return;
 
   const deleted = await db.delete(table).where(eq(table.id, id)).returning();
 

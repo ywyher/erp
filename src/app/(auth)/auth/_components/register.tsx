@@ -37,7 +37,7 @@ export default function Register() {
 
   const handleRegister = async (data: z.infer<typeof registerSchema>) => {
     if (!value) return;
-    setIsLoading(true);
+    // setIsLoading(true);
     if (context == "email") {
       const username = generateFakeField("username");
       const name = generateFakeField("name") || "";
@@ -48,6 +48,7 @@ export default function Register() {
           username: username,
           name: name,
           password: data.password,
+          provider: 'email',
         },
         {
           onSuccess: async () => {
@@ -58,6 +59,7 @@ export default function Register() {
             return;
           },
           onError: (ctx) => {
+            console.error(ctx.error.message)
             toast.error(ctx.error.message);
           },
         },

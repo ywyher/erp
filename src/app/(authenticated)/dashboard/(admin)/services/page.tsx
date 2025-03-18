@@ -1,14 +1,21 @@
 import CreateService from "@/app/(authenticated)/dashboard/(admin)/services/_components/create-service";
+import { getServices } from "@/app/(authenticated)/dashboard/(admin)/services/actions";
 import { serviceTableColumns } from "@/app/(authenticated)/dashboard/(admin)/services/columns";
-import CardLayout from "@/components/card-layout";
+import DashboardLayout from "@/app/(authenticated)/dashboard/_components/dashboard-layout";
+import StatCard from "@/app/(authenticated)/dashboard/_components/stat-cart";
 import { DataTable } from "@/components/ui/data-table";
-import { listServices } from "@/lib/db/queries";
+import { Bell } from "lucide-react";
 
 export default async function Services() {
-    const services = await listServices();
+    const services = await getServices();
 
     return (
-        <CardLayout title="Manage Services">
+        <DashboardLayout title="Manage Services">
+            <StatCard
+              title={'total services'}
+              data={services.length}
+              icon={<Bell />}
+            />
             <DataTable
                 columns={serviceTableColumns}
                 data={services}
@@ -17,6 +24,6 @@ export default async function Services() {
                 hiddenColumns={["id"]}
             />
             <CreateService/>
-        </CardLayout>
+        </DashboardLayout>
     )
 }

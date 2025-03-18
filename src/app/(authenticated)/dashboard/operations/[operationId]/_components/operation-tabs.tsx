@@ -51,7 +51,7 @@ export default function OperationTabs({
     <Tabs
       value={activeTab}
       onValueChange={(value) => setActiveTab(value as typeof activeTab)}
-      className="w-full"
+      className="w-full pt-4"
     >
       <TabsList>
         <TabsTrigger value="patient-data">Patient's data</TabsTrigger>
@@ -60,7 +60,7 @@ export default function OperationTabs({
           <TabsTrigger value="document-viewer">Document Viewer</TabsTrigger>
         )}
       </TabsList>
-      <TabsContent value="patient-data">
+      <TabsContent value="patient-data" className="pt-2">
         <PatientData
           patient={patient}
           medicalFiles={medicalFiles}

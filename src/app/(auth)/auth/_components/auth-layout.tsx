@@ -3,11 +3,13 @@ import Image from "next/image";
 
 export default function AuthLayout({
   children,
+  className = ""
 }: {
   children: React.ReactNode;
+  className?: string
 }) {
   return (
-    <div className="relative min-h-screen">
+    <div className={`relative min-h-screen ${className}`}>
       <Header />
       <div className="absolute inset-x-0 top-0 h-52 lg:hidden">
         <Image

@@ -13,34 +13,45 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Value } from "@udecode/plate";
 import { Post } from "@/lib/db/schema";
-import DeletePost from "@/app/(authenticated)/dashboard/(admin)/posts/_components/delete";
+import {
+  Drawer,
+  DrawerClose,
+  DrawerContent,
+  DrawerDescription,
+  DrawerFooter,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerTrigger,
+} from "@/components/ui/drawer"
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet"
+import PostComponent from "@/components/post";
+import { useQuery } from "@tanstack/react-query";
+import { getPostAuthor } from "@/app/(authenticated)/dashboard/(admin)/posts/actions";
+import { useIsMobile } from "@/hooks/use-mobile";
+import Delete from "@/app/(authenticated)/dashboard/_components/delete";
+
 
 export default function PostActions({
-  postId,
-  slug,
-  content,
-  thumbnail
+  post,
 }: {
-  postId: Post['id']
-  slug: Post['slug']
-  content: Value
-  thumbnail: Post['thumbnail']
+  post: Post
 }) {
   const [open, setOpen] = useState<boolean>(false);
-  const [names, setNames] = useState<string[]>([]);
 
-  useEffect(() => {
-    const uniqueNames = Array.from(
-      new Set(content.filter((con) => (
-        con.type == 'img'
-      || con.type == 'video' 
-      || con.type == 'file' 
-      || con.type == 'audio'
-      )).map((con) => con.name))
-    ) as string[];
-  
-    setNames([...uniqueNames, thumbnail]);
-  }, [content, thumbnail]); // Include `thumbnail` in dependencies
+  const isMobile = useIsMobile();
+
+  const { data: author, isLoading: isAuthorLoaidng } = useQuery({
+    queryKey: ['post-data', post.id],
+    queryFn: async () => {
+      return await getPostAuthor({ authorId: post.authorId })
+    }
+  })
   
   return (
     <DropdownMenu open={open} onOpenChange={setOpen}>
@@ -54,19 +65,63 @@ export default function PostActions({
         <DropdownMenuLabel>Actions</DropdownMenuLabel>
         <DropdownMenuSeparator />
         <div className="flex flex-col gap-2">
-          <Link href={`/dashboard/posts/preview/${slug}`}>
+        {(!isAuthorLoaidng && author) && (
+            <>
+              {isMobile ? (
+                <Drawer>
+                  <DrawerTrigger asChild>
+                    <Button variant="outline" size="sm">
+                      Preview
+                    </Button>
+                  </DrawerTrigger>
+                  <DrawerContent className="h-[95vh]">
+                    <DrawerHeader>
+                      <DrawerTitle className="text-left">Post Preview</DrawerTitle>
+                    </DrawerHeader>
+                    <div className="px-4 h-full overflow-auto">
+                      <PostComponent
+                        post={post}
+                        author={author}
+                      />
+                    </div>
+                  </DrawerContent>
+                </Drawer>
+              ): (
+                <Sheet>
+                  <SheetTrigger asChild>
+                    <Button variant="outline" size="sm">
+                      Preview
+                    </Button>
+                  </SheetTrigger>
+                  <SheetContent side='bottom' className="h-[95vh] flex flex-col gap-3">
+                    <SheetHeader>
+                      <SheetTitle>Post Preview</SheetTitle>
+                    </SheetHeader>
+                    <div className="h-full overflow-auto">
+                      <PostComponent
+                        post={post}
+                        author={author}
+                      />
+                    </div>
+                  </SheetContent>
+                </Sheet>
+              )}
+            </>
+          )}
+          {/* <Link href={`/dashboard/posts/preview/${slug}`}>
             <Button className="w-full">
               Preveiw
             </Button>
-          </Link>
-          <Link href={`/dashboard/posts/update/${slug}`}>
+          </Link> */}
+          <Link href={`/dashboard/posts/update/${post.slug}`}>
             <Button className="w-full">
               Update
             </Button>
           </Link>
-          <DeletePost
-            id={postId}
-            names={names}
+          <Delete
+            id={post.id}
+            table="post"
+            setPopOpen={setOpen}
           />
         </div>
       </DropdownMenuContent>

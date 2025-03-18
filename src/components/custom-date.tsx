@@ -83,9 +83,9 @@ export default function CustomDate({ onClick }: CustomDate) {
         <Separator className="flex-grow" />
       </div>
 
-      <Button variant="secondary" onClick={handleCurrentDate}>
+      <LoadingBtn isLoading={isLoading} variant="secondary" onClick={handleCurrentDate}>
         Current Date
-      </Button>
+      </LoadingBtn>
     </div>
   );
 }

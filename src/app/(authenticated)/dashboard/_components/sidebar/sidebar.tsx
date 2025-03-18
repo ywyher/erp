@@ -21,7 +21,7 @@ export default function Sidebar({ userRole }: { userRole: User["role"] }) {
   const { state, isMobile } = useSidebar();
 
   return (
-    <CSidebar collapsible="icon" variant="floating">
+    <CSidebar collapsible="icon" variant="inset">
       <SidebarHeader
         className={`
           flex justify-between items-center
@@ -40,7 +40,7 @@ export default function Sidebar({ userRole }: { userRole: User["role"] }) {
         `}
         >
           <ThemeToggle />
-          <SidebarTrigger size={"icon"} />
+          {/* <SidebarTrigger size={"icon"} /> */}
         </div>
       </SidebarHeader>
       <SidebarSeparator />

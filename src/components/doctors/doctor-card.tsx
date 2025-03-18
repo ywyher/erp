@@ -1,3 +1,5 @@
+'use client'
+
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Doctor, Schedule, User } from "@/lib/db/schema";
@@ -15,6 +17,8 @@ import {
 } from "@/components/ui/dialog";
 import CustomDate from "@/components/custom-date";
 import { Button } from "@/components/ui/button";
+import { useIsMobile } from "@/hooks/use-mobile";
+import { Drawer, DrawerClose, DrawerContent, DrawerDescription, DrawerFooter, DrawerHeader, DrawerTitle, DrawerTrigger } from "@/components/ui/drawer"
 
 type DoctorCard = {
   data: {
@@ -34,12 +38,34 @@ export function DoctorCard({
   const [open, setOpen] = useState<boolean>(false);
   const { setDoctorId } = useDoctorIdStore();
   const { setDate } = useDateStore();
+  const isMobile = useIsMobile();
 
   const handleBookDoctor = (date: Date) => {
     setDoctorId(data.doctor.id);
     setDate(date);
     setOpen(false);
   };
+
+  const customScheduleContent = (
+    <Tabs defaultValue="custom">
+      <TabsList>
+        <TabsTrigger value="offical">Offical</TabsTrigger>
+        <TabsTrigger value="custom">Custom</TabsTrigger>
+      </TabsList>
+      <TabsContent value="offical" className="pt-3">
+        <ScheduleDisplay
+          open={open}
+          setOpen={setOpen}
+          schedules={data.schedules}
+          onClick={(e) => handleBookDoctor(e)}
+          dialog={false}
+        />
+      </TabsContent>
+      <TabsContent value="custom" className="pt-3">
+        <CustomDate onClick={(e) => handleBookDoctor(e)} />
+      </TabsContent>
+    </Tabs>
+  )
 
   return (
     <Card className="w-full h-full flex flex-col">
@@ -64,36 +90,39 @@ export function DoctorCard({
           </p>
           {book ? (
             customSchedule ? (
-              <Dialog>
-                <DialogTrigger asChild>
-                  <Button variant="outline" className="w-full">
-                    Select Schedules
-                  </Button>
-                </DialogTrigger>
-                <DialogContent>
-                  <DialogHeader>
-                    <DialogTitle>Schedules</DialogTitle>
-                  </DialogHeader>
-                  <Tabs defaultValue="custom">
-                    <TabsList>
-                      <TabsTrigger value="offical">Offical</TabsTrigger>
-                      <TabsTrigger value="custom">Custom</TabsTrigger>
-                    </TabsList>
-                    <TabsContent value="offical">
-                      <ScheduleDisplay
-                        open={open}
-                        setOpen={setOpen}
-                        schedules={data.schedules}
-                        onClick={(e) => handleBookDoctor(e)}
-                        dialog={false}
-                      />
-                    </TabsContent>
-                    <TabsContent value="custom">
-                      <CustomDate onClick={(e) => handleBookDoctor(e)} />
-                    </TabsContent>
-                  </Tabs>
-                </DialogContent>
-              </Dialog>
+              <>
+                {isMobile ? (
+                  <Drawer open={open} onOpenChange={setOpen}>
+                    <DrawerTrigger asChild>
+                      <Button variant="outline" className="w-full">
+                        Select Schedules
+                      </Button>
+                    </DrawerTrigger>
+                    <DrawerContent className="flex flex-col h-[90vh]">
+                      <DrawerHeader className="text-left px-8 pt-5">
+                        <DrawerTitle>Scheudles</DrawerTitle>
+                      </DrawerHeader>
+                      <div className="px-8 pt-3">
+                        {customScheduleContent}
+                      </div>
+                    </DrawerContent>
+                  </Drawer>
+                ): (
+                  <Dialog>
+                    <DialogTrigger asChild>
+                      <Button variant="outline" className="w-full">
+                        Select Schedules
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent>
+                      <DialogHeader>
+                        <DialogTitle>Schedules</DialogTitle>
+                      </DialogHeader>
+                      {customScheduleContent}
+                    </DialogContent>
+                  </Dialog>
+                )}
+              </>
             ) : (
               <ScheduleDisplay
                 open={open}

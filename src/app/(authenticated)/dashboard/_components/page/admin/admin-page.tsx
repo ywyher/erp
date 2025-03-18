@@ -9,27 +9,25 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 export default function AdminPage() {
   return (
-    <div className="p-4">
-      <Tabs defaultValue="overall" className="flex flex-col gap-3">
-        <TabsList>
-          <TabsTrigger value="overall">Overall</TabsTrigger>
-          <TabsTrigger value="analysis">Analysis</TabsTrigger>
-        </TabsList>
-        <TabsContent value="overall">
-          <Employees />
-        </TabsContent>
-        <TabsContent
-          value="analysis"
-          className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 p-4"
-        >
-          <UserChart />
-          <DoctorChart />
-          <ReceptionistChart />
-          <AdminChart />
-          <OperationChart />
-          <AppointmentChart />
-        </TabsContent>
-      </Tabs>
-    </div>
+    <Tabs defaultValue="overall" className="flex flex-col gap-3">
+      <TabsList>
+        <TabsTrigger value="overall">Overall</TabsTrigger>
+        <TabsTrigger value="analysis">Analysis</TabsTrigger>
+      </TabsList>
+      <TabsContent value="overall">
+        <Employees />
+      </TabsContent>
+      <TabsContent
+        value="analysis"
+        className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 p-4"
+      >
+        <UserChart />
+        <DoctorChart />
+        <ReceptionistChart />
+        <AdminChart />
+        <OperationChart />
+        <AppointmentChart />
+      </TabsContent>
+    </Tabs>
   );
 }

@@ -1,34 +1,28 @@
-# If a user uses the bulk table delete it wont work with out post table gotta change it later
+# 'use cache' !!
+
+# Posts tags in post card
+
+# doctors should be able to create posts of the category article only not the news 
+# meaning that the authorId should refer to the user table instead of the admin table
+
+# add an author data column in the posts table
+
+# maybe cache the header query ??
+
+# add stat component but by date instead of total of all time
 
 # add reading duration to posts
 
-# Update post editor content doesnt work well for the media
-
 # the editor when deleting the image with backspace it doesnt get delete from the bucket
+# the undo parrt too
 
 # Rather than your junky formFieldWrapper component make it just have the form skeleton and accept children and for each field u want make a seperate component dumbass
-
-# redirect to onboarding from verify page yet doesnt work as expected
 
 # basic pagination for booking/employees components (real one not just slicing them)
 
 # useMediaQuery hook and change the maxItemPerPage for the pagination system depending on the device !!
 
 # Error: Route "/dashboard/operations/[operationId]" used `params.operationId`. `params` should be awaited before using its properties. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis
-
-# Check https://floating-ui.com/docs clean transition through pages
-
-# Check https://github.com/barvian/number-flow for anlysis page
-
-# Check https://shadcn-ui-sidebar.salimi.my/dashboard for clean dashboard design
-
-# Clean ass https://stepperize.vercel.app/
-
-# for create tutorials https://www.onborda.dev/page-two
-
-# Moving crousol https://github.com/johanguse/shadcn-carousel-testimonials
-
-# Zoom chart https://github.com/shelwinsunga/zoom-chart-demo/tree/main
 
 <!-- Priorty 0 -->
 

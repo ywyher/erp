@@ -1,4 +1,4 @@
-import CardLayout from "@/components/card-layout";
+import DashboardLayout from "@/app/(authenticated)/dashboard/_components/dashboard-layout";
 import AppointmentTabs from "@/app/(authenticated)/dashboard/appointments/[appointmentId]/_components/appointment-tabs";
 import { getSession } from "@/lib/auth-client";
 import db from "@/lib/db";
@@ -97,7 +97,7 @@ export default async function Appointment({
   }
 
   return (
-    <CardLayout className="py-4">
+    <DashboardLayout>
       <AppointmentTabs
         patient={patient}
         medicalFiles={medicalFiles}
@@ -109,6 +109,6 @@ export default async function Appointment({
         editable={data.user.role == "doctor" ? true : false}
         creatorId={data.user.id}
       />
-    </CardLayout>
+    </DashboardLayout>
   );
 }

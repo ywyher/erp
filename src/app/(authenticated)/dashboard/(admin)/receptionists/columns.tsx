@@ -3,28 +3,18 @@
 import { Column, ColumnDef, Row } from "@tanstack/react-table";
 
 import { Checkbox } from "@/components/ui/checkbox";
-import { Button } from "@/components/ui/button";
 import { DataTableColumnHeader } from "@/components/ui/data-table-column-header";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import { isFakeEmail } from "@/lib/funcs";
 import React from "react";
 import ReceptionistAction from "@/app/(authenticated)/dashboard/(admin)/receptionists/_components/receptionist-actions";
-import { ScheduleDisplay } from "@/components/schedule-display";
 import TableCell from "@/components/table-cell";
 
 const receptionistColumns = [
   { value: "name", header: "Name" },
   { value: "username", header: "Username" },
   { value: "email", header: "Email" },
-  { value: "emailVerified", header: "Email Verified", isBoolean: true },
+  // { value: "emailVerified", header: "Email Verified", isBoolean: true },
   { value: "phoneNumber", header: "Phone Number" },
-  { value: "phoneNumberVerified", header: "Phone Verified", isBoolean: true },
+  // { value: "phoneNumberVerified", header: "Phone Verified", isBoolean: true },
   { value: "nationalId", header: "National Id" },
   { value: "department", header: "Department" },
   { value: "schedules", header: "Schedules", dialog: true },
@@ -58,12 +48,10 @@ export const receptionistTableColumns: ColumnDef<any>[] = [
       value,
       header,
       dialog,
-      isBoolean,
     }: {
       value: string;
       header: string;
       dialog?: boolean;
-      isBoolean?: boolean;
     }) => ({
       accessorKey: value,
       header: ({ column }: { column: Column<any, any> }) => (
@@ -75,7 +63,6 @@ export const receptionistTableColumns: ColumnDef<any>[] = [
           value={value}
           header={header}
           dialog={dialog}
-          isBoolean={isBoolean}
         />
       ),
     }),

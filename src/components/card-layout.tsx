@@ -1,30 +1,26 @@
-import React from "react";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { ReactNode } from "react";
 
-type CardLayoutProps = {
-  children: React.ReactNode;
-  title?: string;
-  className?: string;
-};
+interface CardLayoutProps {
+    children: ReactNode;
+    title?: string;
+    className?: string;
+}
 
-export default function CardLayout({
-  children,
-  title,
-  className = "",
-}: CardLayoutProps) {
-  return (
-    <Card
-      className={`
-      relative shadow-md rounded-lg w-full m-2 flex flex-col gap-3
-      ${className}
-    `}
-    >
-      {title && (
-        <CardHeader className="pb-0">
-          <CardTitle className="text-lg font-semibold">{title}</CardTitle>
-        </CardHeader>
-      )}
-      <CardContent className="flex-1">{children}</CardContent>
-    </Card>
-  );
+export default function CardLayout({ children, title, className }: CardLayoutProps) {
+    return (
+        <Card className={`
+        w-full max-w-6xl mx-auto shadow-none border-none rounded-lg
+        ${className}
+        px-6 py-3 md:px-6 md:py-3
+        `}>
+
+            {title && (
+                <CardHeader className="pb-2 mx-0 px-0"> {/* Reduced padding-bottom */}
+                    <CardTitle className="text-2xl font-semibold">{title}</CardTitle>
+                </CardHeader>
+            )}
+            <CardContent className="pt-2 p-0">{children}</CardContent> {/* Reduced padding-top */}
+        </Card>
+    );
 }

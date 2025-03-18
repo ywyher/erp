@@ -8,15 +8,8 @@ import { useDoctorIdStore, useDateStore } from "@/components/doctors/store";
 import { createOperation } from "@/app/(authenticated)/dashboard/operations/actions";
 import { toast } from "sonner";
 import ExistingUser from "@/app/(authenticated)/dashboard/_components/existing-user";
-import NewUser from "@/app/(authenticated)/dashboard/_components/new-user";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import CustomDate from "@/components/custom-date";
 import DataSelector from "@/components/date-selector";
+import DashboardLayout from "@/app/(authenticated)/dashboard/_components/dashboard-layout";
 
 export default function CreateOperation({
   // id from the user table
@@ -88,7 +81,7 @@ export default function CreateOperation({
   }, [patientId, role, doctorWorkId]);
 
   return (
-    <div className="p-2">
+    <DashboardLayout>
       {!patientId && (
         <ExistingUser
           setSelectedUserId={setPatientId}
@@ -116,6 +109,6 @@ export default function CreateOperation({
       {patientId && role !== "doctor" && (
         <DoctorsList book={true} customSchedule={true} />
       )}
-    </div>
+    </DashboardLayout>
   );
 }

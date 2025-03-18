@@ -27,7 +27,7 @@ export default function DoctortPage({ userId }: { userId: string }) {
   if (!doctorId || isDoctorIdLoading) return <>Loading</>;
 
   return (
-    <Tabs defaultValue="analysis" className="flex flex-col gap-3">
+    <Tabs defaultValue="overall" className="flex flex-col gap-3">
       <TabsList>
         <TabsTrigger value="overall">Overall</TabsTrigger>
         <TabsTrigger value="analysis">Analysis</TabsTrigger>

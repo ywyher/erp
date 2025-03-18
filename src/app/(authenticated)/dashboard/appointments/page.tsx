@@ -1,13 +1,15 @@
-import CardLayout from "@/components/card-layout";
+import DashboardLayout from "@/app/(authenticated)/dashboard/_components/dashboard-layout";
+import StatCard from "@/app/(authenticated)/dashboard/_components/stat-cart";
+import { getAppointments } from "@/app/(authenticated)/dashboard/appointments/actions";
 import { appointmentTableColumns } from "@/app/(authenticated)/dashboard/appointments/columns";
 import { Button } from "@/components/ui/button";
 import { DataTable } from "@/components/ui/data-table";
 import { getSession } from "@/lib/auth-client";
 import db from "@/lib/db";
-import { listAppointments } from "@/lib/db/queries";
-import { appointment, doctor, receptionist, user, User } from "@/lib/db/schema";
+import { User } from "@/lib/db/schema";
 import { format } from "date-fns";
 import { eq } from "drizzle-orm";
+import { CalendarCheck } from "lucide-react";
 import { headers } from "next/headers";
 import Link from "next/link";
 
@@ -17,34 +19,40 @@ export default async function Appointments() {
       headers: await headers(),
     },
   });
-
+  
   if (!data) throw new Error("Unauthorized");
-
-  const appointments = await listAppointments(
-    data.user.id,
-    data.user.role as User["role"],
-  );
-
+  const appointments = await getAppointments(data.user.id, data.user.role as User["role"]);
+  
   return (
-    <CardLayout title="Manage Appointments" className="flex-1">
+    <DashboardLayout title="Manage Appointments">
       {appointments && (
-        <div className="h-screen flex flex-col">
-          <div className="flex-1">
+        <div className="relative">
+          <div>
+            <StatCard
+              title={'total appointments'}
+              data={appointments.length}
+              icon={<CalendarCheck />}
+            />
             <DataTable
               columns={appointmentTableColumns}
               data={appointments}
               filters={["doctorId", "patientId"]}
               bulkTableName="appointment"
-              hiddenColumns={["id"]}
+              hiddenColumns={["id", "role", "type", "createdBy"]}
             />
           </div>
-          <Button className="sticky bottom-4 p-4 shadow-md w-full">
-            <Link href="/dashboard/appointments/create">
-              Create Appointment
-            </Link>
-          </Button>
+          
+          <div className="fixed bottom-0 left-0 w-full z-10">
+            <div className="container mx-auto p-4">
+              <Button className="w-full shadow-md">
+                <Link href="/dashboard/appointments/create" className="w-full h-full flex items-center justify-center">
+                  Create Appointment
+                </Link>
+              </Button>
+            </div>
+          </div>
         </div>
       )}
-    </CardLayout>
+    </DashboardLayout>
   );
 }

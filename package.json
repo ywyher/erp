@@ -1,5 +1,5 @@
 {
-  "name": "ayat-snippet",
+  "name": "erp",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -99,7 +99,7 @@
     "@vercel/postgres": "^0.10.0",
     "alert": "^6.0.2",
     "axios": "^1.7.9",
-    "better-auth": "1.1.14",
+    "better-auth": "^1.2.4",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "cmdk": "1.0.4",
@@ -122,7 +122,7 @@
     "nanoid": "^5.1.2",
     "next": "15.2.2",
     "next-themes": "^0.4.4",
-    "nuqs": "^2.4.0",
+    "nuqs": "^2.4.1",
     "oslo": "^1.2.1",
     "pdf-lib": "^1.17.1",
     "pizzip": "^3.1.8",

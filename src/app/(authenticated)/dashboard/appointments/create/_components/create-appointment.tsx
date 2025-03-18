@@ -10,6 +10,7 @@ import { toast } from "sonner";
 import ExistingUser from "@/app/(authenticated)/dashboard/_components/existing-user";
 import NewUser from "@/app/(authenticated)/dashboard/_components/new-user";
 import DateSelector from "@/components/date-selector";
+import DashboardLayout from "@/app/(authenticated)/dashboard/_components/dashboard-layout";
 
 export default function CreateAppointment({
   // id from the user table
@@ -81,7 +82,7 @@ export default function CreateAppointment({
     }, [patientId, role, doctorWorkId, setDoctorId]);
 
   return (
-    <div className="p-2">
+    <DashboardLayout>
       {!patientId && (
         <ExistingUser
           title="Create an appointment"
@@ -110,6 +111,6 @@ export default function CreateAppointment({
       {patientId && role != "doctor" && (
         <DoctorsList book={true} customSchedule={true} />
       )}
-    </div>
+    </DashboardLayout>
   );
 }

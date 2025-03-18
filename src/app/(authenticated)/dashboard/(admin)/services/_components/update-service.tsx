@@ -11,10 +11,9 @@ import { toast } from "sonner";
 import { revalidate } from "@/app/actions";
 import DialogWrapper from "@/app/(authenticated)/dashboard/_components/dialog-wrapper";
 import { servicSchema } from "@/app/(authenticated)/dashboard/(admin)/services/types";
-import { updateService } from "@/app/(authenticated)/dashboard/(admin)/services/actions";
+import { getServiceData, updateService } from "@/app/(authenticated)/dashboard/(admin)/services/actions";
 import { Service } from "@/lib/db/schema";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { queryServiceData } from "@/lib/db/queries";
 import { useFileUpload } from "@/hooks/use-file-upload";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
@@ -49,7 +48,7 @@ export default function UpdateService({ serviceId }: { serviceId: Service['id'] 
   const { data: serviceData, isLoading: isServiceDataLoading } = useQuery({
     queryKey: ['service', 'data', 'update', serviceId],
     queryFn: async () => {
-      return await queryServiceData(serviceId);
+      return await getServiceData(serviceId);
     }
   });
 

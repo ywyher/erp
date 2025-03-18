@@ -9,7 +9,7 @@ import { FormFieldWrapper } from "@/components/form-field-wrapper";
 import LoadingBtn from "@/components/loading-btn";
 import { Form } from "@/components/ui/form";
 import { Operation, OperationData as TOperationData } from "@/lib/db/schema";
-import { Dispatch, SetStateAction, useEffect, useState, useMemo } from "react";
+import { Dispatch, SetStateAction, useEffect, useState, useMemo, cache } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -44,7 +44,11 @@ export default function OperationData({
 
   // Generate a cache key from the operationDocument
   const cacheKey = useMemo(() => {
-    return operationDocument;
+    if(operationDocument) {
+      return operationDocument;
+    }else {
+      return undefined;
+    }
   }, [operationDocument]);
 
   useEffect(() => {
@@ -73,7 +77,9 @@ export default function OperationData({
       }
     };
 
-    fetchPlaceholders();
+    if(cacheKey) {
+      fetchPlaceholders();
+    }
   }, [cacheKey]);
 
   const form = useForm({
@@ -109,41 +115,45 @@ export default function OperationData({
   return (
     <Card>
       <CardHeader>
-        <CardTitle>{task === "create" ? "Insert" : "Update"} Data</CardTitle>
+        <CardTitle className="text-xl">{task === "create" ? "Insert" : "Update"} Data</CardTitle>
       </CardHeader>
       <CardContent>
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(handleOperationData)}>
-            {isLoadingPlaceholders ? (
-              <div className="space-y-4">
-                <Skeleton className="h-10 w-full" />
-                <Skeleton className="h-10 w-full" />
-                <Skeleton className="h-10 w-full" />
-              </div>
-            ) : placeholders && placeholders.length > 0 ? (
-              <div className="space-y-4">
-                {placeholders.map((placeholder, index) => (
-                  <FormFieldWrapper
-                    key={index}
-                    form={form}
-                    name={placeholder}
-                    label={placeholder}
-                  />
-                ))}
-              </div>
-            ) : (
-              <div className="py-4 text-center text-muted-foreground">
-                No placeholders found in document
-              </div>
-            )}
+        {operationData ? (
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(handleOperationData)}>
+              {isLoadingPlaceholders ? (
+                <div className="space-y-4">
+                  <Skeleton className="h-10 w-full" />
+                  <Skeleton className="h-10 w-full" />
+                  <Skeleton className="h-10 w-full" />
+                </div>
+              ) : placeholders && placeholders.length > 0 ? (
+                <div className="space-y-4">
+                  {placeholders.map((placeholder, index) => (
+                    <FormFieldWrapper
+                      key={index}
+                      form={form}
+                      name={placeholder}
+                      label={placeholder}
+                    />
+                  ))}
+                </div>
+              ) : (
+                <div className="py-4 text-center text-muted-foreground">
+                  No placeholders found in document
+                </div>
+              )}
 
-            {editable && (
-              <LoadingBtn isLoading={isLoading} className="mt-4">
-                {task === "create" ? "Create" : "Update"} Operation Data
-              </LoadingBtn>
-            )}
-          </form>
-        </Form>
+              {editable && (
+                <LoadingBtn isLoading={isLoading} className="mt-4">
+                  {task === "create" ? "Create" : "Update"} Operation Data
+                </LoadingBtn>
+              )}
+            </form>
+          </Form>
+        ): (
+          <p className="text-red-500 text-center">Document not uploaded, Contact the admin to upload the document!</p>
+        )}
       </CardContent>
     </Card>
   );

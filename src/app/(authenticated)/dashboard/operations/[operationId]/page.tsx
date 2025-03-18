@@ -1,4 +1,4 @@
-import CardLayout from "@/components/card-layout";
+import CardLayout from "@/app/(authenticated)/dashboard/_components/dashboard-layout";
 import OperationTabs from "@/app/(authenticated)/dashboard/operations/[operationId]/_components/operation-tabs";
 import { getSession } from "@/lib/auth-client";
 import db from "@/lib/db";
@@ -116,7 +116,7 @@ export default async function Operation({
   if (!operationDocument) return new Error("couldnt get operation document");
 
   return (
-    <CardLayout className="py-4">
+    <CardLayout>
       <OperationTabs
         patient={patient}
         medicalFiles={medicalFiles}

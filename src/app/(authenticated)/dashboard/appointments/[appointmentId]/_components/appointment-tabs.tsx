@@ -112,7 +112,7 @@ export default function AppointmentTabs({
     <Tabs
       value={activeTab}
       onValueChange={(value) => setActiveTab(value as typeof activeTab)}
-      className="w-full"
+      className="w-full pt-4"
     >
       <TabsList>
         <TabsTrigger className="w-full" value="user">
@@ -127,7 +127,7 @@ export default function AppointmentTabs({
           </TabsTrigger>
         )}
       </TabsList>
-      <TabsContent value="user" className="flex flex-col gap-3">
+      <TabsContent value="user" className="flex flex-col gap-3 pt-2">
         <UserCard data={patient} />
         <UserMedicalFiles files={medicalFiles} />
       </TabsContent>

@@ -23,30 +23,35 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { deleteById } from "@/lib/db/mutations";
-import { DataTableStatusFilter } from "@/components/ui/data-table-status-filter";
-import { Checkbox } from "@/components/ui/checkbox";
+import { DataTableStatusFilter, StatusConfigType } from "@/components/ui/data-table-status-filter";
+import LoadingBtn from "@/components/loading-btn";
 
 interface DataTableToolbarProps<TData extends { id: string }> {
   table: Table<TData>;
   filters: string[];
   bulkTableName: string;
+  statusConfigType?: StatusConfigType
 }
 
 export function DataTableToolbar<TData extends { id: string }>({
   table,
   filters,
   bulkTableName,
+  statusConfigType = 'tasks',
 }: DataTableToolbarProps<TData>) {
   const isFiltered = table.getState().columnFilters.length > 0;
   const selectedRows = table.getSelectedRowModel().rows;
   const [open, setOpen] = useState(false);
   const [activeFilter, setActiveFilter] = useState(filters[0]);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const handleDelete = async () => {
+    setIsLoading(true)
     for (const row of selectedRows) {
       await deleteById(row.original.id, bulkTableName);
     }
     setOpen(false);
+    setIsLoading(false)
     table.resetRowSelection();
   };
 
@@ -107,7 +112,10 @@ export function DataTableToolbar<TData extends { id: string }>({
       <div className="flex items-center space-x-2">
         {/* Status Filter Component */}
         {table.getAllColumns().some((col) => col.id === "status") && (
-          <DataTableStatusFilter table={table} />
+          <DataTableStatusFilter
+            configType={statusConfigType}
+            table={table}
+          />
         )}
         {selectedRows.length > 0 && (
           <>
@@ -130,9 +138,9 @@ export function DataTableToolbar<TData extends { id: string }>({
                   <Button variant="outline" onClick={() => setOpen(false)}>
                     Cancel
                   </Button>
-                  <Button variant="destructive" onClick={handleDelete}>
+                  <LoadingBtn isLoading={isLoading} variant="destructive" onClick={handleDelete}>
                     Confirm
-                  </Button>
+                  </LoadingBtn>
                 </DialogFooter>
               </DialogContent>
             </Dialog>

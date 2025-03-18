@@ -157,6 +157,9 @@ export default function Check({
         </Button>
       </div>
       <div className="relative">
+      {/* <Separator className="flex-grow" />
+        <Separator className="flex-grow" /> */}
+
         <div className="absolute inset-0 flex items-center">
           <span className="w-full border-t border-zinc-700" />
         </div>

@@ -1,3 +1,5 @@
+"use client"
+
 import {
   Dialog,
   DialogContent,
@@ -17,7 +19,9 @@ import { format } from "date-fns";
 import { Button } from "@/components/ui/button";
 import { CalendarIcon, ChevronLeft, ChevronRight } from "lucide-react";
 import { Dispatch, SetStateAction, useState } from "react";
-import CardLayout from "@/components/card-layout";
+import CardLayout from "@/app/(authenticated)/dashboard/_components/dashboard-layout";
+import { Drawer, DrawerClose, DrawerContent, DrawerDescription, DrawerFooter, DrawerHeader, DrawerTitle } from "@/components/ui/drawer"
+import { useIsMobile } from "@/hooks/use-mobile";
 
 export function ScheduleDisplay({
   schedules,
@@ -72,6 +76,8 @@ export function ScheduleDisplay({
   const startIndex = (currentPage - 1) * maxItemsPerPage;
   const endIndex = Math.min(startIndex + maxItemsPerPage, totalDays);
   const currentDays = sortedDays.slice(startIndex, endIndex);
+  
+  const isMobile = useIsMobile();
 
   // Pagination controls
   const handlePrevPage = () => {
@@ -161,23 +167,41 @@ export function ScheduleDisplay({
   );
 
   return dialog ? (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button variant="outline">
-          <CalendarIcon className="h-4 w-4" />
-          View Schedules
-        </Button>
-      </DialogTrigger>
-      <DialogContent className="sm:max-w-[425px]">
-        <DialogHeader>
-          <DialogTitle>Weekly Schedules</DialogTitle>
-        </DialogHeader>
-        {content}
-      </DialogContent>
-    </Dialog>
+    <>
+      {isMobile ? (
+        <Drawer open={open} onOpenChange={setOpen}>
+          <DrawerContent className="flex flex-col h-[90vh]">
+            <DrawerHeader className="text-left px-4">
+              <DrawerTitle>View Scheudles</DrawerTitle>
+              <DrawerDescription>
+                Fill out the form below. All fields are required.
+              </DrawerDescription>
+            </DrawerHeader>
+            {content}
+          </DrawerContent>
+        </Drawer>
+      ): (
+        <Dialog open={open} onOpenChange={setOpen}>
+          <DialogTrigger asChild>
+            <Button variant="outline">
+              <CalendarIcon className="h-4 w-4" />
+              View Schedules
+            </Button>
+          </DialogTrigger>
+          <DialogContent className="sm:max-w-[425px]">
+            <DialogHeader>
+              <DialogTitle>Weekly Schedules</DialogTitle>
+            </DialogHeader>
+            {content}
+          </DialogContent>
+        </Dialog>
+      )}
+    </>
   ) : (
-    <CardLayout title="Weekly Schedules" className="gap-4">
-      {content}
-    </CardLayout>
+    <Card className="pt-8">
+      <CardContent>
+        {content}
+      </CardContent>
+    </Card>
   );
 }

@@ -12,9 +12,9 @@ const doctorColumns = [
   { value: "name", header: "Name" },
   { value: "username", header: "Username" },
   { value: "email", header: "Email" },
-  { value: "emailVerified", header: "Email Verified", isBoolean: true },
+  // { value: "emailVerified", header: "Email Verified", isBoolean: true },
   { value: "phoneNumber", header: "Phone Number" },
-  { value: "phoneNumberVerified", header: "Phone Verified", isBoolean: true },
+  // { value: "phoneNumberVerified", header: "Phone Verified", isBoolean: true },
   { value: "nationalId", header: "National Id" },
   { value: "specialty", header: "Specialty" },
   { value: "schedules", header: "Schedules", dialog: true },
@@ -43,7 +43,7 @@ export const doctorTableColumns: ColumnDef<any>[] = [
     enableSorting: false,
     enableHiding: false,
   },
-  ...doctorColumns.map(({ value, header, dialog, isBoolean }) => ({
+  ...doctorColumns.map(({ value, header, dialog }) => ({
     accessorKey: value,
     header: ({ column }: { column: Column<any, any> }) => (
       <DataTableColumnHeader column={column} title={header} />
@@ -55,7 +55,6 @@ export const doctorTableColumns: ColumnDef<any>[] = [
           value={value}
           header={header}
           dialog={dialog}
-          isBoolean={isBoolean}
         />
       );
     },

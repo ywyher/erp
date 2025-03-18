@@ -72,7 +72,7 @@ export default function ExistingUser({
   };
 
   return (
-    <Card className="w-full">
+    <Card className="w-full h-full mt-5">
       <CardHeader>
         <CardTitle>{title}</CardTitle>
         <CardDescription>

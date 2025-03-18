@@ -13,7 +13,7 @@ import { generateId } from "@/lib/funcs";
 export async function createAdmin(data: z.infer<typeof createUserSchema>) {
     try {
       return await db.transaction(async (tx) => {
-        const createdUser = await createUser({ data, role: "admin", verified: true });
+        const createdUser = await createUser({ data, role: "admin", verified: true, dbInstance: tx });
 
         if (
           ("error" in createdUser && createdUser.error) ||

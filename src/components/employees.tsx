@@ -1,3 +1,5 @@
+'use client'
+
 import { useEffect } from "react";
 import { getEmployees } from "@/lib/db/queries";
 import { useQuery } from "@tanstack/react-query";
@@ -9,8 +11,9 @@ import { z } from "zod";
 import { Doctor, Receptionist, Schedule, User } from "@/lib/db/schema";
 import { Skeleton } from "@/components/ui/skeleton";
 import DateFilters from "@/components/date-filters";
-import CardLayout from "@/components/card-layout";
+import CardLayout from "@/app/(authenticated)/dashboard/_components/dashboard-layout";
 import { format, isToday } from "date-fns";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 export default function Employees() {
   const [role, setRole] = useQueryState(
@@ -59,84 +62,89 @@ export default function Employees() {
   })();
 
   return (
-    <CardLayout title={formattedTitle} className="gap-0">
-      <div className="flex flex-col gap-5 p-4">
-        <div className="flex gap-2 w-full flex-col lg:flex-row">
-          <div className="flex flex-row gap-2 w-full">
+    <Card>
+      <CardHeader>
+        <CardTitle className="text-xl">{formattedTitle}</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <div className="flex flex-col gap-5 pb-4">
+          <div className="flex gap-2 w-full flex-col lg:flex-row">
+            <div className="flex flex-row gap-2 w-full">
+              <Button
+                className="w-full"
+                variant={role === "doctor" ? "default" : "outline"}
+                onClick={() => setRole("doctor")}
+              >
+                Doctors
+              </Button>
+              <Button
+                className="w-full"
+                variant={role === "receptionist" ? "default" : "outline"}
+                onClick={() => setRole("receptionist")}
+              >
+                Receptionists
+              </Button>
+            </div>
+            <DateFilters />
             <Button
-              className="w-full"
-              variant={role === "doctor" ? "default" : "outline"}
-              onClick={() => setRole("doctor")}
+              variant="destructive"
+              onClick={() => {
+                setRole(null);
+                setDate(null);
+              }}
             >
-              Doctors
-            </Button>
-            <Button
-              className="w-full"
-              variant={role === "receptionist" ? "default" : "outline"}
-              onClick={() => setRole("receptionist")}
-            >
-              Receptionists
+              Reset Filters
             </Button>
           </div>
-          <DateFilters />
-          <Button
-            variant="destructive"
-            onClick={() => {
-              setRole(null);
-              setDate(null);
-            }}
-          >
-            Reset Filters
-          </Button>
-        </div>
-        <div className="flex flex-col gap-3 w-full">
-          <div className="text-lg font-semibold">
-            {role === "doctor" ? "Listed Doctors" : "Listed Receptionists"}
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
-            {!isLoading ? (
-              data && data.length > 0 ? (
-                data.map((employee) =>
-                  role === "doctor" ? (
-                    <DoctorCard
-                      key={(employee as any).user.id}
-                      data={
-                        employee as {
-                          user: User;
-                          doctor: Doctor;
-                          schedules: Schedule[];
+          <div className="flex flex-col gap-3 w-full">
+            <div className="text-lg font-semibold">
+              {role === "doctor" ? "Listed Doctors" : "Listed Receptionists"}
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+              {!isLoading ? (
+                data && data.length > 0 ? (
+                  data.map((employee) =>
+                    role === "doctor" ? (
+                      <DoctorCard
+                        key={(employee as any).user.id}
+                        data={
+                          employee as {
+                            user: User;
+                            doctor: Doctor;
+                            schedules: Schedule[];
+                          }
                         }
-                      }
-                    />
-                  ) : (
-                    <ReceptionistCard
-                      key={(employee as any).user.id}
-                      data={
-                        employee as {
-                          user: User;
-                          receptionist: Receptionist;
-                          schedules: Schedule[];
+                      />
+                    ) : (
+                      <ReceptionistCard
+                        key={(employee as any).user.id}
+                        data={
+                          employee as {
+                            user: User;
+                            receptionist: Receptionist;
+                            schedules: Schedule[];
+                          }
                         }
-                      }
-                    />
-                  ),
+                      />
+                    ),
+                  )
+                ) : (
+                  <div className="flex justify-center items-center w-full col-span-full">
+                    <span className="text-center text-gray-500">
+                      No {role === "doctor" ? "doctors" : "receptionists"} found,
+                      try adjusting the filters.
+                    </span>
+                  </div>
                 )
               ) : (
-                <div className="flex justify-center items-center w-full col-span-full">
-                  <span className="text-center text-gray-500">
-                    No {role === "doctor" ? "doctors" : "receptionists"} found,
-                    try adjusting the filters.
-                  </span>
-                </div>
-              )
-            ) : (
-              Array.from({ length: 3 }).map((_, index) => (
-                <Skeleton key={index} className="w-full h-[300px]" />
-              ))
-            )}
+                Array.from({ length: 3 }).map((_, index) => (
+                  <Skeleton key={index} className="w-full h-[300px]" />
+                ))
+              )}
+            </div>
           </div>
         </div>
-      </div>
-    </CardLayout>
+      </CardContent>
+    </Card>
   );
 }

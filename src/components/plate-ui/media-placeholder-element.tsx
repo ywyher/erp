@@ -77,17 +77,14 @@ export const MediaPlaceholderElement = withHOC(
       // Inside MediaPlaceholderElement
       const { 
         setIsProcessing, 
-        setProgresses, 
         setOperation, 
-        addProcessingFile, 
-        removeProcessingFile 
       } = useProcessStore();
 
       // When starting an upload
       useEffect(() => {
         setIsProcessing(isUploading);
         setOperation(isUploading ? 'upload' : undefined);
-      }, [isUploading, progresses, uploadingFile, setIsProcessing, setProgresses, setOperation, addProcessingFile]);
+      }, [isUploading, progresses, uploadingFile, setIsProcessing, setOperation]);
 
 
       const currentContent = CONTENT[element.mediaType];

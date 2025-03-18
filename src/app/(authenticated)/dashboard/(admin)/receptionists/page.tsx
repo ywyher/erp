@@ -1,21 +1,28 @@
 import CreateReceptionist from "@/app/(authenticated)/dashboard/(admin)/receptionists/_components/create-receptionist";
+import { getReceptionists } from "@/app/(authenticated)/dashboard/(admin)/receptionists/actions";
 import { receptionistTableColumns } from "@/app/(authenticated)/dashboard/(admin)/receptionists/columns";
-import CardLayout from "@/components/card-layout";
+import DashboardLayout from "@/app/(authenticated)/dashboard/_components/dashboard-layout";
+import StatCard from "@/app/(authenticated)/dashboard/_components/stat-cart";
 import { DataTable } from "@/components/ui/data-table";
-import { listUsers } from "@/lib/db/queries";
+import { ConciergeBell } from "lucide-react";
 
 export default async function Doctors() {
-  const data = await listUsers("receptionist", true);
+  const receptionists = await getReceptionists({ merge: true });
 
   return (
-    <CardLayout title="Manage Receptionists">
+    <DashboardLayout title="Manage Receptionists">
+      <StatCard
+        title={'total receptionists'}
+        data={receptionists.length}
+        icon={<ConciergeBell />}
+      />
       <DataTable
         columns={receptionistTableColumns}
-        data={data ?? []}
+        data={receptionists ?? []}
         bulkTableName="user"
         filters={["email", "phoneNumber", "name", "username", "nationalId"]}
       />
       <CreateReceptionist />
-    </CardLayout>
+    </DashboardLayout>
   );
 }

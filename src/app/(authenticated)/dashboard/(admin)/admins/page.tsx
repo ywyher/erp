@@ -1,21 +1,28 @@
 import CreateAdmin from "@/app/(authenticated)/dashboard/(admin)/admins/_components/create-admin";
+import { getAdmins } from "@/app/(authenticated)/dashboard/(admin)/admins/actions";
 import { adminTableColumns } from "@/app/(authenticated)/dashboard/(admin)/admins/columns";
-import CardLayout from "@/components/card-layout";
+import DashboardLayout from "@/app/(authenticated)/dashboard/_components/dashboard-layout";
+import StatCard from "@/app/(authenticated)/dashboard/_components/stat-cart";
 import { DataTable } from "@/components/ui/data-table";
-import { listUsers } from "@/lib/db/queries";
+import { Lock } from "lucide-react";
 
 export default async function Admin() {
-  const data = await listUsers("admin", true);
+  const admins = await getAdmins();
 
   return (
-    <CardLayout title="Manage Admins">
+    <DashboardLayout title="Manage Admins">
+      <StatCard
+        title={'total admins'}
+        data={admins.length}
+        icon={<Lock />}
+      />
       <DataTable
         columns={adminTableColumns}
-        data={data ?? []}
+        data={admins ?? []}
         bulkTableName="user"
         filters={["email", "phoneNumber", "name", "username", "nationalId"]}
       />
       <CreateAdmin />
-    </CardLayout>
+    </DashboardLayout>
   );
 }

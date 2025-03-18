@@ -1,22 +1,29 @@
 import CreateUser from "@/app/(authenticated)/dashboard/(admin)/users/_components/create-user";
+import { getUsers } from "@/app/(authenticated)/dashboard/(admin)/users/actions";
 import { userTableColumns } from "@/app/(authenticated)/dashboard/(admin)/users/columns";
-import CardLayout from "@/components/card-layout";
+import DashboardLayout from "@/app/(authenticated)/dashboard/_components/dashboard-layout";
+import StatCard from "@/app/(authenticated)/dashboard/_components/stat-cart";
 import { DataTable } from "@/components/ui/data-table";
-import { listUsers } from "@/lib/db/queries";
+import { User } from "lucide-react";
 
 export default async function Users() {
-  const data = await listUsers("user");
+  const users = await getUsers()
 
   return (
-    <CardLayout title="Manage Users">
+    <DashboardLayout title="Manage Users">
+      <StatCard 
+        title={'total users'}
+        data={users.length}
+        icon={<User />}
+      />
       <DataTable
         columns={userTableColumns}
-        data={data ?? []}
+        data={users ?? []}
         bulkTableName="user"
         hiddenColumns={["id"]}
         filters={["email", "phoneNumber", "nationalId", "username"]}
       />
       <CreateUser />
-    </CardLayout>
+    </DashboardLayout>
   );
 }

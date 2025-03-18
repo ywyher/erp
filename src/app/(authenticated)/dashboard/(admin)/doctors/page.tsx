@@ -1,17 +1,24 @@
 import CreateDoctor from "@/app/(authenticated)/dashboard/(admin)/doctors/_components/create-doctor";
+import { getDoctors } from "@/app/(authenticated)/dashboard/(admin)/doctors/actions";
 import { doctorTableColumns } from "@/app/(authenticated)/dashboard/(admin)/doctors/columns";
-import CardLayout from "@/components/card-layout";
+import DashboardLayout from "@/app/(authenticated)/dashboard/_components/dashboard-layout";
+import StatCard from "@/app/(authenticated)/dashboard/_components/stat-cart";
 import { DataTable } from "@/components/ui/data-table";
-import { listUsers } from "@/lib/db/queries";
+import { Stethoscope } from "lucide-react";
 
 export default async function Doctors() {
-  const data = await listUsers("doctor", true);
+  const doctors = await getDoctors({ merge: true })
 
   return (
-    <CardLayout title="Manage Doctors">
+    <DashboardLayout title="Manage Doctors">
+      <StatCard
+        title={'total doctors'}
+        data={doctors.length}
+        icon={<Stethoscope />}
+      />
       <DataTable
         columns={doctorTableColumns}
-        data={data ?? []}
+        data={doctors ?? []}
         bulkTableName="user"
         filters={[
           "email",
@@ -23,6 +30,6 @@ export default async function Doctors() {
         ]}
       />
       <CreateDoctor />
-    </CardLayout>
+    </DashboardLayout>
   );
 }

@@ -3,7 +3,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import Images from "./images";
 import Videos from "./videos";
 import Pdfs from "./pdfs";
-import CardLayout from "@/components/card-layout";
+import CardLayout from "@/app/(authenticated)/dashboard/_components/dashboard-layout";
 
 export default function UserMedicalFiles({ files }: { files: MedicalFile[] }) {
   const hasImages = files.some((file) => file.type.startsWith("image/"));

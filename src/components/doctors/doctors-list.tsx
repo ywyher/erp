@@ -14,8 +14,9 @@ import {
 import { DateRange } from "react-day-picker";
 import { z } from "zod";
 import { useState } from "react";
-import CardLayout from "@/components/card-layout";
 import { Skeleton } from "@/components/ui/skeleton";
+import DashboardLayout from "@/app/(authenticated)/dashboard/_components/dashboard-layout";
+import { Card } from "@/components/ui/card";
 
 export default function DoctorsList({
   book,
@@ -76,7 +77,7 @@ export default function DoctorsList({
   };
 
   return (
-    <CardLayout title="Book an appointment">
+    <Card className="flex flex-col gap-3 mt-5 p-5">
       <div className="flex flex-col gap-4">
         <DoctorsFilters
           onApply={handleApplyFilters}
@@ -110,6 +111,6 @@ export default function DoctorsList({
           </div>
         </div>
       </div>
-    </CardLayout>
+    </Card>
   );
 }

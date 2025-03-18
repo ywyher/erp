@@ -1,5 +1,5 @@
 import { jsonb, pgEnum, pgTable, text, timestamp } from "drizzle-orm/pg-core";
-import { admin } from "./roles";
+import { user } from "./roles";
 import { relations } from "drizzle-orm";
 import { socialStatusEnum } from "@/lib/db/schema/enums";
 
@@ -17,7 +17,7 @@ export const post = pgTable("post", {
   tags: text('tags'),
   category: postCategoryEnum("category").notNull(),
   authorId: text("authorId")
-    .references(() => admin.id, { onDelete: "cascade" })
+    .references(() => user.id, { onDelete: "cascade" })
     .notNull(),
   status: socialStatusEnum("status").default("draft").notNull(),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
@@ -25,8 +25,8 @@ export const post = pgTable("post", {
 });
 
 export const postRelation = relations(post, ({ one }) => ({
-  admin: one(admin, {
+  user: one(user, {
     fields: [post.authorId],
-    references: [admin.id],
+    references: [user.id],
   }),
 }));

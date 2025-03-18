@@ -39,10 +39,8 @@ export default function Create() {
       return;
     }
 
-    toast("Done.", {
-      description: result?.message,
-    });
-
+    toast(result?.message);
+    
     form.reset({
       name: "",
       email: "",

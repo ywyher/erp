@@ -9,6 +9,20 @@ import { headers } from "next/headers"
 import { v4 as uuidv4 } from 'uuid';
 import slugify from 'slugify'
 import { deleteFile } from "@/lib/s3";
+import { revalidatePath } from "next/cache";
+
+export const getPosts = async () => {
+    const posts = await db.select().from(post)
+  
+    return posts
+}
+  
+export const getPostData = async (slug: Post['slug']) => {
+    const [postData] = await db.select().from(post)
+      .where(eq(post.slug, slug))
+  
+    return postData
+}
 
 export async function createPost({ title, content, status, category, thumbnail, tags }: { 
      title: Post['title'],
@@ -19,23 +33,16 @@ export async function createPost({ title, content, status, category, thumbnail, 
      tags: Post['tags']
     }) {
     try {
-        const userData = await getSession({
+        const { data } = await getSession({
             fetchOptions: {
                 headers: await headers(),
             },
         });
     
-        if(!userData.data || !userData.data.user) throw new Error("Couldn't Retrieve User Data...");
-        
-        // Get the admin record for this user
-        const adminRecord = await db.query.admin.findFirst({
-            where: eq(admin.userId, userData.data.user.id)
-        });
-        
-        if (!adminRecord) throw new Error("You don't have permission to create posts");
+        if(!data || !data.user) throw new Error("Couldn't Retrieve User Data...");
         
         const postId = generateId();
-        const authorId = adminRecord.id;
+        const authorId = data.user.id;
 
         const slug = slugify(`${title}-${uuidv4().split('-')[0]}`, {
             replacement: '-',
@@ -114,18 +121,35 @@ export async function updatePost({ title, content, status, category, thumbnail, 
       }
 }
 
-export async function DeletePost({ id, names }: { id: Post['id'], names: string[] }) {
+export async function deletePost({ id }: { id: Post['id'] }) {
+    const [postData] = await db.select().from(post)
+        .where(eq(post.id, id))
+
+    // Assuming you want the first post's content
+    const editorFileNames = Array.from(
+        new Set(
+        (postData.content as any[]).filter(con => 
+            con.type === 'img' || 
+            con.type === 'video' || 
+            con.type === 'file' || 
+            con.type === 'audio'
+        ).map(con => con.name)
+        )
+    ) as string[];
+
+    const names = [...editorFileNames, postData.thumbnail]
+
     await db.delete(post).where(eq(post.id, id));
 
     // Execute all deleteFile operations in parallel
     await Promise.all(names.map(name => deleteFile(name)));
 
+    revalidatePath('/dashboard/posts')
     return {
         message: "Post deleted!",
         error: null,
     };
 }
-
 
 export async function getPost({ slug }: { slug: Post['slug'] }) {
     const [postData] = await db.select().from(post)

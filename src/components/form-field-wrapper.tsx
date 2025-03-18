@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { RefObject, useEffect, useState } from "react";
 import { Controller, UseFormReturn } from "react-hook-form";
 import {
   FormItem,
@@ -35,7 +35,7 @@ import { HTML5Backend } from "react-dnd-html5-backend";
 import { useCreateEditor } from "@/components/editor/use-create-editor";
 import { Editor, EditorContainer } from "@/components/plate-ui/editor";
 import { Tag, TagInput } from "emblor";
-import { Value } from "@udecode/plate";
+import { Editor as TEditor, Value } from "@udecode/plate";
 
 type AcceptMimeType =
   | "image/*"
@@ -69,6 +69,8 @@ interface FormFieldWrapperProps {
   maxLength?: number; // Add this line
   onFileChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
   // className?: string;
+  // the editor ref here to make sure content is updated since when uploading an image and the user didnt foucs on the editor it wont update it !
+  editorRef?: RefObject<TEditor | null>;
 }
 
 export const FormFieldWrapper: React.FC<FormFieldWrapperProps> = ({
@@ -84,7 +86,8 @@ export const FormFieldWrapper: React.FC<FormFieldWrapperProps> = ({
   options = [],
   disableSearch = true,
   maxLength = 250,
-  onFileChange
+  onFileChange,
+  editorRef
 }) => {
   const [open, setOpen] = useState<boolean>(false);
   const [showPassword, setShowPassword] = useState<boolean>(false);
@@ -92,10 +95,12 @@ export const FormFieldWrapper: React.FC<FormFieldWrapperProps> = ({
   const errorMessage = form.formState.errors[name]?.message as string | undefined;
   
   let editor = null;
-  if(type === 'editor') {
+  if(type === 'editor' && editorRef) {
     editor = useCreateEditor({
       value: (defaultValue as Value) ? (defaultValue as Value) : []
     });
+    
+    editorRef.current = editor;
   }
   
   const [tags, setTags] = useState<Tag[]>([]);
@@ -333,7 +338,7 @@ export const FormFieldWrapper: React.FC<FormFieldWrapperProps> = ({
                     onChange={onFileChange}
                   />
               )}
-              {type === 'editor' && (
+              {(type === 'editor' && editorRef) && (
                 <>
                   {editor && (
                     <DndProvider backend={HTML5Backend}>

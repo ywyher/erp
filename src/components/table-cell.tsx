@@ -144,11 +144,11 @@ export default function TableCell({
                 View
               </Button>
             </DrawerTrigger>
-            <DrawerContent className="h-[calc(100vh-10vh)]">
+            <DrawerContent className="h-[90vh]">
               <DrawerHeader>
                 <DrawerTitle className="text-left">{header}</DrawerTitle>
               </DrawerHeader>
-              <div className="px-4">
+              <div className="px-4 h-full overflow-auto">
                 {child}
               </div>
             </DrawerContent>
@@ -160,11 +160,13 @@ export default function TableCell({
                 View
               </Button>
             </SheetTrigger>
-            <SheetContent side='bottom' className="h-[calc(100vh-10vh)] flex flex-col gap-3">
+            <SheetContent side='bottom' className="h-[90vh] flex flex-col gap-3">
               <SheetHeader>
                 <SheetTitle>{header}</SheetTitle>
               </SheetHeader>
-              {child}
+              <div className="h-full overflow-auto">
+                {child}
+              </div>
             </SheetContent>
           </Sheet>
         )}
@@ -186,7 +188,7 @@ export default function TableCell({
                 </Button>
               </div>
             </DrawerTrigger>
-            <DrawerContent className="p-4 h-[calc(100vh-10vh)]">
+            <DrawerContent className="p-4 h-[90vh]">
               <DrawerHeader className="text-left px-0">
                 <DrawerTitle>{header}</DrawerTitle>
                 <div className="px-4 mt-2">
@@ -226,7 +228,7 @@ export default function TableCell({
               View
             </Button>
           </DrawerTrigger>
-          <DrawerContent className="p-4 h-[calc(100vh-10vh)]">
+          <DrawerContent className="p-4 h-[90vh]">
             <DrawerHeader className="text-left px-0">
               <DrawerTitle>{header}</DrawerTitle>
               <div className="px-4">

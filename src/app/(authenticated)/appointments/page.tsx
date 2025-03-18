@@ -6,8 +6,10 @@ import { getSession } from "@/lib/auth-client"
 import { User } from "@/lib/db/schema";
 import { useQuery } from "@tanstack/react-query"
 import { appointmentTableColumns } from "../dashboard/appointments/columns";
-import { listAppointments } from "@/lib/db/queries";
-import CardLayout from "../../../components/card-layout";
+import DashboardLayout from "../dashboard/_components/dashboard-layout";
+import { getAppointments } from "@/app/(authenticated)/dashboard/appointments/actions";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import CardLayout from "@/components/card-layout";
 
 export default function Appointments() {
     const { data: user, isLoading: isUserLoading } = useQuery({
@@ -21,7 +23,7 @@ export default function Appointments() {
     const { data: appointments, isLoading: isAppointmentLoading } = useQuery({
         queryKey: ['list-appointments', user?.role],
         queryFn: async () => {
-            return await listAppointments(
+            return await getAppointments(
                 user?.id as User["id"],
                 user?.role as User["role"],
             );
@@ -34,7 +36,7 @@ export default function Appointments() {
     return (
         <>
             <Header />
-            <CardLayout title="My Appointments" className="flex-1">
+            <CardLayout title="My Appointments">
                 {appointments && (
                     <DataTable
                         columns={appointmentTableColumns}

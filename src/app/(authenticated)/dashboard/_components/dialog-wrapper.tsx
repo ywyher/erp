@@ -39,10 +39,10 @@ export default function DialogWrapper({
   if (isMobile)
     return (
       <div
-        className={`${operation == "create" && `flex items-end justify-start w-full h-screen`}`}
+        className={`${operation == "create" && `fixed bottom-0 left-0 w-full`}`}
       >
         <div
-          className={`${operation == "create" && `sticky bottom-0 w-full p-4 shadow-md`}`}
+          className={`${operation == "create" && `sticky bottom-0 w-full p-4 shadow-md bg-background rounded-full`}`}
         >
           <Button onClick={() => setOpen(true)} className="w-full capitalize">
             {operation == "create" ? (
@@ -55,7 +55,7 @@ export default function DialogWrapper({
           </Button>
 
           <Drawer open={open} onOpenChange={setOpen}>
-            <DrawerContent className="p-4 h-[calc(100vh-10vh)]">
+            <DrawerContent className="flex flex-col h-[90vh]">
               <DrawerHeader className="text-left px-0">
                 <DrawerTitle>Edit profile</DrawerTitle>
                 <DrawerDescription>
@@ -72,10 +72,10 @@ export default function DialogWrapper({
 
   return (
     <div
-      className={`${operation == "create" && `flex items-end justify-start w-full h-screen`}`}
+      className={`${operation == "create" && `fixed bottom-0 left-0 w-full`}`}
     >
       <div
-        className={`${operation == "create" && `sticky bottom-0 w-full p-4 shadow-md`}`}
+        className={`${operation == "create" && `sticky bottom-0 w-full p-4 shadow-md bg-background rounded-full`}`}
       >
         <Button onClick={() => setOpen(true)} className="w-full capitalize">
           {operation == "create" ? (

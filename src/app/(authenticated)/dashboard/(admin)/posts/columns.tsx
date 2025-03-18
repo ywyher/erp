@@ -60,10 +60,7 @@ export const postTableColumns: ColumnDef<any>[] = [
       const post = row.original;
       return (
         <PostActions
-          postId={post.id}
-          slug={post.slug}
-          content={post.content}
-          thumbnail={post.thumbnail}
+          post={post}
         />
       );
     },

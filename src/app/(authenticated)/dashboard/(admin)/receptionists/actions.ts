@@ -4,7 +4,7 @@ import { createUser } from "@/lib/db/mutations";
 import { Schedules } from "@/app/(authenticated)/dashboard/types";
 import db from "@/lib/db";
 import { deleteById } from "@/lib/db/mutations";
-import { receptionist, schedule } from "@/lib/db/schema";
+import { receptionist, schedule, user } from "@/lib/db/schema";
 import { generateId, transformSchedulesToRecords } from "@/lib/funcs";
 import { revalidatePath } from "next/cache";
 import { updateUser } from "@/lib/db/mutations";
@@ -13,6 +13,34 @@ import {
   createReceptionistSchema,
   updateReceptionistSchema,
 } from "@/app/(authenticated)/dashboard/(admin)/receptionists/types";
+import { eq } from "drizzle-orm";
+
+export async function getReceptionists({ merge = false }: { merge?: boolean }) {
+  const data = await db.query.user.findMany({
+    where: eq(user.role, "receptionist"),
+    with: {
+      receptionist: true,
+      schedules: true
+    }
+  });
+
+  if (merge) {
+    return data.map(user => {
+      // Extract the receptionist object
+      const { receptionist, ...restUser } = user;
+      
+      // Create merged object with renamed fields
+      return {
+        ...restUser,
+        receptionistId: receptionist.id,
+        department: receptionist.department,
+        // Keep schedules as is
+      };
+    });
+  }
+  
+  return data;
+}
 
 export async function createReceptionist({
   userData,

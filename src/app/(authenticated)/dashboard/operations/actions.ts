@@ -3,12 +3,14 @@
 import db from "@/lib/db";
 import {
   Appointment,
+  doctor,
   Doctor,
   Operation,
   operation,
   OperationData,
   operationData,
   Schedule,
+  user,
   User,
 } from "@/lib/db/schema";
 import { generateId } from "@/lib/funcs";
@@ -21,6 +23,61 @@ import { redirect } from "next/navigation";
 import { getOperationDocument } from "@/lib/db/queries";
 import { GetObjectCommand } from "@aws-sdk/client-s3";
 import { s3 } from "@/lib/utils";
+import { format } from "date-fns";
+
+export const getOperations = async (userId: User["id"], role: User["role"]) => {
+  let operations;
+
+  if (role == "admin") {
+    operations = await db.select().from(operation);
+  }
+
+  if (role == "user") {
+    operations = await db
+      .select()
+      .from(operation)
+      .where(eq(operation.patientId, userId));
+  }
+
+  if (role == "doctor") {
+    const [doctorData] = await db
+      .select()
+      .from(doctor)
+      .where(eq(doctor.userId, userId));
+
+    operations = await db
+      .select()
+      .from(operation)
+      .where(eq(operation.doctorId, doctorData.id));
+  }
+
+  if (role == "receptionist") {
+    const [receptionistData] = await db
+      .select()
+      .from(user)
+      .where(eq(user.id, userId));
+
+    operations = await db
+      .select()
+      .from(operation)
+      .where(eq(operation.creatorId, receptionistData.id));
+  }
+
+  if (!operations) throw new Error("Couldn't get appointmnets");
+
+  return operations.map((operation) => ({
+    id: operation.id,
+    date: format(operation.startTime, "EEEE, d MMMM"),
+    startTime: format(operation.startTime, "HH:mm"),
+    endTime: operation.endTime ? format(operation.endTime, "HH:mm") : "None",
+    status: operation.status,
+    patientId: operation.patientId,
+    doctorId: operation.doctorId,
+    createdBy: operation.createdBy,
+    type: operation.type,
+    role: role,
+  }));
+};
 
 export async function createOperation({
   doctorId,

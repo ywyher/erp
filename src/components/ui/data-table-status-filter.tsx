@@ -1,7 +1,7 @@
 "use client";
 
 import { Table } from "@tanstack/react-table";
-import { Clock, Loader2, CheckCircle2, XCircle, Filter } from "lucide-react";
+import { Clock, Loader2, CheckCircle2, XCircle, Filter, FileText, Globe, EyeOff, Archive } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -14,46 +14,77 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
-type StatusType = "pending" | "ongoing" | "completed" | "cancelled";
+// Define all status types
+type TaskStatusType = "pending" | "ongoing" | "completed" | "cancelled";
+type PostStatusType = "draft" | "published" | "inactive" | "archived";
 
+// Union type for all possible statuses
+type StatusType = TaskStatusType | PostStatusType;
+
+// Define the config types
 type StatusConfig = {
   label: string;
   icon: React.ReactNode;
 };
 
+// Define available status configurations
+export type StatusConfigType = "tasks" | "posts";
+
 interface DataTableStatusFilterProps<TData> {
   table: Table<TData>;
+  // Add configType parameter to select which status config to use
+  configType?: StatusConfigType;
 }
 
 export function DataTableStatusFilter<TData>({
   table,
+  configType = "tasks", // Default to tasks config
 }: DataTableStatusFilterProps<TData>) {
-  // Status configuration with icons
-  const statusConfig: Record<StatusType, StatusConfig> = {
-    pending: {
-      label: "Pending",
-      icon: <Clock className="h-4 w-4" />,
+  // Status configurations with icons
+  const statusConfigs: Record<StatusConfigType, Record<string, StatusConfig>> = {
+    tasks: {
+      pending: {
+        label: "Pending",
+        icon: <Clock className="h-4 w-4" />,
+      },
+      ongoing: {
+        label: "Ongoing",
+        icon: <Loader2 className="h-4 w-4" />,
+      },
+      completed: {
+        label: "Completed",
+        icon: <CheckCircle2 className="h-4 w-4" />,
+      },
+      cancelled: {
+        label: "Cancelled",
+        icon: <XCircle className="h-4 w-4" />,
+      },
     },
-    ongoing: {
-      label: "Ongoing",
-      icon: <Loader2 className="h-4 w-4" />,
-    },
-    completed: {
-      label: "Completed",
-      icon: <CheckCircle2 className="h-4 w-4" />,
-    },
-    cancelled: {
-      label: "Cancelled",
-      icon: <XCircle className="h-4 w-4" />,
+    posts: {
+      draft: {
+        label: "Draft",
+        icon: <FileText className="h-4 w-4" />,
+      },
+      published: {
+        label: "Published",
+        icon: <Globe className="h-4 w-4" />,
+      },
+      inactive: {
+        label: "Inactive",
+        icon: <EyeOff className="h-4 w-4" />,
+      },
+      archived: {
+        label: "Archived",
+        icon: <Archive className="h-4 w-4" />,
+      },
     },
   };
 
-  const statuses: StatusType[] = [
-    "pending",
-    "ongoing",
-    "completed",
-    "cancelled",
-  ];
+  // Get the active status config based on configType
+  const activeStatusConfig = statusConfigs[configType];
+  
+  // Get statuses from the active config
+  const statuses = Object.keys(activeStatusConfig);
 
   // Get the status column
   const statusColumn = table.getColumn("status");
@@ -95,12 +126,20 @@ export function DataTableStatusFilter<TData>({
   // Calculate total active filters
   const totalActiveStatusFilters = statusFilters.length;
 
+  // Get label based on config type
+  const configLabels: Record<StatusConfigType, string> = {
+    tasks: "Status",
+    posts: "Post Status"
+  };
+  
+  const filterLabel = configLabels[configType];
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="outline" className="h-8 px-2">
           <Filter className="h-4 w-4" />
-          Status
+          {filterLabel}
           {totalActiveStatusFilters > 0 && (
             <Badge className="ml-1" variant="secondary">
               {totalActiveStatusFilters}
@@ -109,7 +148,7 @@ export function DataTableStatusFilter<TData>({
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="start" className="w-fit">
-        <DropdownMenuLabel>Filter by status</DropdownMenuLabel>
+        <DropdownMenuLabel>Filter by {filterLabel.toLowerCase()}</DropdownMenuLabel>
         <DropdownMenuSeparator />
         {statuses.map((status) => (
           <DropdownMenuItem
@@ -126,8 +165,8 @@ export function DataTableStatusFilter<TData>({
                 checked={statusFilters.includes(status)}
               />
               <div className="flex items-center gap-3">
-                {statusConfig[status].icon}
-                <span className="text-sm">{statusConfig[status].label}</span>
+                {activeStatusConfig[status].icon}
+                <span className="text-sm">{activeStatusConfig[status].label}</span>
                 <Badge variant="outline">{statusCounts[status]}</Badge>
               </div>
             </div>

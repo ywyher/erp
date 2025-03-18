@@ -1,25 +1,29 @@
-#!/usr/bin/env bash
+#!/bin/bash
 
-# Navigate to the project directory
-erp_dir=$HOME/Developments/Projects/erp/
-
-cd "$erp_dir" || exit
-
-# Run `pnpm run dev` and `pnpm run db:studio` in the background using Ghostty
-ghostty -e "bash -c 'pnpm run dev; exec bash'" &
-ghostty -e "bash -c 'pnpm run db:studio; exec bash'" &
-
-# Wait a moment to ensure the commands are initiated
-sleep 2
+# Run Zen Browser
+zen &
 
 # Open Thunderbird
 thunderbird &
 
-# Open Firefox with specified tabs
-zen &
+# Navigate to the ERP project directory
+cd ~/Development/Projects/erp || exit
 
-# Open the project directory in Visual Studio Code
-code "$erp_dir"
+# Open the project in VS Code
+code .
 
-# Exit script
-exit 0
+# Check if the ERP container is already running
+if ! docker ps | grep -q "erp"; then
+    echo "Starting Docker containers..."
+    docker compose -f ./docker-compose.yml up -d
+
+    # Wait for Docker containers to be ready
+    echo "Waiting for containers to be ready..."
+    sleep 5
+fi
+
+# Open new Ghostty instances in the background
+ghostty -e "bash -c 'cd ~/Development/Projects/erp && pnpm run dev'" &
+ghostty -e "bash -c 'cd ~/Development/Projects/erp && pnpm run db:studio'" &
+
+echo "ERP development environment is now ready!"

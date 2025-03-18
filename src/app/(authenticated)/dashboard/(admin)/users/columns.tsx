@@ -25,6 +25,7 @@ const userColumns = [
   { value: "phoneNumber", header: "Phone Number" },
   { value: "phoneNumberVerified", header: "Phone Verified", isBoolean: true },
   { value: "nationalId", header: "National Id" },
+  { value: "provider", header: "Provider" },
 ];
 
 export const userTableColumns: ColumnDef<any>[] = [

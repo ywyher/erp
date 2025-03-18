@@ -7,6 +7,17 @@ import { generateId } from "@/lib/funcs"
 import { eq } from "drizzle-orm"
 import { headers } from "next/headers"
 
+export async function getServices() {
+    return await db.select().from(service)
+}
+
+export const getServiceData = async (serviceId: Service['id']) => {
+  const [serviceData] = await db.select().from(service)
+    .where(eq(service.id, serviceId))
+
+  return serviceData
+}
+
 export async function createService({ title, content, status, thumbnail }: { 
      title: Service['title'],
      content: Service['content'],

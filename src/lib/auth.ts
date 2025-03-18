@@ -2,7 +2,9 @@ import db from "@/lib/db";
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { nextCookies } from "better-auth/next-js";
-import { emailOTP, phoneNumber, username } from "better-auth/plugins";
+import { emailOTP } from "better-auth/plugins/email-otp";
+import { phoneNumber } from "better-auth/plugins/phone-number";
+import { username } from "better-auth/plugins/username";
 
 export const auth = betterAuth({
   database: drizzleAdapter(db, {
@@ -47,6 +49,11 @@ export const auth = betterAuth({
     google: {
       clientId: (process.env.GOOGLE_CLIENT_ID as string) || "",
       clientSecret: (process.env.GOOGLE_CLIENT_SECRET as string) || "",
+      mapProfileToUser: (profile) => {
+          return {
+            provider: 'google',
+          }
+      }
     },
   },
   user: {
@@ -70,13 +77,21 @@ export const auth = betterAuth({
       },
       gender: {
         type: "string",
-        required: true,
+        required: false,
       },
       dateOfBirth: {
+        type: "string",
+        required: false,
+      },
+      provider: {
         type: "string",
         required: true,
       },
       nationalId: {
+        type: "string",
+        required: false,
+      },
+      image: {
         type: "string",
         required: false,
       },
@@ -169,7 +184,7 @@ export const auth = betterAuth({
       // }
     }),
   ],
-  advanced: {
-    cookiePrefix: "testing",
-  },
+  // advanced: {
+  //   cookiePrefix: "testing",
+  // },
 });

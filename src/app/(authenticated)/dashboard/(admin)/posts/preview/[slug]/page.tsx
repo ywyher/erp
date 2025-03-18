@@ -1,6 +1,6 @@
 'use client'
 
-import Post from "@/app/(authenticated)/dashboard/(admin)/posts/_components/post";
+import Post from "@/components/post";
 import { getPost, getPostAuthor } from "@/app/(authenticated)/dashboard/(admin)/posts/actions";
 import { Post as TPost, User } from "@/lib/db/schema";
 import { useQuery } from "@tanstack/react-query";

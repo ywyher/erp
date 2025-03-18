@@ -3,14 +3,13 @@
 import { FormFieldWrapper } from "@/components/form-field-wrapper";
 import { Form } from "@/components/ui/form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useForm } from "react-hook-form";
 import LoadingBtn from "@/components/loading-btn";
 import { z } from "zod";
 import { toast } from "sonner";
 import { revalidate } from "@/app/actions";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { queryPostData } from "@/lib/db/queries";
 import { useFileUpload } from "@/hooks/use-file-upload";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
@@ -18,10 +17,10 @@ import { X } from "lucide-react";
 import { deleteFile } from "@/lib/s3";
 import { getChangedFields, getFileUrl } from "@/lib/funcs";
 import { useParams, useRouter } from "next/navigation";
-import CardLayout from "@/components/card-layout";
-import { Value } from "@udecode/plate";
+import CardLayout from "@/app/(authenticated)/dashboard/_components/dashboard-layout";
+import { Editor, Value } from "@udecode/plate";
 import { postCategoryStatuses, postSchema } from "@/app/(authenticated)/dashboard/(admin)/posts/types";
-import { updatePost } from "@/app/(authenticated)/dashboard/(admin)/posts/actions";
+import { getPostData, updatePost } from "@/app/(authenticated)/dashboard/(admin)/posts/actions";
 import { socialStatuses } from "@/lib/constants";
 import { useProcessStore } from "@/components/editor/store";
 
@@ -41,6 +40,8 @@ export default function UpdatePost() {
   const { handleUpload } = useFileUpload();
   const { isProcessing } = useProcessStore();
 
+  const editorRef = useRef<Editor | null>(null);
+
   const params = useParams();
   const slug = params.slug as string; // Ensure it's treated as a string
 
@@ -56,7 +57,7 @@ export default function UpdatePost() {
   const { data: postData, isLoading: isPostDataLoading } = useQuery({
     queryKey: ['post', 'date', 'update', slug],
     queryFn: async () => {
-      return await queryPostData(slug);
+      return await getPostData(slug);
     }
   });
 
@@ -101,82 +102,98 @@ export default function UpdatePost() {
   const onSubmit = async (data: z.infer<typeof updatePostSchema>) => {
     if (!postData) return;
     setIsLoading(true);
-
-    const sessionData = {
-      title: postData.title,
-      content: postData.content,
-      thumbnail: postData.thumbnail,
-      status: postData.status,
-    }
-
-    const localData = {
-      title: data.title,
-      content: data.content,
-      status: data.status,
-      thumbnail: data.thumbnail ? 'updated' : postData.thumbnail,
-    }
-
-    const changedFields = getChangedFields(sessionData, localData);
-
-    if (Object.keys(changedFields).length === 0) {
-      toast.error("No Changes thus no fields were updated.");
-      setIsLoading(false);
-      return;
-    }
-
-    let fileName: string = postData.thumbnail || '';
     
-    // Only upload new file if thumbnail is changed
-    if (data.thumbnail) {
-      // Delete the old file if it exists
-      if (postData.thumbnail) {
-        await deleteFile(postData.thumbnail);
+    try {
+      if (editorRef.current) {
+        const currentContent = editorRef.current.children;
+        form.setValue("content", currentContent);
+        data.content = currentContent;
       }
-      
-      const { name, error } = await handleUpload(data.thumbnail);
-      
-      if (!name || error) {
+  
+      const sessionData = {
+        title: postData.title,
+        content: postData.content,
+        thumbnail: postData.thumbnail,
+        status: postData.status,
+      }
+  
+      const localData = {
+        title: data.title,
+        content: data.content,
+        status: data.status,
+        thumbnail: data.thumbnail ? 'updated' : postData.thumbnail,
+      }
+  
+      const changedFields = getChangedFields(sessionData, localData);
+  
+      if (Object.keys(changedFields).length === 0) {
+        toast.error("No Changes thus no fields were updated.");
         setIsLoading(false);
-        throw new Error(error);
+        return;
       }
+  
+      let fileName: string = postData.thumbnail || '';
       
-      fileName = name;
-    } else if (!hasExistingThumbnail && !data.thumbnail) {
-      // If there's no existing thumbnail and no new thumbnail, use empty string
-      fileName = '';
-    }
-
-    const { title, content, status, tags, category } = data;
-    
-    const result = await updatePost({ 
-      title,
-      content,
-      status,
-      category,
-      thumbnail: fileName,
-      tags: tags.join(','),
-      slug,
-    });
-
-    if (result?.error) {
-      toast.error(result?.error);
-      
-      // If we uploaded a new file but the update failed, delete it
-      if (data.thumbnail && fileName !== postData.thumbnail) {
-        await deleteFile(fileName);
+      // Only upload new file if thumbnail is changed
+      if (data.thumbnail) {
+        // Delete the old file if it exists
+        if (postData.thumbnail) {
+          await deleteFile(postData.thumbnail);
+        }
+        
+        const { name, error } = await handleUpload(data.thumbnail);
+        
+        if (!name || error) {
+          setIsLoading(false);
+          throw new Error(error);
+        }
+        
+        fileName = name;
+      } else if (!hasExistingThumbnail && !data.thumbnail) {
+        // If there's no existing thumbnail and no new thumbnail, use empty string
+        fileName = '';
       }
+  
+      const { title, content, status, tags, category } = data;
       
+      const result = await updatePost({ 
+        title,
+        content,
+        status,
+        category,
+        thumbnail: fileName,
+        tags: tags.join(','),
+        slug,
+      });
+  
+      if (result?.error) {
+        toast.error(result?.error);
+        
+        // If we uploaded a new file but the update failed, delete it
+        if (data.thumbnail && fileName !== postData.thumbnail) {
+          await deleteFile(fileName);
+        }
+        
+        setIsLoading(false);
+        return;
+      }
+  
+      toast.message(result?.message);
+  
+      await revalidate("/dashboard/posts");
+      queryClient.invalidateQueries({ queryKey: ['post', 'data', 'update', slug] })
+      router.push('/dashboard/posts')
       setIsLoading(false);
-      return;
+      setOpen(false);
+    } catch (error) {
+      console.error("Error submitting form:", error);
+      toast.error("Failed to create post. Please try again.");
+      setIsLoading(false);
     }
+  };
 
-    toast.message(result?.message);
-
-    await revalidate("/dashboard/posts");
-    queryClient.invalidateQueries({ queryKey: ['post', 'data', 'update', slug] })
-    router.push('/dashboard/posts')
-    setIsLoading(false);
-    setOpen(false);
+  const onError = () => {
+    toast.error(Object.values(form.formState.errors)[0].message);
   };
 
   if(!postData || isPostDataLoading) return <>Loading...</>;
@@ -185,7 +202,7 @@ export default function UpdatePost() {
     <CardLayout title="Update a post">
       <Form {...form}>
         <form
-          onSubmit={form.handleSubmit(onSubmit)}
+          onSubmit={form.handleSubmit(onSubmit, onError)}
           className="flex flex-col gap-5"
         >
           <div className="flex flex-col gap-3">
@@ -247,7 +264,7 @@ export default function UpdatePost() {
                 <FormFieldWrapper form={form} name="status" label="Status" type="select" options={socialStatuses} />
                 <FormFieldWrapper form={form} name="category" label="Category" type="select" options={postCategoryStatuses} />
                 <FormFieldWrapper form={form} name="tags" label="Tags" type="tags" defaultValue={postData.tags as string} />
-                <FormFieldWrapper form={form} name="content" label="Editor" type="editor" defaultValue={postData.content as Value} />
+                <FormFieldWrapper form={form} name="content" label="Editor" type="editor" editorRef={editorRef} defaultValue={postData.content as Value} />
               </>
             )}
           </div>

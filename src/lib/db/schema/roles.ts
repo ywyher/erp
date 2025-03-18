@@ -6,7 +6,7 @@ import { medicalFile } from "./medical-file";
 import { consultation } from "./consultation";
 import { prescription } from "@/lib/db/schema/prescription";
 import { operation } from "@/lib/db/schema/operation";
-import { roleEnum } from "./enums";
+import { providerEnum, roleEnum } from "./enums";
 import { service } from "@/lib/db/schema/service";
 import { post } from "@/lib/db/schema/post";
 
@@ -18,13 +18,14 @@ export const user = pgTable("user", {
   email: text("email").unique(),
   phoneNumber: text("phoneNumber").unique(),
   nationalId: text("nationalId").unique(),
-  gender: text("gender").notNull(),
-  dateOfBirth: date("dateOfBirth").notNull(),
+  gender: text("gender"),
+  dateOfBirth: date("dateOfBirth"),
   phoneNumberVerified: boolean("phoneNumberVerified").default(false).notNull(),
   emailVerified: boolean("emailVerified").default(false).notNull(),
   onBoarding: boolean("onBoarding").default(true).notNull(),
   image: text("image").default("pfp.jpg").notNull(),
   role: roleEnum("role").default("user").notNull(),
+  provider: providerEnum("provider").notNull(),
   createdAt: timestamp("createdAt").notNull(),
   updatedAt: timestamp("updatedAt").notNull(),
 });
@@ -43,7 +44,8 @@ export const userRelation = relations(user, ({ one, many }) => ({
   medicalFiles: many(medicalFile),
   consultations: many(consultation),
   prescriptions: many(prescription),
-  operation: many(operation),
+  operations: many(operation),
+  posts: many(post),
 }));
 
 export const admin = pgTable("admin", {
@@ -61,7 +63,6 @@ export const adminRelation = relations(admin, ({ one, many }) => ({
     references: [user.id],
   }),
   services: many(service),
-  post: many(post)
 }));
 
 // Doctor
