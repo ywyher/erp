@@ -4,7 +4,7 @@ import { Column, ColumnDef, Row, Table } from "@tanstack/react-table";
 import { Checkbox } from "@/components/ui/checkbox";
 import { DataTableColumnHeader } from "@/components/ui/data-table-column-header";
 import TableCell from "@/components/table-cell";
-import PostActions from "@/app/(authenticated)/dashboard/(admin)/posts/_components/post-actions";
+import PostActions from "@/app/(authenticated)/dashboard/posts/_components/post-actions";
 
 const postColumns = [
   { value: "id", header: "ID" },
@@ -12,6 +12,7 @@ const postColumns = [
   { value: "content", header: "Content", editor: true },
   { value: "slug", header: "Slug" },
   { value: "thumbnail", header: "Thumbnail" },
+  // { value: "authorId", header: "Author" },
   { value: "status", header: "Status" },
 ];
 

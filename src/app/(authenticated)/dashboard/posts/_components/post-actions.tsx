@@ -32,7 +32,7 @@ import {
 } from "@/components/ui/sheet"
 import PostComponent from "@/components/post";
 import { useQuery } from "@tanstack/react-query";
-import { getPostAuthor } from "@/app/(authenticated)/dashboard/(admin)/posts/actions";
+import { getPostAuthor } from "@/app/(authenticated)/dashboard/posts/actions";
 import { useIsMobile } from "@/hooks/use-mobile";
 import Delete from "@/app/(authenticated)/dashboard/_components/delete";
 

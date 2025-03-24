@@ -86,16 +86,16 @@ export default function OperationDocument({
       return;
     }
 
-    const fileName = await handleUpload(input.file[0]);
+    const file = await handleUpload(input.file[0]);
 
-    if (!fileName) {
+    if (!file) {
       setIsLoading(false);
       throw new Error("Failed to upload file");
     }
 
     const data: z.infer<typeof settingSchema> = {
       key: operationDocumentKey,
-      value: fileName,
+      value: file.name,
       description: "Operation document url",
     };
 

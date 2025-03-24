@@ -296,8 +296,8 @@ export const getOperationDocument = async ({
       .from(settings)
       .where(eq(settings.key, operationDocumentKey));
 
-    if (!operationDocument.id)
-      throw new Error("Couldn't get operation document");
+    if (!operationDocument)
+      throw new Error("Document not uploaded, Contact the admin to upload the document!");
 
     return {
       name: operationDocument.value,

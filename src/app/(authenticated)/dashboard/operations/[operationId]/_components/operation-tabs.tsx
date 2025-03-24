@@ -1,7 +1,7 @@
 "use client";
 
 import DocumentViewer from "@/app/(authenticated)/dashboard/operations/[operationId]/_components/document-viewer";
-import OperationDataComponent from "@/app/(authenticated)/dashboard/operations/[operationId]/_components/operation-data";
+import OperationDataWrapper from "@/app/(authenticated)/dashboard/operations/[operationId]/_components/operation-data-wrapper";
 import PatientData from "@/app/(authenticated)/dashboard/operations/[operationId]/_components/patient-data";
 import { useDocumentStore } from "@/app/(authenticated)/dashboard/operations/[operationId]/store";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -11,13 +11,13 @@ import type {
   MedicalFile,
   Operation,
   OperationData as TOperationData,
-  Prescription,
   User,
 } from "@/lib/db/schema";
 import { useEffect, useState } from "react";
 
 type OperationTabs = {
   patient: User;
+  doctorId: Doctor['id']
   operationId: Operation["id"];
   editable: boolean;
   operationDocument: string;
@@ -28,6 +28,7 @@ type OperationTabs = {
 
 export default function OperationTabs({
   patient,
+  doctorId,
   operationId,
   medicalFiles,
   consultation,
@@ -37,7 +38,7 @@ export default function OperationTabs({
 }: OperationTabs) {
   const [activeTab, setActiveTab] = useState<
     "patient-data" | "operation-data" | "document-viewer"
-  >("patient-data");
+  >("operation-data");
 
   const { setOperationData } = useDocumentStore();
 
@@ -68,12 +69,14 @@ export default function OperationTabs({
         />
       </TabsContent>
       <TabsContent value="operation-data">
-        <OperationDataComponent
+        <OperationDataWrapper
+          doctorId={doctorId}
           operationId={operationId}
-          operationData={operationData}
-          setActiveTab={setActiveTab}
           operationDocument={operationDocument}
+          operationData={operationData}
           editable={editable}
+          setActiveTab={setActiveTab}
+          task={operationData ? 'update' : 'create'}
         />
       </TabsContent>
       {operationData?.data && (

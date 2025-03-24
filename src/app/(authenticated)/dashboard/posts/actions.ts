@@ -2,7 +2,7 @@
 
 import { getSession } from "@/lib/auth-client"
 import db from "@/lib/db"
-import { admin, Post, post, user } from "@/lib/db/schema"
+import { admin, Post, post, User, user } from "@/lib/db/schema"
 import { generateId } from "@/lib/funcs"
 import { eq } from "drizzle-orm"
 import { headers } from "next/headers"
@@ -11,8 +11,16 @@ import slugify from 'slugify'
 import { deleteFile } from "@/lib/s3";
 import { revalidatePath } from "next/cache";
 
-export const getPosts = async () => {
-    const posts = await db.select().from(post)
+export const getPosts = async ({ id, role }: { id: User['id'], role: User['role'] }) => {
+    let posts;
+
+    if(role == 'admin') {
+        posts = await db.select().from(post)
+    }
+    if(role == 'doctor') {
+        posts = await db.select().from(post)
+            .where(eq(post.authorId, id))
+    }
   
     return posts
 }
@@ -159,11 +167,11 @@ export async function getPost({ slug }: { slug: Post['slug'] }) {
 }
 
 export async function getPostAuthor({ authorId }: { authorId: Post['authorId'] }) {
-    const [adminData] = await db.select().from(admin)
-        .where(eq(admin.id, authorId))
+    const [authorData] = await db.select().from(user)
+        .where(eq(user.id, authorId))
 
     const [author] = await db.select().from(user)
-        .where(eq(user.id, adminData.userId))
+        .where(eq(user.id, authorData.id))
 
         console.log(author)
 

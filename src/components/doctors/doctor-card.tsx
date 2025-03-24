@@ -73,9 +73,14 @@ export function DoctorCard({
         <Pfp image={data.user.image} className="w-20 h-20 sm:w-24 sm:h-24" />
         <CardTitle className="text-xl mb-1">{data.user.name}</CardTitle>
         <p className="text-sm text-muted-foreground">@{data.user.username}</p>
-        <Badge variant="secondary" className="mb-2">
-          {data.doctor.specialty}
-        </Badge>
+        <div className="flex flex-col gap-2">
+          <Badge variant="secondary" className="mb-2">
+            {data.doctor.specialty}
+          </Badge>
+          <Badge variant="secondary" className="mb-2">
+            {data.user.role}
+          </Badge>
+        </div>
       </CardHeader>
       <CardContent className="flex-grow">
         <div className="space-y-2">

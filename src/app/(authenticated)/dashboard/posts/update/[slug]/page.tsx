@@ -19,8 +19,8 @@ import { getChangedFields, getFileUrl } from "@/lib/funcs";
 import { useParams, useRouter } from "next/navigation";
 import CardLayout from "@/app/(authenticated)/dashboard/_components/dashboard-layout";
 import { Editor, Value } from "@udecode/plate";
-import { postCategoryStatuses, postSchema } from "@/app/(authenticated)/dashboard/(admin)/posts/types";
-import { getPostData, updatePost } from "@/app/(authenticated)/dashboard/(admin)/posts/actions";
+import { postCategoryStatuses, postSchema } from "@/app/(authenticated)/dashboard/posts/types";
+import { getPostData, updatePost } from "@/app/(authenticated)/dashboard/posts/actions";
 import { socialStatuses } from "@/lib/constants";
 import { useProcessStore } from "@/components/editor/store";
 

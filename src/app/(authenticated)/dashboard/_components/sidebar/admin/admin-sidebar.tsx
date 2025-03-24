@@ -9,6 +9,7 @@ import {
   ConciergeBell,
   Cross,
   Home,
+  Layers,
   Lock,
   Newspaper,
   Plus,
@@ -109,6 +110,14 @@ export default function AdminSidebar() {
     },
   ];
 
+  const extrasGroupItems: MenuItem[] = [
+    {
+      title: "Doctors Presets",
+      url: "/dashboard/presets",
+      icon: Layers
+    }
+  ]
+
   return (
     <div className="flex flex-col gap-1">
       <SidebarGroup items={mainGroupItems} label="Main" />
@@ -116,6 +125,8 @@ export default function AdminSidebar() {
       <SidebarGroup items={manageGroupItems} label="Manage" />
       <SidebarSeparator />
       <SidebarGroup items={socialGroupItems} label="Social" />
+      <SidebarSeparator />
+      <SidebarGroup items={extrasGroupItems} label="Extras" />
     </div>
   );
 }

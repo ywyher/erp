@@ -9,6 +9,7 @@ import { operation } from "@/lib/db/schema/operation";
 import { providerEnum, roleEnum } from "./enums";
 import { service } from "@/lib/db/schema/service";
 import { post } from "@/lib/db/schema/post";
+import { preset } from "@/lib/db/schema/preset";
 
 // User
 export const user = pgTable("user", {
@@ -85,7 +86,8 @@ export const doctorRelation = relations(doctor, ({ one, many }) => ({
   appointments: many(appointment),
   consultations: many(consultation),
   prescriptions: many(prescription),
-  operation: many(operation),
+  operations: many(operation),
+  presets: many(preset),
 }));
 
 // Receptionist

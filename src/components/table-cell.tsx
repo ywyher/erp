@@ -37,6 +37,7 @@ interface TableCellProps {
   isBoolean?: boolean;
   readMore?: boolean;
   maxChars?: number;
+  json?: boolean
 }
 
 export default function TableCell({
@@ -48,6 +49,7 @@ export default function TableCell({
   isBoolean,
   readMore = false,
   maxChars = 24,
+  json
 }: TableCellProps) {
   const isMobile = useIsMobile()
 
@@ -69,6 +71,14 @@ export default function TableCell({
   if (value === "schedules") {
     const schedules = Array.isArray(cellValue) ? cellValue : [cellValue];
     return <ScheduleDisplay schedules={schedules} />;
+  }
+
+  if (value === "adminId") {
+    if (row.getValue("role") != "admin") {
+      return <UserDataDialog userId={cellValue as string} role="admin" />;
+    } else {
+      return <span className="text-muted-foreground">Empty</span>;
+    }
   }
 
   if (value === "doctorId") {
@@ -217,6 +227,46 @@ export default function TableCell({
         )}
       </>
     );
+  }
+
+  if(json) {
+    return (
+      <>
+        {isMobile ? (
+          <Drawer>
+            <DrawerTrigger asChild>
+              <Button variant="outline" size="sm">
+                View
+              </Button>
+            </DrawerTrigger>
+            <DrawerContent className="h-[90vh]">
+              <DrawerHeader>
+                <DrawerTitle className="text-left">{header}</DrawerTitle>
+              </DrawerHeader>
+              <div className="px-4 h-full overflow-auto">
+                <pre>{JSON.stringify(cellValue, null, 2)}</pre>
+              </div>
+            </DrawerContent>
+          </Drawer>
+        ): (
+          <Sheet>
+            <SheetTrigger asChild>
+              <Button variant="outline" size="sm">
+                View
+              </Button>
+            </SheetTrigger>
+            <SheetContent side='bottom' className="h-[90vh] flex flex-col gap-3">
+              <SheetHeader>
+                <SheetTitle>{header}</SheetTitle>
+              </SheetHeader>
+              <div className="h-full overflow-auto">
+                <pre>{JSON.stringify(cellValue, null, 2)}</pre>
+              </div>
+            </SheetContent>
+          </Sheet>
+        )}
+      </>
+    )
   }
 
   return dialog ? (

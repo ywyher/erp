@@ -22,7 +22,7 @@ import { generateFakeField, generateId } from "../funcs";
 import { hashPassword } from "../password";
 import { deleteFile } from "@/lib/s3";
 import { revalidatePath } from "next/cache";
-import { deletePost } from "@/app/(authenticated)/dashboard/(admin)/posts/actions";
+import { deletePost } from "@/app/(authenticated)/dashboard/posts/actions";
 
 export async function createUser({
   data,
@@ -315,8 +315,6 @@ export async function deleteById(id: string, tableName: Tables) {
       await db.delete(medicalFile).where(eq(medicalFile.appointmentId, id));
     }
   }
-
-  return;
 
   const deleted = await db.delete(table).where(eq(table.id, id)).returning();
 

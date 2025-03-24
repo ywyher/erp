@@ -184,7 +184,4 @@ export const auth = betterAuth({
       // }
     }),
   ],
-  // advanced: {
-  //   cookiePrefix: "testing",
-  // },
 });

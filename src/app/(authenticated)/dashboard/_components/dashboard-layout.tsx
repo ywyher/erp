@@ -1,7 +1,7 @@
 "use client"
 
 import React from "react"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -11,16 +11,30 @@ import {
 } from "@/components/ui/breadcrumb"
 import { usePathname } from "next/navigation"
 import { SidebarTrigger } from "@/components/ui/sidebar"
-import { ChevronRight, Home } from "lucide-react"
+import { ChevronRight, CircleAlert, Home } from "lucide-react"
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip"
 import Link from "next/link"
 
 type DashboardLayoutProps = {
   children: React.ReactNode
   title?: string
   className?: string
+  tip?: string
+  description?: string
 }
 
-export default function DashboardLayout({ children, title, className = "" }: DashboardLayoutProps) {
+export default function DashboardLayout({ 
+   children,
+   title,
+   className = "",
+   tip = "",
+   description = ""
+  }: DashboardLayoutProps) {
   const pathname = usePathname()
   const segments = pathname.split("/").filter(Boolean)
 
@@ -80,7 +94,26 @@ export default function DashboardLayout({ children, title, className = "" }: Das
       <div className="flex flex-col gap-3">
         {title && (
           <CardHeader className="pt-4 ps-5 pb-0">
-            <CardTitle className="text-xl font-semibold tracking-tight">{title}</CardTitle>
+            <CardTitle className="flex flex-row gap-2 items-center text-xl font-semibold tracking-tight">
+              <div>
+                {title}
+              </div>
+              {tip && (
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger><CircleAlert size={18} /></TooltipTrigger>
+                    <TooltipContent>
+                      {tip?.split("\n").map((line, index) => (
+                        <p key={index}>{line}</p>
+                      ))}
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              )}
+            </CardTitle>
+            <CardDescription>
+              {description}
+            </CardDescription>
           </CardHeader>
         )}
         <CardContent className="flex-1 px-5">

@@ -24,6 +24,7 @@ import { getOperationDocument } from "@/lib/db/queries";
 import { GetObjectCommand } from "@aws-sdk/client-s3";
 import { s3 } from "@/lib/utils";
 import { format } from "date-fns";
+import { presetSchema } from "@/app/(authenticated)/dashboard/operations/[operationId]/types";
 
 export const getOperations = async (userId: User["id"], role: User["role"]) => {
   let operations;
@@ -188,7 +189,7 @@ export async function createOperationData({
   data,
   operationId,
 }: {
-  data: any;
+  data: z.infer<typeof presetSchema>;
   operationId: Operation["id"];
 }) {
   try {
@@ -197,15 +198,13 @@ export async function createOperationData({
 
       const { name } = await getOperationDocument({ dbInstance: tx });
 
-      console.log(name);
-
       if (!name) throw new Error("Couldn't get the document");
 
       const [createdOperationData] = await tx
         .insert(operationData)
         .values({
           id: operationDataId,
-          data,
+          data: data.data,
           documentName: name,
           operationId: operationId,
         })
@@ -252,13 +251,13 @@ export async function updateOperationData({
   data,
   operationDataId,
 }: {
-  data: any;
+  data: z.infer<typeof presetSchema>;
   operationDataId: OperationData["id"];
 }) {
   const [updatedOperationData] = await db
     .update(operationData)
     .set({
-      data,
+      data: data.data,
     })
     .where(eq(operationData.id, operationDataId))
     .returning();

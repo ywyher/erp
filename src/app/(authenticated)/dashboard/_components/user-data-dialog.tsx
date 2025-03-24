@@ -56,7 +56,7 @@ export default function UserDataDialog({
         </DialogHeader>
         {userData ? (
           <div>
-            {role == "user" ? (
+            {(role == "user" || role == "admin") ? (
               <UserCard data={userData} />
             ) : (
               <DoctorCard data={userData} />

@@ -1,9 +1,24 @@
+# presets for all doctors at once ?
+
+# when updating the operation document make the preset choice better its now ass
+
+# Transfer patient with approval request from the admin
+
+# defaults values for document placeholders with presets
+
+# operation should have postOperatoin/preOperation documents instead of one fill!!
+
+# https://github.com/javabuddy/best-system-design-resources
+
 # 'use cache' !!
 
 # Posts tags in post card
 
 # doctors should be able to create posts of the category article only not the news 
-# meaning that the authorId should refer to the user table instead of the admin table
+# if so the articles written by doctors need to be verified by an admin first
+# so we need a verified field and createdBy field to determine
+# and another pending approval page for the admin to see the doctors articles that are pending approval
+# would be call if we have a notificatoin system for that so we add it later
 
 # add an author data column in the posts table
 
@@ -16,7 +31,7 @@
 # the editor when deleting the image with backspace it doesnt get delete from the bucket
 # the undo parrt too
 
-# Rather than your junky formFieldWrapper component make it just have the form skeleton and accept children and for each field u want make a seperate component dumbass
+# Rather than your junky formFieldWrapper component make it just have the form skeleton and accept children and for each field u want make a seperate component
 
 # basic pagination for booking/employees components (real one not just slicing them)
 
@@ -40,8 +55,6 @@
 
 # laboratories/radiologies/medicines real data
 
-# defaults values for document placeholders with presets
-
 # for operation document there should be default datas despite the document content example:
 
 # {
@@ -60,4 +73,6 @@
 
 # for operation document there should be the ability to upload a different document for each role (doctor/nurse/receptionist)
 
-# https://github.com/react-grid-layout/react-grid-layout?tab=readme-ov-file
+# https://github.com/react-grid-layout/react-grid-layout?tab=readme-ov-
+
+file

@@ -15,7 +15,7 @@ export default function Header({ className = "" }: { className?: string }) {
   const { data: user } = useQuery({
     queryKey: ["session", "header"],
     queryFn: async () => {
-      const { data } = await getSession();
+      const { data } = await getSession()
       return (data?.user as User) || null;
     },
   });

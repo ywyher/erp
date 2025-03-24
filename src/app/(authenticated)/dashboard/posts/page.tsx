@@ -1,14 +1,25 @@
-import { getPosts } from "@/app/(authenticated)/dashboard/(admin)/posts/actions";
-import { postTableColumns } from "@/app/(authenticated)/dashboard/(admin)/posts/columns";
+import { getPosts } from "@/app/(authenticated)/dashboard/posts/actions";
+import { postTableColumns } from "@/app/(authenticated)/dashboard/posts/columns";
 import CardLayout from "@/app/(authenticated)/dashboard/_components/dashboard-layout";
 import StatCard from "@/app/(authenticated)/dashboard/_components/stat-cart";
 import { Button } from "@/components/ui/button";
 import { DataTable } from "@/components/ui/data-table";
 import { Newspaper } from "lucide-react";
 import Link from "next/link";
+import { getSession } from "@/lib/auth-client";
+import { headers } from "next/headers";
+import { User } from "@/lib/db/schema";
 
 export default async function Services() {
-    const posts = await getPosts();
+    const { data } = await getSession({
+      fetchOptions: {
+        headers: await headers()
+      }
+    })
+
+    if(!data?.user.id) return <>Loading...</>
+
+    const posts = await getPosts({ id: data.user.id, role: data.user.role as User['role'] });
 
     return (
     <CardLayout title="Manage Posts" className="flex-1">
