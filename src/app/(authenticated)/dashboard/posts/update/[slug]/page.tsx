@@ -17,7 +17,7 @@ import { X } from "lucide-react";
 import { deleteFile } from "@/lib/s3";
 import { getChangedFields, getFileUrl } from "@/lib/funcs";
 import { useParams, useRouter } from "next/navigation";
-import CardLayout from "@/app/(authenticated)/dashboard/_components/dashboard-layout";
+import DashboardLayout from "@/app/(authenticated)/dashboard/_components/dashboard-layout";
 import { Editor, Value } from "@udecode/plate";
 import { postCategoryStatuses, postSchema } from "@/app/(authenticated)/dashboard/posts/types";
 import { getPostData, updatePost } from "@/app/(authenticated)/dashboard/posts/actions";
@@ -199,7 +199,7 @@ export default function UpdatePost() {
   if(!postData || isPostDataLoading) return <>Loading...</>;
 
   return (
-    <CardLayout title="Update a post">
+    <DashboardLayout title="Update a post">
       <Form {...form}>
         <form
           onSubmit={form.handleSubmit(onSubmit, onError)}
@@ -271,6 +271,6 @@ export default function UpdatePost() {
           <LoadingBtn isLoading={isLoading || isProcessing}>Update</LoadingBtn>
         </form>
       </Form>
-    </CardLayout>
+    </DashboardLayout>
   );
 }

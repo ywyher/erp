@@ -77,7 +77,7 @@ export default function DoctorsList({
   };
 
   return (
-    <Card className="flex flex-col gap-3 mt-5 p-5">
+    <div className="flex flex-col gap-3">
       <div className="flex flex-col gap-4">
         <DoctorsFilters
           onApply={handleApplyFilters}
@@ -91,7 +91,7 @@ export default function DoctorsList({
                 doctors.map((doctor) => (
                   <DoctorCard
                     key={doctor.user.id}
-                    data={doctor}
+                    doctor={doctor}
                     book={book}
                     customSchedule={customSchedule}
                   />
@@ -111,6 +111,6 @@ export default function DoctorsList({
           </div>
         </div>
       </div>
-    </Card>
+    </div>
   );
 }

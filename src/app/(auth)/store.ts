@@ -1,9 +1,9 @@
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
 
-type AuthStore = {
+export type AuthStore = {
   value: string | null;
-  context: "email" | "phoneNumber" | null;
+  context: "email" | "phoneNumber" | "username" | null;
   password: string | null;
   operation: "register" | "verify" | null;
   redirectTo: string | null;

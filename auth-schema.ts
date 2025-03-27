@@ -9,6 +9,7 @@ export const user = pgTable("user", {
  createdAt: timestamp('created_at').notNull(),
  updatedAt: timestamp('updated_at').notNull(),
  username: text('username'),
+ displayUsername: text('display_username'),
  phoneNumber: text('phone_number').unique(),
  phoneNumberVerified: boolean('phone_number_verified'),
  onBoarding: boolean('on_boarding'),

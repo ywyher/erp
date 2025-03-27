@@ -7,17 +7,18 @@ import { useForm } from "react-hook-form";
 import { loginSchema } from "@/app/(auth)/types";
 import { useState } from "react";
 import LoadingBtn from "@/components/loading-btn";
-import { useAuthStore } from "@/app/(auth)/store";
+import { AuthStore, useAuthStore } from "@/app/(auth)/store";
 import { z } from "zod";
 import { FormFieldWrapper } from "@/components/form-field-wrapper";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
+import { getEmail } from "@/app/(auth)/actions";
 
 export default function Login() {
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
   const value = useAuthStore((state) => state.value);
-  const context = useAuthStore((state) => state.context);
+  const context = useAuthStore((state) => state.context) as AuthStore['context'];
 
   if (!value) return <>Loading...</>;
 
@@ -87,20 +88,18 @@ export default function Login() {
 
   const resetPassword = async () => {
     if (!value) return;
+    let email;
     if (context != "email") {
-      toast("Password Reset functionality only works for emals at the moment", {
-        description: "May Take 1-5 Minutes",
-      });
-      return;
+      email = await getEmail({ value: value, field: context as 'username' | 'phoneNumber' })
     }
 
     const { error } = await forgetPassword({
-      email: value,
+      email: context == 'email' ? value : email as string,
       redirectTo: "/reset-password",
     });
 
     if (!error) {
-      toast("Password Reset Link Sent Successfully", {
+      toast.success("Password Reset Link Sent Successfully", {
         description: "May Take 1-5 Minutes",
       });
     }

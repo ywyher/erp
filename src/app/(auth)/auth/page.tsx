@@ -12,6 +12,7 @@ import { User } from "@/lib/db/schema";
 import { useAuthStore } from "@/app/(auth)/store";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
+import clsx from "clsx";
 
 export default function Auth() {
   const router = useRouter();
@@ -42,19 +43,18 @@ export default function Auth() {
   };
 
   return (
-    <AuthLayout>
+    <AuthLayout className={clsx(
+      port != 'check' && 'gap-2'
+    )}>
       {(port === "register" || port === "login") && (
         <Button
           variant="link"
-          className="flex items-center gap-2 p-0 text-sm text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white"
+          className="p-0 text-sm"
           onClick={handleGoBack}
         >
           <ArrowLeft size={12} /> Go Back
         </Button>
       )}
-      <div className="space-y-2">
-        <h1 className="text-2xl font-semibold tracking-tight">Authentication</h1>
-      </div>
       {port === "check" && <Check setPort={setPort} />}
       {port === "register" && <Register />}
       {port === "login" && <Login />}

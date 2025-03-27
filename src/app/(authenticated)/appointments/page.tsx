@@ -6,10 +6,9 @@ import { getSession } from "@/lib/auth-client"
 import { User } from "@/lib/db/schema";
 import { useQuery } from "@tanstack/react-query"
 import { appointmentTableColumns } from "../dashboard/appointments/columns";
-import DashboardLayout from "../dashboard/_components/dashboard-layout";
-import { getAppointments } from "@/app/(authenticated)/dashboard/appointments/actions";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import CardLayout from "@/components/card-layout";
+import { getAppointments } from "@/app/(authenticated)/appointments/actions";
+import DataTableSkeleton from "@/components/data-table-skeleton";
 
 export default function Appointments() {
     const { data: user, isLoading: isUserLoading } = useQuery({
@@ -23,20 +22,20 @@ export default function Appointments() {
     const { data: appointments, isLoading: isAppointmentLoading } = useQuery({
         queryKey: ['list-appointments', user?.role],
         queryFn: async () => {
-            return await getAppointments(
-                user?.id as User["id"],
-                user?.role as User["role"],
-            );
+            return await getAppointments(user?.id as User['id']);
         },
         enabled: user?.id ? true : false
     });
 
-    if (isUserLoading || isAppointmentLoading) return <>Loading...</>;
-
     return (
         <>
             <Header />
-            <CardLayout title="My Appointments">
+            <CardLayout title="My Appointments"
+                className={`${(isUserLoading || isAppointmentLoading) && 'flex flex-col gap-3'}`}
+            >
+                {(isUserLoading || isAppointmentLoading) && (
+                    <DataTableSkeleton />
+                )}
                 {appointments && (
                     <DataTable
                         columns={appointmentTableColumns}

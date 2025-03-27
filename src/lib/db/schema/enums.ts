@@ -16,14 +16,14 @@ export const roleEnum = pgEnum("role", [
 
 export const providerEnum = pgEnum("provider", [
   "google",
-  'email'
+  'email',
+  "phoneNumber"
 ])
 
 export const genderEnum = pgEnum("gender", [
   'male',
   'female'
 ])
-
 
 export const socialStatusEnum = pgEnum("post-status", [
   "draft", // Service is created but not yet published

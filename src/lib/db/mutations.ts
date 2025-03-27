@@ -147,7 +147,6 @@ export async function updateUser({
   role: User["role"];
   dbInstance?: typeof db;
 }) {
-  console.log(data.dateOfBirth)
   try {
     const updateUserPayload: Partial<z.infer<typeof updateUserSchema>> = {};
 
@@ -214,6 +213,10 @@ export async function updateUser({
     
     if (data.nationalId) {
       updateUserPayload.nationalId = data.nationalId;
+    }
+
+    if (data.dateOfBirth) {
+      updateUserPayload.dateOfBirth = data.dateOfBirth.toISOString().split('T')[0];
     }
 
     const updatedUser = await dbInstance

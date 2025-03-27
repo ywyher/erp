@@ -4,13 +4,17 @@ import { FC } from "react";
 interface LogoProps {
   size?: number; // Optional size parameter
   type?: "full" | "icon";
+  className?: string
 }
 
-const Logo: FC<LogoProps> = ({ size = 110, type = "full" }) => {
+const Logo: FC<LogoProps> = ({ size = 110, type = "full", className = "" }) => {
   const height = (size * 40) / 110; // Maintain the aspect ratio (110:40)
 
   return (
-    <Link href="/">
+    <Link 
+      href="/"
+      className={className}
+    >
       {type == "full" ? (
         <svg
           width={`${size}px`} // Use the size parameter

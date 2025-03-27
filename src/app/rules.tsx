@@ -3,7 +3,7 @@
 import { useRouter, usePathname } from "next/navigation";
 import { useEffect } from "react";
 import { useAuthStore } from "@/app/(auth)/store";
-import { emailOtp, getSession, phoneNumber } from "@/lib/auth-client";
+import { getSession } from "@/lib/auth-client";
 import { checkVerificationNeeded } from "@/lib/funcs";
 import { useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";

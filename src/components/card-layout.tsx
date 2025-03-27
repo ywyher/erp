@@ -12,7 +12,7 @@ export default function CardLayout({ children, title, className }: CardLayoutPro
         <Card className={`
         w-full max-w-6xl mx-auto shadow-none border-none rounded-lg
         ${className}
-        px-6 py-3 md:px-6 md:py-3
+        py-3 px-6 md:px-0 md:py-3
         `}>
 
             {title && (

@@ -22,7 +22,7 @@ export default function Links({
   ];
 
   return (
-    <>
+    <div className="flex flex-row gap-5">
       {links.map((link, index) => {
         return (
           <StyledLink
@@ -36,6 +36,6 @@ export default function Links({
           </StyledLink>
         );
       })}
-    </>
+    </div>
   );
 }

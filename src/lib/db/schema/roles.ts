@@ -16,6 +16,7 @@ export const user = pgTable("user", {
   id: text("id").primaryKey(),
   name: text("name").notNull(),
   username: text("username").unique(),
+  displayUsername: text('display_username'), // required by better-auth
   email: text("email").unique(),
   phoneNumber: text("phoneNumber").unique(),
   nationalId: text("nationalId").unique(),

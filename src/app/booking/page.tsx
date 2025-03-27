@@ -2,6 +2,7 @@
 
 import { useAuthStore } from "@/app/(auth)/store";
 import { createAppointment } from "@/app/(authenticated)/dashboard/appointments/actions";
+import CardLayout from "@/components/card-layout";
 import DoctorsList from "@/components/doctors/doctors-list";
 import {
   useAppointmentReservationStore,
@@ -93,7 +94,9 @@ export default function Booking() {
   return (
     <>
       <Header />
-      <DoctorsList book={true} />
+      <CardLayout title="Book an appointment" className="flex flex-col gap-3">
+        <DoctorsList book={true} />
+      </CardLayout>
     </>
   );
 }

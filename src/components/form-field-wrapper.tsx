@@ -36,6 +36,7 @@ import { useCreateEditor } from "@/components/editor/use-create-editor";
 import { Editor, EditorContainer } from "@/components/plate-ui/editor";
 import { Tag, TagInput } from "emblor";
 import { Editor as TEditor, Value } from "@udecode/plate";
+import { DateTimePicker } from "@/components/ui/datetime-picker";
 
 type AcceptMimeType =
   | "image/*"
@@ -138,6 +139,7 @@ export const FormFieldWrapper: React.FC<FormFieldWrapperProps> = ({
                 <Input
                   {...field}
                   disabled={disabled}
+                  placeholder={placeholder}
                   // onChange={(e) => {
                   //     const input = e.target;
                   //     const start = input.selectionStart; // Get current cursor position
@@ -172,40 +174,13 @@ export const FormFieldWrapper: React.FC<FormFieldWrapperProps> = ({
                 />
               )}
               {type === "date" && (
-                <Popover modal open={open} onOpenChange={setOpen}>
-                  <PopoverTrigger asChild>
-                    <FormControl>
-                      <Button
-                        variant={"outline"}
-                        className={cn(
-                          "w-full pl-3 text-left font-normal",
-                          !field.value && "text-muted-foreground"
-                        )}
-                      >
-                        {field.value ? (
-                          format(field.value, "PPP")
-                        ) : (
-                          <span>{placeholder}</span>
-                        )}
-                        <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                      </Button>
-                    </FormControl>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0" align="start">
-                    <Calendar
-                      mode="single"
-                      selected={field.value}
-                      onSelect={(value) => {
-                        field.onChange(value);
-                        setOpen(false);
-                      }}
-                      disabled={(date) =>
-                        date > new Date() || date < new Date("1900-01-01")
-                      }
-                      initialFocus
-                    />
-                  </PopoverContent>
-                </Popover>
+                <DateTimePicker 
+                  granularity="day" 
+                  value={field.value} 
+                  onChange={(date) => {
+                    field.onChange(date)
+                  }}
+                />
               )}
               {type === "password" && (
                 <div className="relative w-full">

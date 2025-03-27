@@ -17,6 +17,7 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import AuthLayout from "@/app/(auth)/auth/_components/auth-layout";
 import Seeder from "@/components/seeder";
+import { Separator } from "@/components/ui/separator";
 
 export default function Verify() {
   const [isLoading, setIsLoading] = useState(false);
@@ -78,7 +79,7 @@ export default function Verify() {
             {
               onSuccess: () => {
                 setOtpExists(true);
-                toast.success("OTP sent to email.");
+                toast.success("OTP sent successfully.");
               },
               onError: (ctx) => {
                 toast.error(ctx.error.message);
@@ -157,6 +158,7 @@ export default function Verify() {
                 username: username,
                 name: name,
                 password: password,
+                provider: "phoneNumber"
               });
 
               if (error) console.error(error.message);
@@ -227,14 +229,13 @@ export default function Verify() {
 
   if (!isHydrated || !value || !context) return null; // Prevent rendering before hydration
 
+  const title = context == 'email' ? "Check your inbox" : "Check you messages"
+
   return (
-    <AuthLayout>
-      <div className="w-full mb-6 flex flex-col gap-10 sm:mb-8">
+    <AuthLayout title={title}>
+      <div className="w-full flex flex-col gap-5">
         <div className="flex flex-col gap-4">
           <div className="flex flex-col gap-4">
-            <h3 className="text-2xl font-semibold text-zinc-100">
-              Check your {context}
-            </h3>
             <p className="text-teal-500">{value}</p>
             <p className="text-gray-400">
               If this account exists, you will receive an {context} with a One
@@ -243,6 +244,7 @@ export default function Verify() {
           </div>
           <VerifyForm form={form} onVerify={onVerify} isLoading={isLoading} />
         </div>
+        <Separator />
         <div className="flex flex-col gap-3">
           <Button variant="destructive" onClick={() => router.push("/logout")}>
             Logout

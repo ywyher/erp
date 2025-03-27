@@ -1,6 +1,6 @@
 "use client";
 
-import { changePassword, getSession } from "@/lib/auth-client";
+import { getSession } from "@/lib/auth-client";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -9,10 +9,8 @@ import OnboardingForm from "@/app/(auth)/onboarding/_components/onboarding-form"
 import Header from "@/components/header";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useImageStore } from "@/app/store";
 import { z } from "zod";
 import { updateUserSchema } from "@/app/types";
-import { getUserRegistrationType } from "@/lib/db/queries";
 import {
   checkVerificationNeeded,
   excludeField,
@@ -102,7 +100,6 @@ export default function Onboarding() {
     const updatedOnboarding = await updateOnboarding(userId || "", false);
 
     if (success && updatedOnboarding && updatedOnboarding.success) {
-      console.log("INVALIDATEEEE");
       setIsLoading(false);
       queryClient.invalidateQueries({ queryKey: ["session"] });
       toast(message);

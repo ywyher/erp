@@ -18,10 +18,13 @@ import {
 import CustomDate from "@/components/custom-date";
 import { Button } from "@/components/ui/button";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { Drawer, DrawerClose, DrawerContent, DrawerDescription, DrawerFooter, DrawerHeader, DrawerTitle, DrawerTrigger } from "@/components/ui/drawer"
+import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerTrigger } from "@/components/ui/drawer"
+import { getSession } from "@/lib/auth-client";
+import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 type DoctorCard = {
-  data: {
+  doctor: {
     user: User;
     doctor: Doctor;
     schedules: Schedule[];
@@ -31,17 +34,30 @@ type DoctorCard = {
 };
 
 export function DoctorCard({
-  data,
+  doctor,
   book = false,
   customSchedule = false,
 }: DoctorCard) {
   const [open, setOpen] = useState<boolean>(false);
   const { setDoctorId } = useDoctorIdStore();
   const { setDate } = useDateStore();
+
+  const router = useRouter()
   const isMobile = useIsMobile();
 
-  const handleBookDoctor = (date: Date) => {
-    setDoctorId(data.doctor.id);
+  const handleBookDoctor = async (date: Date) => {
+    const session = await getSession()
+
+    if(!session.data) {
+      toast.error("You must be authenticated", {
+        action: {
+          label: "Authenticate ?",
+          onClick: () => router.push('/auth')
+        }
+      })
+    }
+
+    setDoctorId(doctor.doctor.id);
     setDate(date);
     setOpen(false);
   };
@@ -56,7 +72,7 @@ export function DoctorCard({
         <ScheduleDisplay
           open={open}
           setOpen={setOpen}
-          schedules={data.schedules}
+          schedules={doctor.schedules}
           onClick={(e) => handleBookDoctor(e)}
           dialog={false}
         />
@@ -70,28 +86,28 @@ export function DoctorCard({
   return (
     <Card className="w-full h-full flex flex-col">
       <CardHeader className="flex flex-col items-center text-center">
-        <Pfp image={data.user.image} className="w-20 h-20 sm:w-24 sm:h-24" />
-        <CardTitle className="text-xl mb-1">{data.user.name}</CardTitle>
-        <p className="text-sm text-muted-foreground">@{data.user.username}</p>
-        <div className="flex flex-col gap-2">
-          <Badge variant="secondary" className="mb-2">
-            {data.doctor.specialty}
+        <Pfp image={doctor.user.image} className="w-20 h-20 sm:w-24 sm:h-24" />
+        <CardTitle className="text-xl">{doctor.user.name}</CardTitle>
+        <p className="text-sm text-muted-foreground">@{doctor.user.username}</p>
+        <div className="flex flex-row flex-wrap gap-2 items-center capitalize">
+          <Badge variant="secondary">
+            {doctor.doctor.specialty}
           </Badge>
-          <Badge variant="secondary" className="mb-2">
-            {data.user.role}
+          <Badge variant="secondary">
+            {doctor.user.role}
           </Badge>
         </div>
       </CardHeader>
       <CardContent className="flex-grow">
         <div className="space-y-2">
           <p className="text-sm">
-            <strong>Email:</strong> {data.user.email}
+            <strong>Email:</strong> {doctor.user.email}
           </p>
           <p className="text-sm">
-            <strong>Role:</strong> {data.user.role}
+            <strong>Role:</strong> {doctor.user.role}
           </p>
           <p className="text-sm">
-            <strong>National ID:</strong> {data.user.nationalId}
+            <strong>National ID:</strong> {doctor.user.nationalId}
           </p>
           {book ? (
             customSchedule ? (
@@ -132,7 +148,7 @@ export function DoctorCard({
               <ScheduleDisplay
                 open={open}
                 setOpen={setOpen}
-                schedules={data.schedules}
+                schedules={doctor.schedules}
                 onClick={(e) => handleBookDoctor(e)}
               />
             )
@@ -140,7 +156,7 @@ export function DoctorCard({
             <ScheduleDisplay
               open={open}
               setOpen={setOpen}
-              schedules={data.schedules}
+              schedules={doctor.schedules}
             />
           )}
         </div>

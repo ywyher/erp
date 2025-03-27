@@ -14,7 +14,7 @@ import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { X } from "lucide-react";
 import { deleteFile } from "@/lib/s3";
-import CardLayout from "@/app/(authenticated)/dashboard/_components/dashboard-layout";
+import DashboardLayout from "@/app/(authenticated)/dashboard/_components/dashboard-layout";
 import { useRouter } from "next/navigation";
 import { postCategoryStatuses, postSchema } from "@/app/(authenticated)/dashboard/posts/types";
 import { createPost } from "@/app/(authenticated)/dashboard/posts/actions";
@@ -116,7 +116,7 @@ export default function CreatePost() {
   };
 
   return (
-    <CardLayout title="Create a post">
+    <DashboardLayout title="Create a post">
       <Form {...form}>
         <form
           onSubmit={form.handleSubmit(onSubmit, onError)}
@@ -162,6 +162,6 @@ export default function CreatePost() {
           <LoadingBtn isLoading={isLoading || isProcessing}>Create</LoadingBtn>
         </form>
       </Form>
-    </CardLayout>
+    </DashboardLayout>
   );
 }

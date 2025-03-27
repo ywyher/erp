@@ -3,15 +3,9 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
   Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
 } from "@/components/ui/form";
-import { Button } from "@/components/ui/button";
 import { useForm } from "react-hook-form";
-import { redirect, useRouter } from "next/navigation";
+import { redirect, useRouter, useSearchParams } from "next/navigation";
 import AuthLayout from "@/app/(auth)/auth/_components/auth-layout";
 import { Input } from "@/components/ui/input";
 import { useState } from "react";
@@ -26,7 +20,8 @@ export default function ResetPassword() {
   const [isLoading, setIsLoading] = useState(false);
 
   const router = useRouter();
-  const token = new URLSearchParams(window.location.search).get("token");
+  const searchParams = useSearchParams();
+  const token = searchParams.get("token"); // Get the token from the URL
 
   const form = useForm<z.infer<typeof passwordSchema>>({
     resolver: zodResolver(passwordSchema),
@@ -60,11 +55,8 @@ export default function ResetPassword() {
   };
 
   return (
-    <AuthLayout>
-      <div className="w-full mb-6 flex flex-col space-y-6 sm:mb-8">
-        <h3 className="text-2xl font-semibold text-zinc-100">
-          Reset Your Password{" "}
-        </h3>
+    <AuthLayout title="Reset Your Password">
+      <div className="w-full flex flex-col gap-2">
         <Form {...form}>
           <form
             className="flex flex-col gap-4"

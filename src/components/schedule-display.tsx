@@ -19,8 +19,7 @@ import { format } from "date-fns";
 import { Button } from "@/components/ui/button";
 import { CalendarIcon, ChevronLeft, ChevronRight } from "lucide-react";
 import { Dispatch, SetStateAction, useState } from "react";
-import CardLayout from "@/app/(authenticated)/dashboard/_components/dashboard-layout";
-import { Drawer, DrawerClose, DrawerContent, DrawerDescription, DrawerFooter, DrawerHeader, DrawerTitle } from "@/components/ui/drawer"
+import { Drawer, DrawerContent, DrawerDescription, DrawerFooter, DrawerHeader, DrawerTitle } from "@/components/ui/drawer"
 import { useIsMobile } from "@/hooks/use-mobile";
 
 export function ScheduleDisplay({

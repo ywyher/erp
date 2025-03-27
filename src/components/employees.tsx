@@ -11,7 +11,6 @@ import { z } from "zod";
 import { Doctor, Receptionist, Schedule, User } from "@/lib/db/schema";
 import { Skeleton } from "@/components/ui/skeleton";
 import DateFilters from "@/components/date-filters";
-import CardLayout from "@/app/(authenticated)/dashboard/_components/dashboard-layout";
 import { format, isToday } from "date-fns";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 

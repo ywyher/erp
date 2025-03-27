@@ -1,6 +1,6 @@
 import { getPosts } from "@/app/(authenticated)/dashboard/posts/actions";
 import { postTableColumns } from "@/app/(authenticated)/dashboard/posts/columns";
-import CardLayout from "@/app/(authenticated)/dashboard/_components/dashboard-layout";
+import DashboardLayout from "@/app/(authenticated)/dashboard/_components/dashboard-layout";
 import StatCard from "@/app/(authenticated)/dashboard/_components/stat-cart";
 import { Button } from "@/components/ui/button";
 import { DataTable } from "@/components/ui/data-table";
@@ -22,7 +22,7 @@ export default async function Services() {
     const posts = await getPosts({ id: data.user.id, role: data.user.role as User['role'] });
 
     return (
-    <CardLayout title="Manage Posts" className="flex-1">
+    <DashboardLayout title="Manage Posts" className="flex-1">
       {posts && (
         <div className="h-screen flex flex-col">
           <div className="flex-1">
@@ -47,6 +47,6 @@ export default async function Services() {
           </Button>
         </div>
       )}
-    </CardLayout>
+    </DashboardLayout>
   )
 }

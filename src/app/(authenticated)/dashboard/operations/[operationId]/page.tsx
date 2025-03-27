@@ -1,4 +1,4 @@
-import CardLayout from "@/app/(authenticated)/dashboard/_components/dashboard-layout";
+import DashboardLayout from "@/app/(authenticated)/dashboard/_components/dashboard-layout";
 import OperationTabs from "@/app/(authenticated)/dashboard/operations/[operationId]/_components/operation-tabs";
 import { getDoctorData, getPatientData } from "@/app/(authenticated)/dashboard/operations/[operationId]/actions";
 import { getSession } from "@/lib/auth-client";
@@ -51,7 +51,7 @@ export default async function Operation({
   if (!operationDocument) return new Error("couldnt get operation document");
 
   return (
-    <CardLayout>
+    <DashboardLayout>
       <OperationTabs
         patient={patient}
         doctorId={doctor.id}
@@ -62,6 +62,6 @@ export default async function Operation({
         operationDocument={operationDocument.name}
         editable={data.user.role == "doctor" ? true : false}
       />
-    </CardLayout>
+    </DashboardLayout>
   );
 }

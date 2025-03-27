@@ -51,7 +51,7 @@ export default function SettingsForm() {
         phoneNumber: user.phoneNumber || "",
         nationalId: user.nationalId || "",
         gender: user.gender || "",
-        dateOfBirth: new Date(user.dateOfBirth) || "",
+        dateOfBirth: user.dateOfBirth ? new Date(user.dateOfBirth) : "",
       });
     }
   }, [user]);
@@ -68,7 +68,7 @@ export default function SettingsForm() {
       phoneNumber: user.phoneNumber || "",
       nationalId: user.nationalId || "",
       gender: user.gender || "",
-      dateOfBirth: new Date(user.dateOfBirth) || "",
+      dateOfBirth: user.dateOfBirth ? new Date(user.dateOfBirth) : "",
     };
 
     const changedFields = getChangedFields(sessionData, data);
@@ -83,10 +83,10 @@ export default function SettingsForm() {
 
   const onSubmit = async (data: z.infer<typeof updateUserSchema>) => {
     if (!user || !user.id) return;
-    setIsLoading(true);
-
+    // setIsLoading(true);
+    
     const normalizedData = normalizeData(data, "object");
-
+    
     const result = await updateUser({
       data: normalizedData,
       userId: user.id,

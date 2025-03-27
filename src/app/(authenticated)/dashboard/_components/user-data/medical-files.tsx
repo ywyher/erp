@@ -3,7 +3,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import Images from "./images";
 import Videos from "./videos";
 import Pdfs from "./pdfs";
-import CardLayout from "@/app/(authenticated)/dashboard/_components/dashboard-layout";
+import DashboardLayout from "@/app/(authenticated)/dashboard/_components/dashboard-layout";
 
 export default function UserMedicalFiles({ files }: { files: MedicalFile[] }) {
   const hasImages = files.some((file) => file.type.startsWith("image/"));
@@ -31,7 +31,7 @@ export default function UserMedicalFiles({ files }: { files: MedicalFile[] }) {
   }
 
   return (
-    <CardLayout title="User Medical Files" className="m-0 p-0">
+    <DashboardLayout title="User Medical Files" className="m-0 p-0">
       <Tabs defaultValue={tabs[0].value}>
         <TabsList className={``}>
           {tabs.map((tab) => (
@@ -46,6 +46,6 @@ export default function UserMedicalFiles({ files }: { files: MedicalFile[] }) {
           </TabsContent>
         ))}
       </Tabs>
-    </CardLayout>
+    </DashboardLayout>
   );
 }
