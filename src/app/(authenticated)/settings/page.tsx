@@ -36,11 +36,18 @@ export default function Settings() {
       <Header />
       <VerifyAlert />
       {user && (
-        <div className="flex flex-col gap-5 w-full p-6 mx-auto border-x border-t border-b border-zinc-800 sm:p-8 md:w-[70%] lg:w-[60%] xl:w-[50%] 2xl:w-[40%]">
+        <div className="
+          bg-background
+          flex flex-col gap-5 w-full
+          p-6 mx-auto 
+          sm:p-8 md:w-[70%] lg:w-[60%] xl:w-[50%] 2xl:w-[40%]
+          shadow-lg 
+          rounded-es-2xl rounded-ee-2xl
+        ">
           {provider == "credential" ? (
             <Tabs
               defaultValue="settings"
-              className="w-full flex flex-col gap-3"
+              className="flex flex-col w-full gap-3"
             >
               <TabsList className="w-full">
                 <TabsTrigger className="w-full" value="settings">

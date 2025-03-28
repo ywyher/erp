@@ -58,7 +58,7 @@ export default function Header({ className = "" }: { className?: string }) {
     <nav
       className={clsx(
         "flex items-center justify-center",
-        "px-6 md:px-0 pt-4",
+        "px-6 pt-4",
       )}
     >
       <div 
@@ -68,6 +68,7 @@ export default function Header({ className = "" }: { className?: string }) {
           "w-full max-w-6xl",
           "border rounded-2xl shadow-sm",
           "px-5 py-2 md:py-0",
+          "bg-background",
           className
         )}
       >

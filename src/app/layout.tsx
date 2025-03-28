@@ -8,6 +8,7 @@ import { NuqsAdapter } from "nuqs/adapters/next/app";
 import Rules from "@/app/rules";
 import Script from "next/script";
 import Seeder from "@/components/seeder";
+import clsx from "clsx";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -36,10 +37,15 @@ export default async function RootLayout({
         {/* <Script src="//unpkg.com/react-scan/dist/auto.global.js" strategy="afterInteractive" /> */}
       </head>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`
+          ${geistSans.variable} ${geistMono.variable}
+          antialiased
+        `}
       >
         <ReactQueryProvider>
-          <main>
+          <main className="
+              absolute top-0 z-[-2] h-screen w-screen bg-background bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(120,119,198,0.3),rgba(255,255,255,0))] dark:bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(66,0,255,0.3),rgba(0,0,0,0))]
+            ">
             <NuqsAdapter>
               <ThemeProvider
                 attribute="class"
