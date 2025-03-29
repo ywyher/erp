@@ -16,11 +16,11 @@ export default function Right() {
             <div className="
                 absolute 
                 w-[400px] h-[400px] 
-                bg-gradient-to-br from-[#4200FF] to-purple-600 
+                bg-gradient-to-br from-primary to-secondary
                 rounded-full 
                 flex items-end justify-center
-                shadow-[0_35px_60px_-15px_rgba(66,0,255,0.3)]
-                dark:shadow-[0_35px_60px_-15px_rgba(66,0,255,0.5)]
+                shadow-[0_35px_60px_-15px_hsla(215,85%,30%,0.3)]
+                dark:shadow-[0_35px_60px_-15px_hsla(215,70%,40%,0.5)]
                 hover:scale-[1.02] 
                 transition-transform 
                 duration-300 
@@ -43,7 +43,7 @@ export default function Right() {
                     w-[500px] h-[500px]
                 ">
                     <Image
-                        src="/images/cleft.png"
+                        src="/images/cat.png"
                         alt="Profile Picture"
                         fill
                         className="object-cover rounded-full"

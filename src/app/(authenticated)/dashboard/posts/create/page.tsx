@@ -111,20 +111,21 @@ export default function CreatePost() {
     }
   };
 
-  const onError = () => {
-    toast.error(Object.values(form.formState.errors)[0].message);
-  };
+  // const onError = () => {
+  //   console.error(form.formState.errors)
+  //   toast.error(Object.values(form.formState.errors)[0].message);
+  // };
 
   return (
     <DashboardLayout title="Create a post">
       <Form {...form}>
         <form
-          onSubmit={form.handleSubmit(onSubmit, onError)}
+          onSubmit={form.handleSubmit(onSubmit)}
           className="flex flex-col gap-5"
         >
           <div className="flex flex-col gap-3 max-w-[95%]">
             {previewUrl ? (
-              <div className="relative rounded-md overflow-hidden border border-gray-200">
+              <div className="relative overflow-hidden border border-gray-200 rounded-md">
                 <div className="relative w-full h-96">
                   <Image 
                     src={previewUrl}
@@ -137,10 +138,10 @@ export default function CreatePost() {
                   type="button"
                   variant="destructive"
                   size="icon"
-                  className="absolute top-2 right-2 rounded-full w-8 h-8"
+                  className="absolute w-8 h-8 rounded-full top-2 right-2"
                   onClick={handleRemoveImage}
                 >
-                  <X className="h-4 w-4" />
+                  <X className="w-4 h-4" />
                 </Button>
               </div>
             ) : (

@@ -1,6 +1,6 @@
 "use client"
-import PostCard from "@/app/posts/_components/post-card";
-import PostCardSkeleton from "@/app/posts/_components/post-card-skeleton";
+import PostCard from "@/components/post-card";
+import PostCardSkeleton from "@/components/post-card-skeleton";
 import PostFilters from "@/app/posts/_components/post-filters";
 import { getPosts } from "@/app/posts/actionts";
 import CardLayout from "@/components/card-layout";
@@ -132,7 +132,7 @@ export default function Posts() {
           <PostFilters />
           
           {!posts || isLoading ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8 w-full">
+            <div className="grid w-full grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 md:gap-8">
               {[1, 2, 3].map((index) => (
                 <PostCardSkeleton key={index} />
               ))}
@@ -141,7 +141,7 @@ export default function Posts() {
             <div className="flex flex-col gap-8">
               {posts.length ? (
                 <>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8 w-full">
+                  <div className="grid w-full grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 md:gap-8">
                     {posts.map((post) => (
                       <PostCard key={post.id} post={post} />
                     ))}

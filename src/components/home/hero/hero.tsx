@@ -6,7 +6,7 @@ import Book from '@/components/home/hero/book';
 export default function Hero() {
     return (
         <CardLayout 
-            className='bg-transparent'
+            className='mb-[4rem] bg-transparent'
             contentClassName="
                 grid grid-cols-1 lg:grid-cols-2
                 items-center min-h-[85vh]
@@ -14,7 +14,7 @@ export default function Hero() {
                 lg:gap-0 gap-24
             "
         >
-            <div className="flex flex-col gap-5 justify-center h-full">
+            <div className="flex flex-col justify-center h-full gap-5">
                 <Left />
                 <Book />
             </div>

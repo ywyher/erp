@@ -17,13 +17,13 @@ export default function FloatingCard({
       <Card
         className={clsx(
           "absolute flex flex-row gap-3 items-center p-3",
-          className 
+          className
         )}
       >
-        <Icon size={30} color='#4200FF' />
+        <Icon size={30} color="hsl(var(--primary))" />
         <div className='flex flex-col'>
-            <CardHeader className='p-0 font-bold text-lg'>{title}</CardHeader>
-            <CardContent className='p-0 text-gray-500 text-sm'>
+            <CardHeader className='p-0 text-lg font-bold'>{title}</CardHeader>
+            <CardContent className='p-0 text-sm text-gray-500'>
                 {description}
             </CardContent>
         </div>
