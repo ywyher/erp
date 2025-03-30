@@ -36,14 +36,17 @@ export default function Right() {
                     title="Book an Appointment" 
                     description='At your fingertips'
                     Icon={Clock}
-                    className="top-44 left-64 w-[280px] rotate-[5deg] z-10"
+                    className="
+                        top-44 left-48 md:left-64 z-10 
+                        w-[280px] rotate-[5deg]
+                    "
                 />
                 <div className="
                     relative 
                     w-[500px] h-[500px]
                 ">
                     <Image
-                        src="/images/cleft.png"
+                        src="/images/cat.png"
                         alt="Profile Picture"
                         fill
                         className="object-cover rounded-full"

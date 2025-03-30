@@ -60,7 +60,7 @@ export default function Posts() {
     
     return (
         <CardLayout
-          title="Latest posts"
+          title="Latest Posts"
           className="relative flex flex-col justify-center h-screen w-full"
           variant="home"
         >

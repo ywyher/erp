@@ -3,6 +3,7 @@
 import { Badge } from "@/components/ui/badge";
 import { Post, User } from "@/lib/db/schema";
 import { getFileUrl } from "@/lib/funcs";
+import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
@@ -35,14 +36,13 @@ export default function PostCard({ post }: { post: Post & { author: User } }) {
     };
 
     return (
-        <div
-            className="
-                flex flex-col justify-between w-full
-                rounded-lg overflow-hidden shadow-lg bg-[#f9f9f9] dark:bg-[#121212] p-4
-                border border-gray-300 dark:border-gray-700
-                min-w-[350px] max-w-[320px] min-h-[470px]
-                transition-transform hover:scale-105 hover:shadow-xl cursor-pointer
-            "
+        <div className={cn(
+            "flex flex-col justify-between w-full",
+            "rounded-lg overflow-hidden shadow-lg bg-[#f9f9f9] dark:bg-[#121212] p-4",
+            "border border-gray-300 dark:border-gray-700",
+            "min-w-[350px] md:min-h-[470px] max-w-[400px] min-h-[500px]",
+            "transition-transform hover:scale-105 hover:shadow-xl cursor-pointer",
+        )}
             onClick={handleClick}
         >
             {/* Thumbnail with priority loading for visible cards */}

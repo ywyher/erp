@@ -9,13 +9,6 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-  SelectContent,
-} from "@/components/ui/select";
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
 import {
   Popover,
@@ -24,11 +17,9 @@ import {
 } from "@/components/ui/popover"
 import { Textarea } from "@/components/ui/textarea";
 import MultipleSelector from "@/components/ui/multi-select";
-import { CalendarIcon, Check, ChevronsUpDown, Eye, EyeOff } from "lucide-react";
+import { Check, ChevronsUpDown, Eye, EyeOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Calendar } from "@/components/ui/calendar";
 import { cn } from "@/lib/utils";
-import { format } from "date-fns";
 import { DndProvider } from "react-dnd";
 import { Plate } from "@udecode/plate/react";
 import { HTML5Backend } from "react-dnd-html5-backend";
@@ -37,6 +28,7 @@ import { Editor, EditorContainer } from "@/components/plate-ui/editor";
 import { Tag, TagInput } from "emblor";
 import { Editor as TEditor, Value } from "@udecode/plate";
 import { DateTimePicker } from "@/components/ui/datetime-picker";
+import IconSelector, { IconName } from "@/components/icons-selector";
 
 type AcceptMimeType =
   | "image/*"
@@ -64,7 +56,8 @@ interface FormFieldWrapperProps {
     | "date"
     | "file"
     | "editor"
-    | "tags";
+    | "tags"
+    | "icon";
   options?: { value: string; label: string }[] | string[] | readonly string[];
   disableSearch?: boolean
   maxLength?: number; // Add this line
@@ -140,24 +133,6 @@ export const FormFieldWrapper: React.FC<FormFieldWrapperProps> = ({
                   {...field}
                   disabled={disabled}
                   placeholder={placeholder}
-                  // onChange={(e) => {
-                  //     const input = e.target;
-                  //     const start = input.selectionStart; // Get current cursor position
-                  //     let value = input.value;
-
-                  //     if (name === "name") {
-                  //         value = value.toLowerCase(); // Lowercase without trim
-                  //     } else {
-                  //         value = value.trim().toLowerCase(); // Trim + lowercase for other fields
-                  //     }
-
-                  //     field.onChange(value);
-
-                  //     // Restore cursor position
-                  //     requestAnimationFrame(() => {
-                  //         input.setSelectionRange(start, start);
-                  //     });
-                  // }}
                 />
               )}
               {type === "number" && (
@@ -346,6 +321,14 @@ export const FormFieldWrapper: React.FC<FormFieldWrapperProps> = ({
                     }}
                     activeTagIndex={activeTagIndex}
                     setActiveTagIndex={setActiveTagIndex}
+                />
+              )}
+              {type === "icon" && (
+                <IconSelector
+                  value={field.value as IconName}
+                  onChange={(iconName: IconName) => {
+                    field.onChange(iconName);
+                  }}
                 />
               )}
             </div>

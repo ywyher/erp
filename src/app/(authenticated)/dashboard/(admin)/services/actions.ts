@@ -1,11 +1,13 @@
 'use server'
 
+import { serviceSchema } from "@/app/(authenticated)/dashboard/(admin)/services/types"
 import { getSession } from "@/lib/auth-client"
 import db from "@/lib/db"
 import { admin, Service, service } from "@/lib/db/schema"
 import { generateId } from "@/lib/funcs"
 import { eq } from "drizzle-orm"
 import { headers } from "next/headers"
+import { z } from "zod"
 
 export async function getServices() {
     return await db.select().from(service)
@@ -18,12 +20,7 @@ export const getServiceData = async (serviceId: Service['id']) => {
   return serviceData
 }
 
-export async function createService({ title, content, status, thumbnail }: { 
-     title: Service['title'],
-     content: Service['content'],
-     status: Service['status'],
-     thumbnail: Service['thumbnail']
-    }) {
+export async function createService({ data }: { data: z.infer<typeof serviceSchema> }) {
     try {
         const userData = await getSession({
             fetchOptions: {
@@ -45,10 +42,9 @@ export async function createService({ title, content, status, thumbnail }: {
         
         const [createdService] = await db.insert(service).values({
             id: serviceId,
-            title,
-            content,
-            thumbnail,
-            status,
+            title: data.title,
+            icon: data.icon,
+            status: data.status,
             creatorId,
             createdAt: new Date(),
             updatedAt: new Date(),
@@ -68,19 +64,12 @@ export async function createService({ title, content, status, thumbnail }: {
       }
 }
 
-export async function updateService({ title, content, status, thumbnail, serviceId }: { 
-     title: Service['title'],
-     content: Service['content'],
-     status: Service['status'],
-     thumbnail: Service['thumbnail']
-     serviceId: Service['id'] 
-    }) {
+export async function updateService({ data, serviceId }: { data: z.infer<typeof serviceSchema>, serviceId: Service['id'] }) {
     try {
         const [updatedService] = await db.update(service).set({
-            title,
-            content,
-            status,
-            thumbnail,
+            title: data.title,
+            status: data.status,
+            icon: data.icon,
             updatedAt: new Date(),
         })
         .where(eq(service.id, serviceId))

@@ -8,9 +8,8 @@ import TableCell from "@/components/table-cell";
 
 const serviceColumns = [
   { value: "id", header: "ID" },
-  { value: "title", header: "Title", readMore: true, maxChars: 24 },
-  { value: "content", header: "Content", dialog: true },
-  { value: "thumbnail", header: "Thumbnail" },
+  { value: "title", header: "Title" },
+  { value: "icon", header: "Icon" },
   { value: "status", header: "Status" },
 ];
 
@@ -37,13 +36,13 @@ export const serviceTableColumns: ColumnDef<any>[] = [
     enableSorting: false,
     enableHiding: false,
   },
-  ...serviceColumns.map(({ value, header, dialog, readMore, maxChars }) => ({
+  ...serviceColumns.map(({ value, header }) => ({
     accessorKey: value,
     header: ({ column }: { column: Column<any> }) => (
       <DataTableColumnHeader column={column} title={header} />
     ),
     cell: ({ row }: { row: Row<any> }) => (
-      <TableCell row={row} value={value} header={header} readMore={readMore} maxChars={maxChars} dialog={dialog} />
+      <TableCell row={row} value={value} header={header} />
     ),
   })),
   {

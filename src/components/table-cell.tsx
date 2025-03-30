@@ -27,6 +27,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet"
+import DynamicIcon from "@/components/dynamic-icon";
 
 interface TableCellProps {
   row: Row<any>;
@@ -95,6 +96,12 @@ export default function TableCell({
     } else {
       return <span className="text-muted-foreground">Empty</span>;
     }
+  }
+
+  if (value === "icon") {
+    return (
+      <DynamicIcon name={cellValue as string} />
+    );
   }
 
   if (value === "thumbnail") {

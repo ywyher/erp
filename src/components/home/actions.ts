@@ -1,7 +1,7 @@
 'use server'
 
 import db from "@/lib/db"
-import { Post, post } from "@/lib/db/schema"
+import { Post, post, service } from "@/lib/db/schema"
 import { and, eq, inArray } from "drizzle-orm";
 
 type TGetPosts = { 
@@ -11,7 +11,7 @@ type TGetPosts = {
 
 export async function getPosts({ category = 'all', limit = 6 }: TGetPosts) {
 
-    const conditions = [];
+    const conditions = [eq(post.status, 'published')];
 
     if (category != 'all') {
         conditions.push(eq(post.category, category));
@@ -32,4 +32,8 @@ export async function getPosts({ category = 'all', limit = 6 }: TGetPosts) {
           author: user, // Rename "user" to "author"
         })),
     };
+}
+
+export async function getService() {
+    return await db.select().from(service).where(eq(service.status, 'published'))
 }
