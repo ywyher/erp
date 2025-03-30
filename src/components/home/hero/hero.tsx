@@ -6,7 +6,7 @@ import Book from '@/components/home/hero/book';
 export default function Hero() {
     return (
         <CardLayout 
-            className='mb-[4rem] bg-transparent'
+            variant="home"
             contentClassName="
                 grid grid-cols-1 lg:grid-cols-2
                 items-center min-h-[85vh]

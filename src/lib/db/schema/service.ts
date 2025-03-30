@@ -6,8 +6,7 @@ import { socialStatusEnum } from "@/lib/db/schema/enums";
 export const service = pgTable("service", {
   id: text("id").primaryKey(),
   title: text("title").notNull(),
-  content: text("content").notNull(),
-  thumbnail: text("thumbnail").notNull(),
+  icon: text("icon").notNull(),
   creatorId: text("creatorId")
     .references(() => admin.id, { onDelete: "cascade" })
     .notNull(),
