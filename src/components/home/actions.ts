@@ -1,7 +1,7 @@
 'use server'
 
 import db from "@/lib/db"
-import { Post, post, service } from "@/lib/db/schema"
+import { faq, Post, post, service } from "@/lib/db/schema"
 import { and, eq, inArray } from "drizzle-orm";
 
 type TGetPosts = { 
@@ -36,4 +36,8 @@ export async function getPosts({ category = 'all', limit = 6 }: TGetPosts) {
 
 export async function getService() {
     return await db.select().from(service).where(eq(service.status, 'published'))
+}
+
+export async function getFaq() {
+    return await db.select().from(faq).where(eq(faq.status, 'published'))
 }

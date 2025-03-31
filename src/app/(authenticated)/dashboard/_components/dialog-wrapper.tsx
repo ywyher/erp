@@ -91,9 +91,9 @@ export default function DialogWrapper({
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle className="capitalize">Create A New {label}</DialogTitle>
+            <DialogTitle className="capitalize">{operation} {operation == 'create' ? "A" : "the"} {operation == 'create' && "New"} {label}</DialogTitle>
             <DialogDescription>
-              Fill out the form below to create a new user. All fields are
+              Fill out the form below to {operation} {operation == 'create' ? "a" : "the"} {operation == 'create' && "New"} user. All fields are
               required.
             </DialogDescription>
           </DialogHeader>

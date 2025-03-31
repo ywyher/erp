@@ -24,7 +24,7 @@ import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 
 type DoctorCard = {
-  doctor: {
+  data: {
     user: User;
     doctor: Doctor;
     schedules: Schedule[];
@@ -34,7 +34,7 @@ type DoctorCard = {
 };
 
 export function DoctorCard({
-  doctor,
+  data,
   book = false,
   customSchedule = false,
 }: DoctorCard) {
@@ -57,7 +57,7 @@ export function DoctorCard({
       })
     }
 
-    setDoctorId(doctor.doctor.id);
+    setDoctorId(data.doctor.id);
     setDate(date);
     setOpen(false);
   };
@@ -72,7 +72,7 @@ export function DoctorCard({
         <ScheduleDisplay
           open={open}
           setOpen={setOpen}
-          schedules={doctor.schedules}
+          schedules={data.schedules}
           onClick={(e) => handleBookDoctor(e)}
           dialog={false}
         />
@@ -86,28 +86,28 @@ export function DoctorCard({
   return (
     <Card className="w-full h-full flex flex-col">
       <CardHeader className="flex flex-col items-center text-center">
-        <Pfp image={doctor.user.image} className="w-20 h-20 sm:w-24 sm:h-24" />
-        <CardTitle className="text-xl">{doctor.user.name}</CardTitle>
-        <p className="text-sm text-muted-foreground">@{doctor.user.username}</p>
+        <Pfp image={data.user.image} className="w-20 h-20 sm:w-24 sm:h-24" />
+        <CardTitle className="text-xl">{data.user.name}</CardTitle>
+        <p className="text-sm text-muted-foreground">@{data.user.username}</p>
         <div className="flex flex-row flex-wrap gap-2 items-center capitalize">
           <Badge variant="secondary">
-            {doctor.doctor.specialty}
+            {data.doctor.specialty}
           </Badge>
           <Badge variant="secondary">
-            {doctor.user.role}
+            {data.user.role}
           </Badge>
         </div>
       </CardHeader>
       <CardContent className="flex-grow">
         <div className="space-y-2">
           <p className="text-sm">
-            <strong>Email:</strong> {doctor.user.email}
+            <strong>Email:</strong> {data.user.email}
           </p>
           <p className="text-sm">
-            <strong>Role:</strong> {doctor.user.role}
+            <strong>Role:</strong> {data.user.role}
           </p>
           <p className="text-sm">
-            <strong>National ID:</strong> {doctor.user.nationalId}
+            <strong>National ID:</strong> {data.user.nationalId}
           </p>
           {book ? (
             customSchedule ? (
@@ -148,7 +148,7 @@ export function DoctorCard({
               <ScheduleDisplay
                 open={open}
                 setOpen={setOpen}
-                schedules={doctor.schedules}
+                schedules={data.schedules}
                 onClick={(e) => handleBookDoctor(e)}
               />
             )
@@ -156,7 +156,7 @@ export function DoctorCard({
             <ScheduleDisplay
               open={open}
               setOpen={setOpen}
-              schedules={doctor.schedules}
+              schedules={data.schedules}
             />
           )}
         </div>

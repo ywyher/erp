@@ -13,12 +13,14 @@ import { FormFieldWrapper } from "@/components/form-field-wrapper";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { getEmail } from "@/app/(auth)/actions";
+import { useQueryClient } from "@tanstack/react-query";
 
 export default function Login() {
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
   const value = useAuthStore((state) => state.value);
   const context = useAuthStore((state) => state.context) as AuthStore['context'];
+  const queryClient = useQueryClient();
 
   if (!value) return <>Loading...</>;
 
@@ -37,6 +39,7 @@ export default function Login() {
           },
           onError: (ctx) => {
             setIsLoading(false);
+            queryClient.invalidateQueries({ queryKey: ["session"] });
             toast.error(ctx.error.message);
           },
         },
@@ -50,6 +53,7 @@ export default function Login() {
         {
           onSuccess: async (e) => {
             setIsLoading(false);
+            queryClient.invalidateQueries({ queryKey: ["session"] });
             router.push("/");
           },
           onError: (ctx) => {
@@ -67,6 +71,7 @@ export default function Login() {
         {
           onSuccess: async (e) => {
             setIsLoading(false);
+            queryClient.invalidateQueries({ queryKey: ["session"] });
             router.push("/");
           },
           onError: (ctx) => {

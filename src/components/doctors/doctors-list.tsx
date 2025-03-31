@@ -91,7 +91,7 @@ export default function DoctorsList({
                 doctors.map((doctor) => (
                   <DoctorCard
                     key={doctor.user.id}
-                    doctor={doctor}
+                    data={doctor}
                     book={book}
                     customSchedule={customSchedule}
                   />

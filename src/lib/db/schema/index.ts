@@ -8,8 +8,9 @@ import { prescription } from "./prescription";
 import { operation, operationData } from "./operation";
 import { settings } from "./settings";
 import { service } from "./service";
-import { post } from "./post";
 import { preset } from "./preset";
+import { post } from "./post";
+import { faq } from "./faq";
 export * from "./enums";
 export * from "./roles";
 export * from "./auth";
@@ -23,7 +24,9 @@ export * from "./settings";
 export * from "./service";
 export * from "./post";
 export * from "./preset";
+export * from "./faq";
 
+export type Faq = InferSelectModel<typeof faq>;
 export type Preset = InferSelectModel<typeof preset>;
 export type Post = InferSelectModel<typeof post>;
 export type Service = InferSelectModel<typeof service>;
@@ -50,3 +53,4 @@ export type Tables =
   | "service"
   | "post"
   | "preset"
+  | "faq"

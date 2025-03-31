@@ -67,6 +67,8 @@ export default function CreatePost() {
         data.content = currentContent;
       }
 
+      console.log(data.content)
+
       const { name, error } = await handleUpload(data.thumbnail);
       
       if (!name) {

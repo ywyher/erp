@@ -64,7 +64,7 @@ export default function Services() {
     return (
         <CardLayout
           title="Our Services"
-          className="relative flex flex-col justify-center h-screen w-full"
+          className="relative flex flex-col justify-center h-fit w-full"
           variant="home"
         >
           {gradient('middle')}

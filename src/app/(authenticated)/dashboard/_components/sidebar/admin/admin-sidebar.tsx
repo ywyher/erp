@@ -11,6 +11,7 @@ import {
   Home,
   Layers,
   Lock,
+  MessageCircleQuestion,
   Newspaper,
   Plus,
   Settings,
@@ -107,6 +108,11 @@ export default function AdminSidebar() {
           icon: Plus,
         },
       ],
+    },
+    {
+      title: "Faq",
+      url: "/dashboard/faqs",
+      icon: MessageCircleQuestion,
     },
   ];
 

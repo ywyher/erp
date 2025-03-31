@@ -11,6 +11,7 @@ import {
   session,
   user,
   preset,
+  faq,
 } from "@/lib/db/schema";
 import { service } from "@/lib/db/schema/service";
 import { z } from "zod";
@@ -170,5 +171,6 @@ export const tableMap: Record<string, any> = {
   operation,
   service,
   post,
-  preset
+  preset,
+  faq
 };

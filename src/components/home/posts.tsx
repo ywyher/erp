@@ -61,7 +61,7 @@ export default function Posts() {
     return (
         <CardLayout
           title="Latest Posts"
-          className="relative flex flex-col justify-center h-screen w-full"
+          className="relative flex flex-col justify-center h-fit w-full"
           variant="home"
         >
           {gradient('top-left')}

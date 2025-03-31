@@ -46,7 +46,7 @@ export default function Right() {
                     w-[500px] h-[500px]
                 ">
                     <Image
-                        src="/images/cat.png"
+                        src="/images/cleft.png"
                         alt="Profile Picture"
                         fill
                         className="object-cover rounded-full"

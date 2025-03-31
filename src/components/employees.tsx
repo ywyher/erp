@@ -1,6 +1,5 @@
 'use client'
 
-import { useEffect } from "react";
 import { getEmployees } from "@/lib/db/queries";
 import { useQuery } from "@tanstack/react-query";
 import { DoctorCard } from "@/components/doctors/doctor-card";

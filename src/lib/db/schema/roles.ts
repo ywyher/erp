@@ -10,6 +10,7 @@ import { providerEnum, roleEnum } from "./enums";
 import { service } from "@/lib/db/schema/service";
 import { post } from "@/lib/db/schema/post";
 import { preset } from "@/lib/db/schema/preset";
+import { faq } from "@/lib/db/schema/faq";
 
 // User
 export const user = pgTable("user", {
@@ -65,6 +66,7 @@ export const adminRelation = relations(admin, ({ one, many }) => ({
     references: [user.id],
   }),
   services: many(service),
+  faqs: many(faq),
 }));
 
 // Doctor
