@@ -9,6 +9,8 @@ import {
 
 export default async function Faq() {
   const faq = await getFaq()
+
+  if (faq && faq.length === 0) return null;
   
   return (
     <CardLayout 
