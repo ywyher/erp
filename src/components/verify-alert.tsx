@@ -1,11 +1,10 @@
 "use client";
 
-import { emailOtp, getSession, phoneNumber } from "@/lib/auth-client";
+import { getSession } from "@/lib/auth-client";
 import { useQuery } from "@tanstack/react-query";
-import { redirect, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Button } from "@/components/ui/button";
-import { Mail, Phone, Router } from "lucide-react";
+import { Mail, Phone } from "lucide-react";
 import { useAuthStore } from "@/app/(auth)/store";
 import { isFakeEmail } from "@/lib/funcs";
 import LoadingBtn from "@/components/loading-btn";
@@ -16,9 +15,8 @@ export default function VerifyAlert() {
   const setValue = useAuthStore((state) => state.setValue);
   const setContext = useAuthStore((state) => state.setContext);
   const setOperation = useAuthStore((state) => state.setOperation);
-  const setRedirectTo = useAuthStore((state) => state.setRedirectTo);
 
-  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isLoading] = useState<boolean>(false);
 
   const { data: user, isPending } = useQuery({
     queryKey: ["session", "verifyAlert"],
@@ -51,7 +49,7 @@ export default function VerifyAlert() {
     <>
       {!user.emailVerified && !isFakeEmail(user.email) && (
         <div className="space-y-4 md:w-[70%] lg:w-[60%] xl:w-[50%] 2xl:w-[40%] mx-auto py-2">
-          <Alert variant="destructive" className="py-2">
+          <Alert variant="destructive" className="py-2 bg-background">
             <Mail className="h-4 w-4" />
             <AlertTitle>Verify your email</AlertTitle>
             <div className="grid grid-cols-3 items-center">
@@ -73,7 +71,7 @@ export default function VerifyAlert() {
       )}
       {!user.phoneNumberVerified && user.phoneNumber && (
         <div className="space-y-4 md:w-[70%] lg:w-[60%] xl:w-[50%] 2xl:w-[40%] mx-auto py-2">
-          <Alert variant="destructive" className="py-2">
+          <Alert variant="destructive" className="py-2 bg-background">
             <Phone className="h-4 w-4" />
             <AlertTitle>Verify your phone number</AlertTitle>
             <div className="grid grid-cols-3 items-center">

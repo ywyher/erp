@@ -111,9 +111,9 @@ export default function Onboarding() {
 
   return (
     <div>
-      <Header />
+      <Header className="mb-0" />
       {user && (
-        <div className="flex flex-col gap-5 w-full p-6 mx-auto border-x border-b border-zinc-800 sm:p-8 md:w-[70%] lg:w-[50%] xl:w-[50%] 2xl:w-[40%]">
+        <div className="bg-background flex flex-col gap-5 w-full pt-0 p-6 sm:p-8 mx-auto border-x border-b border-zinc-800 md:w-[70%] lg:w-[50%] xl:w-[50%] 2xl:w-[40%]">
           <p className="text-lg font-medium text-white sm:text-2xl">
             Setup your profile
           </p>

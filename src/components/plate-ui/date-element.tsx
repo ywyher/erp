@@ -3,8 +3,8 @@
 import { cn, withRef } from '@udecode/cn';
 import { PlateElement, useReadOnly } from '@udecode/plate/react';
 
-import { Calendar } from './calendar';
 import { Popover, PopoverContent, PopoverTrigger } from './popover';
+import { Calendar } from '@/components/ui/calendar';
 
 export const DateElement = withRef<typeof PlateElement>(
   ({ children, className, ...props }, ref) => {
@@ -77,7 +77,6 @@ export const DateElement = withRef<typeof PlateElement>(
                 );
               }}
               mode="single"
-              initialFocus
             />
           </PopoverContent>
         </Popover>

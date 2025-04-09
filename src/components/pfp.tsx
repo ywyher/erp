@@ -10,7 +10,13 @@ export default function Pfp({
 }) {
   return (
     <Avatar className={className}>
-      <AvatarImage src={getFileUrl(image as string)} alt="Profile picture" />
+      <AvatarImage
+        src={getFileUrl(image as string)}
+        alt="Profile picture"
+        onError={(e) =>{ 
+          e.currentTarget.src = "/images/pfp.jpg";
+        }}
+      />
       <AvatarFallback>AS</AvatarFallback>
     </Avatar>
   );

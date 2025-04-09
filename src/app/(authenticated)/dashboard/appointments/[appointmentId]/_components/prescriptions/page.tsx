@@ -10,7 +10,7 @@ import {
   type Appointment,
 } from "@/lib/db/schema";
 import Prescription from "@/components/prescription";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { handleFinishConsultation } from "@/app/(authenticated)/dashboard/appointments/[appointmentId]/handle-finish-consultation";
 import {
@@ -53,7 +53,7 @@ export default function Prescriptions({
     useState<boolean>(false);
   const [operationDate, setOperationDate] = useState<Date | null>(null);
 
-  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [,setIsLoading] = useState<boolean>(false);
   const {
     history,
     diagnosis,
@@ -68,15 +68,7 @@ export default function Prescriptions({
     reset,
   } = useConsultationStore(appointmentId);
 
-  const tabs = [
-    { key: "laboratory", label: "Laboratory", data: laboratories },
-    { key: "medicine", label: "Medicine", data: medicines },
-    { key: "radiology", label: "Radiology", data: radiologies },
-  ].filter((tab) => tab.data && tab.data.length > 0);
-
-  if (tabs.length === 0) return null;
-
-  const handleFinish = async () => {
+  const handleFinish = useCallback(async () => {
     if (!history || !diagnosis) return;
     await handleFinishConsultation({
       history,
@@ -101,13 +93,23 @@ export default function Prescriptions({
       operationDate: operationDate,
       creatorId,
     });
-  };
+  }, [history, diagnosis, appointmentId, consultationId, creatorId, doctorId, laboratories, laboratory, medicine, medicines, operation, operationDate, patientId, prescriptions, radiologies, radiology, reset]);
 
   useEffect(() => {
     if (operationDate) {
       handleFinish();
     }
-  }, [operationDate]);
+  }, [operationDate, handleFinish]);
+  
+  const tabs = [
+    { key: "laboratory", label: "Laboratory", data: laboratories },
+    { key: "medicine", label: "Medicine", data: medicines },
+    { key: "radiology", label: "Radiology", data: radiologies },
+  ].filter((tab) => tab.data && tab.data.length > 0);
+
+  if (tabs.length === 0) return null;
+
+
 
   return (
     <div className="flex flex-col h-[calc(100vh-64px)]">
@@ -120,7 +122,7 @@ export default function Prescriptions({
               </TabsTrigger>
             ))}
           </TabsList>
-          {tabs.map(({ key, label, data }) => (
+          {tabs.map(({ key, data }) => (
             <TabsContent key={key} value={key}>
               <Prescription
                 appointmentId={appointmentId}

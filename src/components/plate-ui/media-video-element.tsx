@@ -21,7 +21,7 @@ import {
 export const MediaVideoElement = withHOC(
   ResizableProvider,
   withRef<typeof PlateElement>(
-    ({ children, className, nodeProps, ...props }, ref) => {
+    ({ children, className, ...props }, ref) => {
       const {
         align = 'center',
         embed,

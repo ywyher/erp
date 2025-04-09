@@ -1,5 +1,5 @@
 import { relations } from "drizzle-orm";
-import { pgTable, text, timestamp, boolean, pgEnum } from "drizzle-orm/pg-core";
+import { pgTable, text, timestamp, pgEnum } from "drizzle-orm/pg-core";
 import { user } from "./roles";
 
 // Schedule

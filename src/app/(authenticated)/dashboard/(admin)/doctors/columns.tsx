@@ -5,6 +5,37 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { DataTableColumnHeader } from "@/components/ui/data-table-column-header";
 import DoctorAction from "@/app/(authenticated)/dashboard/(admin)/doctors/_components/doctor-actions";
 import TableCell from "@/components/table-cell";
+import { Doctor, Schedule } from "@/lib/db/schema";
+
+type DoctorWithDetails = {
+  id: string;
+  name: string;
+  username: string | null;
+  displayUsername: string | null;
+  email: string | null;
+  phoneNumber: string | null;
+  nationalId: string | null;
+  gender: string | null;
+  dateOfBirth: string | null;
+  phoneNumberVerified: boolean;
+  emailVerified: boolean;
+  onBoarding: boolean;
+  image: string | null;
+  role: string;
+  provider: string;
+  createdAt: Date;
+  updatedAt: Date;
+  specialty: Doctor['specialty']
+  doctor: {
+    id: string;
+    specialty: string | null;
+    userId: string;
+    createdAt: Date;
+    updatedAt: Date;
+  };
+  schedules: Schedule[];
+};
+
 
 // Define columns
 const doctorColumns = [
@@ -20,7 +51,7 @@ const doctorColumns = [
   { value: "schedules", header: "Schedules", dialog: true },
 ];
 
-export const doctorTableColumns: ColumnDef<any>[] = [
+export const doctorTableColumns: ColumnDef<DoctorWithDetails>[] = [
   {
     id: "select",
     header: ({ table }) => (
@@ -45,10 +76,10 @@ export const doctorTableColumns: ColumnDef<any>[] = [
   },
   ...doctorColumns.map(({ value, header, dialog }) => ({
     accessorKey: value,
-    header: ({ column }: { column: Column<any, any> }) => (
+    header: ({ column }: { column: Column<DoctorWithDetails> }) => (
       <DataTableColumnHeader column={column} title={header} />
     ),
-    cell: ({ row }: { row: Row<any> }) => {
+    cell: ({ row }: { row: Row<DoctorWithDetails> }) => {
       return (
         <TableCell
           row={row}

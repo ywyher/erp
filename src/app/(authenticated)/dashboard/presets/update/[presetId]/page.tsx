@@ -3,7 +3,10 @@ import PresetData from "@/app/(authenticated)/dashboard/presets/_components/pres
 import { getPreset } from "@/app/(authenticated)/dashboard/presets/actions"
 import { Preset } from "@/lib/db/schema"
 
-export default async function UpdatePreset({ params: { presetId } }: { params: { presetId: Preset['id'] } }) {
+type Params = Promise<{ presetId: Preset['id'] }>
+
+export default async function UpdatePreset({ params }: { params: Params }) {
+    const { presetId } = await params
     const preset = await getPreset({ presetId })
 
     return (

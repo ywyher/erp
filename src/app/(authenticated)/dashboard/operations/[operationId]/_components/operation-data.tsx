@@ -9,10 +9,9 @@ import { FormFieldWrapper } from "@/components/form-field-wrapper";
 import LoadingBtn from "@/components/loading-btn";
 import { Form } from "@/components/ui/form";
 import { Operation, Preset, OperationData as TOperationData } from "@/lib/db/schema";
-import { Dispatch, SetStateAction, useEffect, useState, useMemo, cache } from "react";
+import { Dispatch, SetStateAction, useEffect, useState, useMemo } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
   placeholdersCache,
@@ -20,7 +19,7 @@ import {
 } from "@/app/(authenticated)/dashboard/operations/[operationId]/store";
 import { useQuery } from "@tanstack/react-query";
 import { getPreset } from "@/app/(authenticated)/dashboard/operations/[operationId]/actions";
-import { operationDataSchema } from "@/app/(authenticated)/dashboard/operations/[operationId]/types";
+import { operationDataSchema } from "@/app/(authenticated)/dashboard/operations/types";
 import { z } from "zod";
 
 export default function OperationData({
@@ -73,7 +72,7 @@ export default function OperationData({
         }
       })
     }
-  }, [preset])
+  }, [preset, form, isPresetLoading, presetError])
 
   // Generate a cache key from the operationDocument
   const cacheKey = useMemo(() => {
@@ -115,7 +114,7 @@ export default function OperationData({
     if(cacheKey) {
       fetchPlaceholders();
     }
-  }, [cacheKey]);
+  }, [cacheKey, operationDocument]);
 
   const handleOperationData = async (data: z.infer<typeof operationDataSchema>) => {
     setIsLoading(true);

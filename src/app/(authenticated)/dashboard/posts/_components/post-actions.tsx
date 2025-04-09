@@ -9,16 +9,12 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { MoreHorizontal } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Link from "next/link";
-import { Value } from "@udecode/plate";
 import { Post } from "@/lib/db/schema";
 import {
   Drawer,
-  DrawerClose,
   DrawerContent,
-  DrawerDescription,
-  DrawerFooter,
   DrawerHeader,
   DrawerTitle,
   DrawerTrigger,

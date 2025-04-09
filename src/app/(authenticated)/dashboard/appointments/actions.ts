@@ -55,17 +55,20 @@ export const getAppointments = async (userId: User["id"], role: User["role"]) =>
 
   return appointments.map((appointment) => ({
     id: appointment.id,
-    date: format(appointment.startTime, "EEEE, d MMMM"), // Example format
-    startTime: format(appointment.startTime, "HH:mm"),
-    endTime: appointment.endTime
-      ? format(appointment.endTime, "HH:mm")
-      : "None",
-    status: appointment.status,
     patientId: appointment.patientId,
     doctorId: appointment.doctorId,
-    createdBy: appointment.createdBy,
-    role: role,
+    createdAt: appointment.createdAt,
+    updatedAt: appointment.updatedAt,
+    status: appointment.status,
+    creatorId: appointment.creatorId || null,
+    startTime: appointment.startTime, // Keep as Date object
+    endTime: appointment.endTime, // Keep as Date object
+    createdBy: appointment.createdBy || 'user',
+    date: format(appointment.startTime, "EEEE, d MMMM"), // Example format
+    // The formatted strings can be used in columns definition or in cell renderers
+    // but don't include them in the main data object
   }));
+
 };
 
 export async function createAppointment({
@@ -109,9 +112,9 @@ export async function createAppointment({
         appointmentId: createdAppointment.id,
       };
     }
-  } catch (error: any) {
+  } catch (error: unknown) {
     return {
-      error: error.message,
+      error: error instanceof Error ? error.message : "Coulnd't create appointment",
       message: null,
       appointmentId: null,
     };
@@ -156,6 +159,7 @@ export async function updateAppointmentEndTime({
     .set({
       endTime: date,
     })
+    .where(eq(appointment.id, appointmentId))
     .returning();
 
   if (!updatedAppointment.id)

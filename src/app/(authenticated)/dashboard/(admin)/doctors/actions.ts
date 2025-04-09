@@ -5,7 +5,7 @@ import { Schedules } from "@/app/(authenticated)/dashboard/types";
 import db from "@/lib/db";
 import { doctor, schedule, user, User } from "@/lib/db/schema";
 import { generateId, transformSchedulesToRecords } from "@/lib/funcs";
-import { eq, sql } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import {
   createDoctorSchema,
@@ -13,7 +13,7 @@ import {
 } from "@/app/(authenticated)/dashboard/(admin)/doctors/types";
 import { z } from "zod";
 
-export async function getDoctors({ merge }: { merge: true }) {
+export async function getDoctors() {
   const data = await db.query.user.findMany({
     where: eq(user.role, "doctor"),
     with: {
@@ -22,23 +22,15 @@ export async function getDoctors({ merge }: { merge: true }) {
     }
   });
 
-  if (merge) {
-    return data.map(user => {
-      // Extract the receptionist object
-      const { doctor, ...restUser } = user;
-      
-      // Create merged object with renamed fields
-      return {
-        ...restUser,
-        doctorId: doctor.id,
-        specialty: doctor.specialty,
-        // Keep schedules as is
-      };
-    });
-  }
-  
+  const doctor = data.map((d) => {
+    return {
+      ...d,
+      specialty: d.doctor.specialty
+    }
+  });
 
-  return data;
+  console.log(doctor)
+  return doctor
 }
 
 export async function createDoctor({
@@ -61,7 +53,7 @@ export async function createDoctor({
         ("error" in createdUser && createdUser.error) ||
         ("error" in createdUser && !createdUser.userId)
       ) {
-        throw new Error(createdUser.error);
+        throw new Error(createdUser.error || "");
       }
 
       const doctorId = generateId();
@@ -91,9 +83,9 @@ export async function createDoctor({
       revalidatePath("/dashboard/doctors");
       return { error: null, message: "Doctor created successfully!" };
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     return {
-      error: error.message || "Something went wrong while creating the user.",
+      error: error instanceof Error ? error.message : "Something went wrong while creating the user.",
       message: null,
     };
   }
@@ -129,9 +121,9 @@ export async function updateDoctor({
       revalidatePath("/dashboard/doctors");
       return { message: "Doctor updated successfully!", error: null };
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     return {
-      error: error.message || "Failed to update doctor",
+      error: error instanceof Error ? error.message : "Failed to update doctor",
       message: null,
     };
   }

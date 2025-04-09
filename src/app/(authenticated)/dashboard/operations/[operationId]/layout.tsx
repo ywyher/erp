@@ -4,14 +4,16 @@ import { redirect } from "next/navigation";
 import { Operation } from "@/lib/db/schema";
 import { getOperationStatus } from "@/app/(authenticated)/dashboard/operations/actions";
 
+type Params = Promise<{ operationId: Operation['id'] }>
+
 export default async function Layout({
   children,
   params,
 }: {
   children: React.ReactNode;
-  params: { operationId: Operation["id"] };
+  params: Params;
 }) {
-  const { operationId } = params;
+  const { operationId } = await params;
 
   const reqHeaders = await headers();
 

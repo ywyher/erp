@@ -97,7 +97,7 @@ export async function POST(req: NextRequest) {
       expiresIn: 3600,
     });
     return NextResponse.json({ key: fileName, url: preSignedUrl, name: fileName, type, size });
-  } catch (error) {
+  } catch {
     return NextResponse.json(
       { message: "Failed to generate pre-signed URL" },
       { status: 500 },

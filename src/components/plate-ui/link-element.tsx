@@ -21,6 +21,7 @@ export const LinkElement = withRef<typeof PlateElement>(
           className,
           'font-medium text-primary underline decoration-primary underline-offset-4'
         )}
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         {...(linkProps as any)}
         {...props}
       >

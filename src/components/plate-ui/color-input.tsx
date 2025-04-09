@@ -16,7 +16,7 @@ export const ColorInput = withRef<'input'>(
           if (!child) return child;
 
           return React.cloneElement(
-            child as React.ReactElement<any>,
+            child as React.ReactElement,
             childProps
           );
         })}

@@ -7,7 +7,7 @@ import { DataTable } from "@/components/ui/data-table";
 import { ConciergeBell } from "lucide-react";
 
 export default async function Doctors() {
-  const receptionists = await getReceptionists({ merge: true });
+  const receptionists = await getReceptionists();
 
   return (
     <DashboardLayout title="Manage Receptionists">

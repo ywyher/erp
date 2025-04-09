@@ -2,7 +2,7 @@
   Global app settings schema
 */
 
-import { pgTable, serial, text, timestamp, integer } from "drizzle-orm/pg-core";
+import { pgTable, text, timestamp } from "drizzle-orm/pg-core";
 import { user } from "@/lib/db/schema/roles";
 
 export const settings = pgTable("settings", {

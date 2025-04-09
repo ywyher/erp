@@ -1,10 +1,11 @@
 "use client";
 
-import { Column, ColumnDef, Row, Table } from "@tanstack/react-table";
+import { Column, ColumnDef, Row } from "@tanstack/react-table";
 import { Checkbox } from "@/components/ui/checkbox";
 import { DataTableColumnHeader } from "@/components/ui/data-table-column-header";
 import AppointmentActions from "@/app/(authenticated)/dashboard/appointments/_components/appointment-actions";
 import TableCell from "@/components/table-cell";
+import { Appointment, User } from "@/lib/db/schema";
 
 const appointmentColumns = [
   { value: "id", header: "ID" },
@@ -18,7 +19,7 @@ const appointmentColumns = [
   { value: "role", header: "Role" },
 ];
 
-export const appointmentTableColumns: ColumnDef<any>[] = [
+export const appointmentTableColumns: ColumnDef<Appointment>[] = [
   {
     id: "select",
     header: ({ table }) => (
@@ -43,17 +44,17 @@ export const appointmentTableColumns: ColumnDef<any>[] = [
   },
   ...appointmentColumns.map(({ value, header }) => ({
     accessorKey: value,
-    header: ({ column }: { column: Column<any> }) => (
+    header: ({ column }: { column: Column<Appointment> }) => (
       <DataTableColumnHeader column={column} title={header} />
     ),
-    cell: ({ row }: { row: Row<any> }) => (
+    cell: ({ row }: { row: Row<Appointment> }) => (
       <TableCell row={row} value={value} header={header} />
     ),
   })),
   {
     id: "actions",
     cell: ({ row }) => {
-      const appointment = row.original;
+      const appointment = row.original as Appointment & { role: User['role'] };
       return (
         <AppointmentActions
           appointmentId={appointment.id}

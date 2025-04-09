@@ -16,7 +16,6 @@ import { z } from "zod";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import AuthLayout from "@/app/(auth)/auth/_components/auth-layout";
-import Seeder from "@/components/seeder";
 import { Separator } from "@/components/ui/separator";
 
 export default function Verify() {
@@ -95,7 +94,7 @@ export default function Verify() {
     if (!otpExists) {
       sendOtp();
     }
-  }, [isHydrated, value, context, operation, password]);
+  }, [isHydrated, value, context, operation, password, otpExists, router, setOtpExists]);
 
   const form = useForm<z.infer<typeof verifyOtpSchema>>({
     resolver: zodResolver(verifyOtpSchema),

@@ -1,4 +1,5 @@
 "use client"
+
 import PostCard from "@/components/post-card";
 import PostCardSkeleton from "@/components/post-card-skeleton";
 import PostFilters from "@/app/posts/_components/post-filters";
@@ -8,7 +9,7 @@ import Header from "@/components/header";
 import { Post } from "@/lib/db/schema";
 import { useQuery } from "@tanstack/react-query";
 import { parseAsArrayOf, parseAsInteger, parseAsString, useQueryState } from "nuqs";
-import { useEffect } from "react";
+import { Suspense, useEffect } from "react";
 
 // Import shadcn Pagination components
 import {
@@ -24,7 +25,8 @@ import {
 // Define posts per page constant
 const POSTS_PER_PAGE = 3;
 
-export default function Posts() {
+// Create a client component to handle the search params logic
+function PostsContent() {
   const [title] = useQueryState("title");
   const [authors] = useQueryState('authors', parseAsArrayOf(parseAsString));
   const [categories] = useQueryState('categories', parseAsArrayOf(parseAsString));
@@ -52,11 +54,10 @@ export default function Posts() {
   }, [title, authors, categories, setPage]);
 
   const generatePaginationItems = () => {
-    // Always show first page, last page, current page,
-    // one page before and after current page
+    // Same pagination logic as before
+    // ...
     const items = [];
     
-    // Add first page
     items.push(
       <PaginationItem key="page-1">
         <PaginationLink 
@@ -69,7 +70,6 @@ export default function Posts() {
       </PaginationItem>
     );
     
-    // If there are many pages, we might need ellipsis
     if (page > 3) {
       items.push(
         <PaginationItem key="ellipsis-1">
@@ -78,9 +78,7 @@ export default function Posts() {
       );
     }
     
-    // Pages around current page
     for (let i = Math.max(2, page - 1); i <= Math.min(totalPages - 1, page + 1); i++) {
-      // Skip if we've already added page 1 or will add the last page separately
       if (i === 1 || i === totalPages) continue;
       
       items.push(
@@ -96,7 +94,6 @@ export default function Posts() {
       );
     }
     
-    // Another ellipsis if needed
     if (page < totalPages - 2) {
       items.push(
         <PaginationItem key="ellipsis-2">
@@ -105,7 +102,6 @@ export default function Posts() {
       );
     }
     
-    // Add last page if there's more than one page
     if (totalPages > 1) {
       items.push(
         <PaginationItem key={`page-${totalPages}`}>
@@ -124,67 +120,90 @@ export default function Posts() {
   };
 
   return (
-    <>
-      <Header />
-      <CardLayout title="All Posts" className="flex flex-col gap-2">
-        <div className="flex flex-col gap-5">
-          <p className="text-gray-400">{totalPosts} posts found.</p>
-          <PostFilters />
-          
-          {!posts || isLoading ? (
-            <div className="grid w-full grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 md:gap-8">
-              {[1, 2, 3].map((index) => (
-                <PostCardSkeleton key={index} />
-              ))}
-            </div>
-          ) : (
-            <div className="flex flex-col gap-8">
-              {posts.length ? (
-                <>
-                  <div className="grid w-full grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 md:gap-8">
-                    {posts.map((post) => (
-                      <PostCard key={post.id} post={post} />
-                    ))}
-                  </div>
-                  
-                  {totalPages > 1 && (
-                    <Pagination>
-                      <PaginationContent>
-                        <PaginationItem>
-                          <PaginationPrevious 
-                            href="#" 
-                            onClick={(e) => { 
-                              e.preventDefault(); 
-                              if (page > 1) setPage(page - 1);
-                            }}
-                            className={page === 1 ? "pointer-events-none opacity-50" : ""}
-                          />
-                        </PaginationItem>
-                        
-                        {generatePaginationItems()}
-                        
-                        <PaginationItem>
-                          <PaginationNext 
-                            href="#" 
-                            onClick={(e) => { 
-                              e.preventDefault(); 
-                              if (page < totalPages) setPage(page + 1);
-                            }}
-                            className={page === totalPages ? "pointer-events-none opacity-50" : ""}
-                          />
-                        </PaginationItem>
-                      </PaginationContent>
-                    </Pagination>
-                  )}
-                </>
-              ) : (
-                <div className="bg-[#f9f9f9] dark:bg-[#121212] p-[4rem] w-full rounded-xl text-center border border-gray-300 dark:border-gray-700">
-                  No Posts Found
-                </div>
+    <div className="flex flex-col gap-5">
+      <p className="text-gray-400">{totalPosts} posts found.</p>
+      <PostFilters />
+      
+      {!posts || isLoading ? (
+        <div className="grid w-full grid-cols-1 gap-6 place-items-center md:grid-cols-2 lg:grid-cols-3 md:gap-8">
+
+          {[1, 2, 3].map((index) => (
+            <PostCardSkeleton key={index} />
+          ))}
+        </div>
+      ) : (
+        <div className="flex flex-col gap-8">
+          {posts.length ? (
+            <>
+              <div className="grid w-full grid-cols-1 gap-6 place-items-center md:grid-cols-2 lg:grid-cols-3 md:gap-8">
+                {posts.map((post) => (
+                  <PostCard key={post.id} post={post} />
+                ))}
+              </div>
+              
+              {totalPages > 1 && (
+                <Pagination>
+                  <PaginationContent>
+                    <PaginationItem>
+                      <PaginationPrevious 
+                        href="#" 
+                        onClick={(e) => { 
+                          e.preventDefault(); 
+                          if (page > 1) setPage(page - 1);
+                        }}
+                        className={page === 1 ? "pointer-events-none opacity-50" : ""}
+                      />
+                    </PaginationItem>
+                    
+                    {generatePaginationItems()}
+                    
+                    <PaginationItem>
+                      <PaginationNext 
+                        href="#" 
+                        onClick={(e) => { 
+                          e.preventDefault(); 
+                          if (page < totalPages) setPage(page + 1);
+                        }}
+                        className={page === totalPages ? "pointer-events-none opacity-50" : ""}
+                      />
+                    </PaginationItem>
+                  </PaginationContent>
+                </Pagination>
               )}
+            </>
+          ) : (
+            <div className="bg-[#f9f9f9] dark:bg-[#121212] p-[4rem] w-full rounded-xl text-center border border-gray-300 dark:border-gray-700">
+              No Posts Found
             </div>
           )}
         </div>
+      )}
+    </div>
+  );
+}
+
+// Create a loading fallback component
+function PostsLoading() {
+  return (
+    <div className="flex flex-col gap-5">
+      <p className="text-gray-400">Loading posts...</p>
+      <div className="grid w-full grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 md:gap-8">
+        {[1, 2, 3].map((index) => (
+          <PostCardSkeleton key={index} />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+export default function Posts() {
+  return (
+    <>
+      <Header />
+      <CardLayout title="All Posts" className="flex flex-col gap-2">
+        <Suspense fallback={<PostsLoading />}>
+          <PostsContent />
+        </Suspense>
       </CardLayout>
     </>
   );

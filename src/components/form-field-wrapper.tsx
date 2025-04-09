@@ -17,7 +17,7 @@ import {
 } from "@/components/ui/popover"
 import { Textarea } from "@/components/ui/textarea";
 import MultipleSelector from "@/components/ui/multi-select";
-import { Check, ChevronsUpDown, Eye, EyeOff } from "lucide-react";
+import { CalendarIcon, Check, ChevronsUpDown, Eye, EyeOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { DndProvider } from "react-dnd";
@@ -27,8 +27,9 @@ import { useCreateEditor } from "@/components/editor/use-create-editor";
 import { Editor, EditorContainer } from "@/components/plate-ui/editor";
 import { Tag, TagInput } from "emblor";
 import { Editor as TEditor, Value } from "@udecode/plate";
-import { DateTimePicker } from "@/components/ui/datetime-picker";
 import IconSelector, { IconName } from "@/components/icons-selector";
+import { Calendar } from "@/components/ui/calendar";
+import { format } from "date-fns";
 
 type AcceptMimeType =
   | "image/*"
@@ -38,6 +39,7 @@ type AcceptMimeType =
   | "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
 
 interface FormFieldWrapperProps {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   form: UseFormReturn<any, any, any>;
   name: string;
   label?: string;
@@ -60,10 +62,8 @@ interface FormFieldWrapperProps {
     | "icon";
   options?: { value: string; label: string }[] | string[] | readonly string[];
   disableSearch?: boolean
-  maxLength?: number; // Add this line
+  maxLength?: number;
   onFileChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  // className?: string;
-  // the editor ref here to make sure content is updated since when uploading an image and the user didnt foucs on the editor it wont update it !
   editorRef?: RefObject<TEditor | null>;
 }
 
@@ -88,12 +88,11 @@ export const FormFieldWrapper: React.FC<FormFieldWrapperProps> = ({
   
   const errorMessage = form.formState.errors[name]?.message as string | undefined;
   
-  let editor = null;
+  const editor = useCreateEditor({
+    value: type === 'editor' && editorRef && (defaultValue as Value) ? (defaultValue as Value) : []
+  });
+  
   if(type === 'editor' && editorRef) {
-    editor = useCreateEditor({
-      value: (defaultValue as Value) ? (defaultValue as Value) : []
-    });
-    
     editorRef.current = editor;
   }
   
@@ -116,7 +115,7 @@ export const FormFieldWrapper: React.FC<FormFieldWrapperProps> = ({
       control={form.control}
       name={name}
       defaultValue={defaultValue ? defaultValue : ""}
-      render={({ field, formState }) => (
+      render={({ field }) => (
         <FormItem className="w-full">
           {label && (
             <FormLabel className="capitalize">
@@ -149,13 +148,40 @@ export const FormFieldWrapper: React.FC<FormFieldWrapperProps> = ({
                 />
               )}
               {type === "date" && (
-                <DateTimePicker 
-                  granularity="day" 
-                  value={field.value} 
-                  onChange={(date) => {
-                    field.onChange(date)
-                  }}
-                />
+                <Popover modal open={open} onOpenChange={setOpen}>
+                  <PopoverTrigger asChild>
+                    <FormControl>
+                      <Button
+                        variant={"outline"}
+                        className={cn(
+                          "w-full pl-3 text-left font-normal",
+                          !field.value && "text-muted-foreground"
+                        )}
+                      >
+                        {field.value ? (
+                          format(field.value, "PPP")
+                        ) : (
+                          <span>{placeholder}</span>
+                        )}
+                        <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                      </Button>
+                    </FormControl>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="start">
+                    <Calendar
+                      mode="single"
+                      selected={field.value}
+                      onSelect={(value) => {
+                        field.onChange(value);
+                        setOpen(false);
+                      }}
+                      disabled={(date) =>
+                        date > new Date() || date < new Date("1900-01-01")
+                      }
+                      initialFocus
+                    />
+                  </PopoverContent>
+                </Popover>
               )}
               {type === "password" && (
                 <div className="relative w-full">

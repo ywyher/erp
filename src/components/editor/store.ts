@@ -1,6 +1,5 @@
 // Used to track delete/upload functionlaity in the editor !!
 
-import { ZodNullable } from 'zod';
 import { create } from 'zustand';
 
 interface ProcessState {

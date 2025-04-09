@@ -1,4 +1,3 @@
-import { emailRegex, phoneNumberRegex } from "@/app/types";
 import { z } from "zod";
 
 export const verifyOtpSchema = z.object({

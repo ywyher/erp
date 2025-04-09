@@ -55,6 +55,7 @@ interface InlineComboboxContextValue {
 }
 
 const InlineComboboxContext = createContext<InlineComboboxContextValue>(
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   null as any
 );
 

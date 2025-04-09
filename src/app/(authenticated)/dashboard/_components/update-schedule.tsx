@@ -17,11 +17,11 @@ export default function UpdateSchedule({
   setOpen,
 }: {
   userId: string;
-  setOpen?: Dispatch<SetStateAction<boolean>>;
+setOpen?: Dispatch<SetStateAction<boolean>>;
 }) {
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
-  const { data: user, isLoading: isPending } = useQuery({
+  const { data: user } = useQuery({
     queryKey: ["userById", userId],
     queryFn: async () => {
       const data = await getUserById(userId, "doctor");
@@ -45,7 +45,7 @@ export default function UpdateSchedule({
 
   // strips schedules id/createdAt/updatedAt allowing the comprasion to work properly
   const stripSchedules = (schedules: Schedule[]) =>
-    schedules.map(({ id, createdAt, updatedAt, ...rest }) => rest);
+    schedules.map(({ ...rest }) => rest);
 
   const onSubmit = async () => {
     setIsLoading(true);
@@ -97,8 +97,8 @@ export default function UpdateSchedule({
       }
 
       toast.message(result.message);
-      // if (setOpen) setOpen(false)
-    } catch (error) {
+      if (setOpen) setOpen(false)
+    } catch {
       toast.error("An error occurred while updating the schedule.");
     } finally {
       setIsLoading(false);

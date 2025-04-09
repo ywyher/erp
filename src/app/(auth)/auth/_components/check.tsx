@@ -1,6 +1,5 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
 import { useForm } from "react-hook-form";
 import { Form } from "@/components/ui/form";
 import { authSchema } from "@/app/(auth)/types";
@@ -89,7 +88,7 @@ export default function Check({
     setIsLoading(true);
     const data = await signIn.social({
       provider: "google",
-      callbackURL: "http://localhost:3000/",
+      callbackURL: process.env.NEXT_PUBLIC_APP_URL,
     });
 
     if (!data.error) {

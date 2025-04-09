@@ -2,7 +2,7 @@
 
 import db from "@/lib/db"
 import { faq, Post, post, service } from "@/lib/db/schema"
-import { and, eq, inArray } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 
 type TGetPosts = { 
     category?: Post['category'] | 'all';

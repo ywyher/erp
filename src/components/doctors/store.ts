@@ -1,4 +1,4 @@
-import { Appointment, Doctor, Schedule, User } from "@/lib/db/schema";
+import { Appointment, Doctor, User } from "@/lib/db/schema";
 import { create } from "zustand";
 
 type ReservedState = {

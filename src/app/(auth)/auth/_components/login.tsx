@@ -22,6 +22,14 @@ export default function Login() {
   const context = useAuthStore((state) => state.context) as AuthStore['context'];
   const queryClient = useQueryClient();
 
+  const form = useForm<z.infer<typeof loginSchema>>({
+    resolver: zodResolver(loginSchema),
+    defaultValues: {
+      value: value || "",
+      password: "",
+    },
+  });
+
   if (!value) return <>Loading...</>;
 
   const login = async (data: z.infer<typeof loginSchema>) => {
@@ -33,7 +41,7 @@ export default function Login() {
           password: data.password,
         },
         {
-          onSuccess: async (e) => {
+          onSuccess: async () => {
             setIsLoading(false);
             router.push("/");
           },
@@ -51,7 +59,7 @@ export default function Login() {
           password: data.password,
         },
         {
-          onSuccess: async (e) => {
+          onSuccess: async () => {
             setIsLoading(false);
             queryClient.invalidateQueries({ queryKey: ["session"] });
             router.push("/");
@@ -69,7 +77,7 @@ export default function Login() {
           password: data.password,
         },
         {
-          onSuccess: async (e) => {
+          onSuccess: async () => {
             setIsLoading(false);
             queryClient.invalidateQueries({ queryKey: ["session"] });
             router.push("/");
@@ -82,14 +90,6 @@ export default function Login() {
       );
     }
   };
-
-  const form = useForm<z.infer<typeof loginSchema>>({
-    resolver: zodResolver(loginSchema),
-    defaultValues: {
-      value: value || "",
-      password: "",
-    },
-  });
 
   const resetPassword = async () => {
     if (!value) return;

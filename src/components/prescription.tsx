@@ -23,10 +23,9 @@ export default function Prescription({
   context,
   editable,
 }: PrescriptionProps) {
-  const consultationStore = appointmentId
-    ? useConsultationStore(appointmentId)
-    : null;
-
+  const maybeStore = useConsultationStore(appointmentId || '');
+  const consultationStore = appointmentId ? maybeStore : null;
+  
   const contentRef = useRef<HTMLDivElement>(null);
   const handlePrint = useReactToPrint({ contentRef });
 

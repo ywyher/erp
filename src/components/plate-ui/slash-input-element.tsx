@@ -3,9 +3,7 @@
 import React from 'react';
 
 import { withRef } from '@udecode/cn';
-import { AIChatPlugin } from '@udecode/plate-ai/react';
 import { BlockquotePlugin } from '@udecode/plate-block-quote/react';
-import { CodeBlockPlugin } from '@udecode/plate-code-block/react';
 import { DatePlugin } from '@udecode/plate-date/react';
 import { HEADING_KEYS } from '@udecode/plate-heading';
 import { TocPlugin } from '@udecode/plate-heading/react';
@@ -21,7 +19,6 @@ import { PlateElement } from '@udecode/plate/react';
 import {
   CalendarIcon,
   ChevronRightIcon,
-  Code2,
   Columns3Icon,
   Heading1Icon,
   Heading2Icon,
@@ -31,7 +28,6 @@ import {
   PilcrowIcon,
   Quote,
   RadicalIcon,
-  SparklesIcon,
   Square,
   Table,
   TableOfContentsIcon,

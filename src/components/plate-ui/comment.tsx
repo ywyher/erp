@@ -24,6 +24,7 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from './avatar';
 import {
   discussionStore,
+  TDiscussion,
   useFakeCurrentUserId,
   useFakeUserInfo,
 } from './block-discussion';
@@ -104,14 +105,14 @@ export function Comment(props: {
 
   const removeDiscussion = async (id: string) => {
     const updatedDiscussions = discussions.filter(
-      (discussion: any) => discussion.id !== id
+      (discussion: TDiscussion) => discussion.id !== id
     );
     discussionStore.set('discussions', updatedDiscussions);
   };
 
   const updateComment = async (input: {
     id: string;
-    contentRich: any;
+    contentRich: Value;
     discussionId: string;
     isEdited: boolean;
   }) => {
@@ -132,7 +133,7 @@ export function Comment(props: {
       }
       return discussion;
     });
-    discussionStore.set('discussions', updatedDiscussions);
+    discussionStore.set('discussions', updatedDiscussions as TDiscussion[]);
   };
 
   const { tf } = useEditorPlugin(CommentsPlugin);
@@ -322,13 +323,13 @@ export function CommentMoreDropdown(props: CommentMoreDropdownProps) {
       return alert('You are operating too quickly, please try again later.');
 
     // Find and update the discussion
-    const updatedDiscussions = discussions.map((discussion: any) => {
+    const updatedDiscussions = discussions.map((discussion: TDiscussion) => {
       if (discussion.id !== comment.discussionId) {
         return discussion;
       }
 
       const commentIndex = discussion.comments.findIndex(
-        (c: any) => c.id === comment.id
+        (c: TComment) => c.id === comment.id
       );
       if (commentIndex === -1) {
         return discussion;

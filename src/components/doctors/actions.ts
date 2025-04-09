@@ -15,7 +15,7 @@ export async function listDoctors({
   date: DateRange | null;
   name: string | null;
 }) {
-  let conditions = [eq(user.role, "doctor")];
+  const conditions = [eq(user.role, "doctor")];
 
   if (specialties) {
     conditions.push(inArray(doctor.specialty, specialties));

@@ -18,7 +18,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { MoreHorizontal, Loader2, UserPlus } from "lucide-react";
+import { MoreHorizontal, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -50,7 +50,7 @@ export default function ExistingUser({
     try {
       const results = await searchUsers(query, "all");
       setSearchResults(results);
-    } catch (error) {
+    } catch {
       toast.error(`Error searching patients, Please try again later.`);
     } finally {
       setIsSearching(false);

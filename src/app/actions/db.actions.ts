@@ -2,11 +2,9 @@
 
 import { passwordSchema } from "@/app/types";
 import db from "@/lib/db";
-import { revokeUserSessions } from "@/lib/db/mutations";
 import { account, User } from "@/lib/db/schema";
 import { hashPassword } from "@/lib/password";
 import { eq } from "drizzle-orm";
-import { revalidatePath } from "next/cache";
 import { z } from "zod";
 
 export async function changePassword(

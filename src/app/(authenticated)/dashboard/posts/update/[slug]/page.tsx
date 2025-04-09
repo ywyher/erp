@@ -30,7 +30,7 @@ const updatePostSchema = postSchema.extend({
 });
 
 export default function UpdatePost() {
-  const [open, setOpen] = useState<boolean>(false);
+  const [,setOpen] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [previewUrl, setPreviewUrl] = useState<string | undefined>(undefined);
   const [hasExistingThumbnail, setHasExistingThumbnail] = useState<boolean>(false);

@@ -6,6 +6,7 @@ import {
   useLightboxState,
 } from "yet-another-react-lightbox";
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function isNextJsImage(slide: any) {
   return (
     isImageSlide(slide) &&
@@ -19,9 +20,13 @@ export default function NextJsImage({
   offset,
   rect,
 }: {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   slide: any;
-  offset: any;
-  rect: any;
+  offset: number;
+  rect: {
+    width: number;
+    height: number;
+  };
 }) {
   const {
     on: { click },

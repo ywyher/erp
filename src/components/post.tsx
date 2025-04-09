@@ -2,7 +2,6 @@
 
 import { useCreateEditor } from "@/components/editor/use-create-editor"
 import Pfp from "@/components/pfp"
-import { Editor, EditorContainer } from "@/components/plate-ui/editor"
 import { Badge } from "@/components/ui/badge"
 import { Separator } from "@/components/ui/separator"
 import { User, Post as TPost } from "@/lib/db/schema"

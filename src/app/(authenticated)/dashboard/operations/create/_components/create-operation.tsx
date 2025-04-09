@@ -70,7 +70,7 @@ export default function CreateOperation({
     }
 
     handleCreateOperation();
-  }, [doctorId, date, patientId, role, id, router]);
+  }, [doctorId, date, patientId, role, id, router, isSubmitting, setDate, setDoctorId]);
 
   // Set the date for the doctor role and open dialog
   useEffect(() => {
@@ -78,7 +78,7 @@ export default function CreateOperation({
       setDoctorId(doctorWorkId);
       setOpen(true);
     }
-  }, [patientId, role, doctorWorkId]);
+  }, [patientId, role, doctorWorkId, setDoctorId]);
 
   return (
     <DashboardLayout>

@@ -125,7 +125,7 @@ import { ToolbarButton } from './toolbar';
 const siteUrl = 'https://platejs.org';
 const lowlight = createLowlight(all);
 
-export function ExportToolbarButton({ children, ...props }: DropdownMenuProps) {
+export function ExportToolbarButton({ ...props }: DropdownMenuProps) {
   const editor = useEditorRef();
   const openState = useOpenState();
 

@@ -104,7 +104,7 @@ export default function Employees() {
                   data.map((employee) =>
                     role === "doctor" ? (
                       <DoctorCard
-                        key={(employee as any).user.id}
+                        key={employee.user.id}
                         data={
                           employee as {
                             user: User;
@@ -115,7 +115,7 @@ export default function Employees() {
                       />
                     ) : (
                       <ReceptionistCard
-                        key={(employee as any).user.id}
+                        key={employee.user.id}
                         data={
                           employee as {
                             user: User;

@@ -41,7 +41,6 @@ export const editorVariants = cva(
 );
 
 export function EditorStatic({
-  children,
   className,
   variant,
   ...props

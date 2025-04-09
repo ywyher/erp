@@ -1,20 +1,18 @@
 "use client";
 
 import { FormFieldWrapper } from "@/components/form-field-wrapper";
-import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { departments } from "@/app/(authenticated)/dashboard/constants";
 import LoadingBtn from "@/components/loading-btn";
-import { useRouter } from "next/navigation";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import UpdatePassword from "@/components/update-password";
 import { useQuery } from "@tanstack/react-query";
 import { getUserById } from "@/lib/db/queries";
 import { User } from "@/lib/auth-client";
-import { getChangedFields, isFakeEmail, normalizeData } from "@/lib/funcs";
+import { getChangedFields, isFakeEmail } from "@/lib/funcs";
 import UpdateSchedule from "@/app/(authenticated)/dashboard/_components/update-schedule";
 import { z } from "zod";
 import { updateReceptionist } from "@/app/(authenticated)/dashboard/(admin)/receptionists/actions";
@@ -33,9 +31,8 @@ export default function UpdateReceptionist({
 }) {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [open, setOpen] = useState<boolean>(false);
-  const router = useRouter();
 
-  const { data: user, isLoading: isPending } = useQuery({
+  const { data: user } = useQuery({
     queryKey: ["userById", userId],
     queryFn: async () => {
       const data = await getUserById(userId, "receptionist");
@@ -57,10 +54,10 @@ export default function UpdateReceptionist({
         nationalId: user.user.nationalId || "",
         department: user.receptionist.department || "",
         gender: user.user.gender || "",
-        dateOfBirth: new Date(user.user.dateOfBirth) || "",
+        dateOfBirth: new Date(user.user.dateOfBirth || "") || "",
       });
     }
-  }, [user]);
+  }, [user, form]);
 
   const onCheckChangedFields = async (
     data: z.infer<typeof updateReceptionistSchema>,
@@ -75,7 +72,7 @@ export default function UpdateReceptionist({
       nationalId: user.user.nationalId || "",
       department: user.receptionist.department,
       gender: user.user.gender || "",
-      dateOfBirth: new Date(user.user.dateOfBirth) || "",
+      dateOfBirth: new Date(user.user.dateOfBirth || "") || "",
     };
 
     const changedFields = getChangedFields(sessionData, data);
@@ -106,8 +103,10 @@ export default function UpdateReceptionist({
       toast(result.message);
       setIsLoading(false);
       setOpen(false);
+      setPopOpen(false)
     } finally {
       setIsLoading(false);
+      setPopOpen(false)
     }
   };
 

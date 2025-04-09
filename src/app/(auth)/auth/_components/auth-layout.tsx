@@ -1,7 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import Image from "next/image";
-import Link from "next/link";
-import { Home } from "lucide-react";
 import Logo from "@/components/logo";
 
 export default function AuthLayout({

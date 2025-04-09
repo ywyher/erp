@@ -58,7 +58,7 @@ export default function IconSelector({
       onChange(iconName);
     }
     setOpen(false);
-  }, [onChange]);
+  }, [onChange, setSelectedIcon]);
   
   const Row = useCallback(({ index, style }: { index: number; style: React.CSSProperties }) => {
     const iconName = filteredIcons[index];

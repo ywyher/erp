@@ -2,7 +2,6 @@
 
 import { consultationSchema } from "@/app/(authenticated)/dashboard/appointments/types";
 import { FormFieldWrapper } from "@/components/form-field-wrapper";
-import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
 import { Consultation } from "@/lib/db/schema";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -33,7 +32,7 @@ export default function ConsultationData({
     if (consultation.medicines && consultation.medicines?.length > 0) {
       form.setValue("medicines", consultation.medicines.split(","));
     }
-  }, [consultation]);
+  }, [consultation, form]);
 
   return (
     <div className="flex flex-col gap-2">

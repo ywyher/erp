@@ -2,9 +2,6 @@
 
 import { useRouter } from "next/navigation";
 import {
-  CalendarCheck,
-  Home,
-  LayoutDashboard,
   LogOut,
   Settings,
 } from "lucide-react";
@@ -15,15 +12,11 @@ import {
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
-  DropdownMenuShortcut,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {
   Sheet,
-  SheetClose,
   SheetContent,
-  SheetDescription,
-  SheetFooter,
   SheetHeader,
   SheetTitle,
   SheetTrigger,

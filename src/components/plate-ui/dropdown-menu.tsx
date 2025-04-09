@@ -238,3 +238,6 @@ export const useOpenState = () => {
     onOpenChange,
   };
 };
+
+DropdownMenuGroup.displayName = "DropdownMenuGroup";
+DropdownMenuRadioGroup.displayName = "DropdownMenuRadioGroup";

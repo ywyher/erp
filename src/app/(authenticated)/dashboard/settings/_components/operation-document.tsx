@@ -30,7 +30,6 @@ import {
   updateSetting,
 } from "@/app/(authenticated)/dashboard/settings/actions";
 import type { settingSchema } from "@/app/(authenticated)/dashboard/settings/types";
-import LoadingBtn from "@/components/loading-btn";
 import type { User } from "@/lib/db/schema";
 import { toast } from "sonner";
 import {
@@ -71,7 +70,7 @@ export default function OperationDocument({
     },
   });
 
-  const onSubmit = async (input: Schema) => {
+  const onSubmit = async () => {
     setShowAlert(true);
   };
 

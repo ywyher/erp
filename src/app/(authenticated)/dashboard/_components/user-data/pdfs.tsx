@@ -4,12 +4,6 @@ import type { MedicalFile } from "@/lib/db/schema";
 import { getFileUrl } from "@/lib/funcs";
 import { useMemo } from "react";
 
-type Pdf = {
-  src: string;
-  type: string;
-  alt: string;
-};
-
 export default function Pdfs({ files }: { files: MedicalFile[] }) {
   const pdfs = useMemo(
     () =>

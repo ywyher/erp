@@ -15,10 +15,10 @@ import { User } from "@/lib/db/schema";
 import { checkVerificationNeeded } from "@/lib/funcs";
 import { useQuery } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { Suspense, useEffect } from "react";
 import { toast } from "sonner";
 
-export default function Booking() {
+function BookingContent() {
   const router = useRouter();
   const setValue = useAuthStore((state) => state.setValue);
   const setContext = useAuthStore((state) => state.setContext);
@@ -81,22 +81,30 @@ export default function Booking() {
           patientId: user.id,
         });
         router.push(`/booking/reservation`);
-      } catch (err: any) {
-        toast.error(err.message);
+      } catch (err: unknown) {
+        toast.error(err instanceof Error ? err.message : "error with reservation");
       }
     }
 
     if (!isLoading && user && doctorId && date) {
       handleCreateAppointment();
     }
-  }, [doctorId, date, user, isLoading]);
+  }, [doctorId, date, user, isLoading, router, setContext, setDate, setDoctorId, setOperation, setReserved, setValue]);
 
+  return (
+    <CardLayout title="Book an appointment" className="flex flex-col gap-3">
+      <DoctorsList book={true} />
+    </CardLayout>
+  );
+}
+
+export default function Booking() {
   return (
     <>
       <Header />
-      <CardLayout title="Book an appointment" className="flex flex-col gap-3">
-        <DoctorsList book={true} />
-      </CardLayout>
+      <Suspense fallback={<div className="p-4 text-center">Loading booking page...</div>}>
+        <BookingContent />
+      </Suspense>
     </>
   );
 }

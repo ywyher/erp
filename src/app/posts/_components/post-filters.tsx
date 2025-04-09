@@ -7,9 +7,9 @@ import { Button } from "@/components/ui/button";
 import { parseAsArrayOf, parseAsString, useQueryState } from "nuqs";
 
 export default function PostFilters() {
-    const [title, setTitle] = useQueryState("title");
-    const [authors, setAuthors] = useQueryState('authors', parseAsArrayOf(parseAsString))
-    const [categories, setCategories] = useQueryState('categories', parseAsArrayOf(parseAsString))
+    const [,setTitle] = useQueryState("title");
+    const [,setAuthors] = useQueryState('authors', parseAsArrayOf(parseAsString))
+    const [,setCategories] = useQueryState('categories', parseAsArrayOf(parseAsString))
 
     const reset = () => {
         setTitle(null)

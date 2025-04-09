@@ -15,7 +15,7 @@ import clsx from "clsx";
 import { Avatar } from "@/components/plate-ui/avatar";
 
 // Skeleton loading component for right actions
-const RightActionsSkeleton = ({ isMobile }: { isMobile: boolean }) => (
+const RightActionsSkeleton = () => (
   <div className="flex items-center gap-4">
     <ThemeToggle />
     <Avatar className={'bg-foreground rounded-full animate-pulse'} />
@@ -36,7 +36,7 @@ export default function Header({ className = "" }: { className?: string }) {
 
   // Memoize the right-side content to prevent unnecessary re-renders
   const RightActions = useMemo(() => {
-    if (isLoading) return <RightActionsSkeleton isMobile={isMobile} />;
+    if (isLoading) return <RightActionsSkeleton />;
     
     return (
       <div className="flex items-center gap-4">
@@ -69,6 +69,9 @@ export default function Header({ className = "" }: { className?: string }) {
           "border rounded-2xl shadow-sm",
           "px-5 py-2 md:py-0",
           "bg-background",
+          {
+            "mb-4": !className.includes("mb-0")
+          },
           className
         )}
       >

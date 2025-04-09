@@ -19,7 +19,7 @@ export const MentionElement = withRef<
   typeof PlateElement,
   {
     prefix?: string;
-    onClick?: (mentionNode: any) => void;
+    onClick?: (mentionNode: unknown) => void;
   }
 >(({ children, className, prefix, onClick, ...props }, ref) => {
   const element = props.element as TMentionElement;

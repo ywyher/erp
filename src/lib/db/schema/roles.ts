@@ -1,4 +1,4 @@
-import { or, relations } from "drizzle-orm";
+import { relations } from "drizzle-orm";
 import { pgTable, text, timestamp, boolean, pgEnum, date } from "drizzle-orm/pg-core";
 import { schedule } from "./schedule";
 import { appointment } from "./appointment";
@@ -121,7 +121,7 @@ export const receptionist = pgTable("receptionist", {
 
 export const receptionistRelation = relations(
   receptionist,
-  ({ one, many }) => ({
+  ({ one }) => ({
     user: one(user, {
       fields: [receptionist.userId],
       references: [user.id],

@@ -9,7 +9,6 @@ import {
   operation,
   OperationData,
   operationData,
-  Schedule,
   user,
   User,
 } from "@/lib/db/schema";
@@ -18,13 +17,11 @@ import { eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import mammoth from "mammoth";
-import fs from "fs/promises";
-import { redirect } from "next/navigation";
 import { getOperationDocument } from "@/lib/db/queries";
 import { GetObjectCommand } from "@aws-sdk/client-s3";
 import { s3 } from "@/lib/utils";
 import { format } from "date-fns";
-import { presetSchema } from "@/app/(authenticated)/dashboard/operations/[operationId]/types";
+import { operationDataSchema } from "@/app/(authenticated)/dashboard/operations/types";
 
 export const getOperations = async (userId: User["id"], role: User["role"]) => {
   let operations;
@@ -69,12 +66,16 @@ export const getOperations = async (userId: User["id"], role: User["role"]) => {
   return operations.map((operation) => ({
     id: operation.id,
     date: format(operation.startTime, "EEEE, d MMMM"),
-    startTime: format(operation.startTime, "HH:mm"),
-    endTime: operation.endTime ? format(operation.endTime, "HH:mm") : "None",
+    startTime: operation.startTime,
+    endTime: operation.endTime,
     status: operation.status,
+    appointmentId: operation.appointmentId || null,
     patientId: operation.patientId,
     doctorId: operation.doctorId,
-    createdBy: operation.createdBy,
+    creatorId: operation.creatorId || null,
+    createdBy: operation.createdBy || "doctor",
+    createdAt: operation.createdAt,
+    updatedAt: operation.updatedAt,
     type: operation.type,
     role: role,
   }));
@@ -158,11 +159,9 @@ export async function updateOperationStatus({
 }
 
 export async function updateOperationEndTime({
-  operationId,
   date,
   dbInstance = db,
 }: {
-  operationId: Operation["id"];
   date: Date;
   dbInstance?: typeof db;
 }) {
@@ -189,7 +188,7 @@ export async function createOperationData({
   data,
   operationId,
 }: {
-  data: z.infer<typeof presetSchema>;
+  data: z.infer<typeof operationDataSchema>;
   operationId: Operation["id"];
 }) {
   try {
@@ -223,7 +222,6 @@ export async function createOperationData({
         throw new Error(updatedOperationData.error);
 
       const updatedOperationEndTime = await updateOperationEndTime({
-        operationId,
         date: new Date(),
         dbInstance: tx,
       });
@@ -238,11 +236,11 @@ export async function createOperationData({
         error: null,
       };
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     return {
       message: null,
       data: null,
-      error: error.message,
+      error: error instanceof Error ? error.message : "Error while inserting operation data",
     };
   }
 }
@@ -251,7 +249,7 @@ export async function updateOperationData({
   data,
   operationDataId,
 }: {
-  data: z.infer<typeof presetSchema>;
+  data: z.infer<typeof operationDataSchema>;
   operationDataId: OperationData["id"];
 }) {
   const [updatedOperationData] = await db

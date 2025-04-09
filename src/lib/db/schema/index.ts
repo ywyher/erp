@@ -11,6 +11,7 @@ import { service } from "./service";
 import { preset } from "./preset";
 import { post } from "./post";
 import { faq } from "./faq";
+import { account, session } from "@/lib/db/schema/auth";
 export * from "./enums";
 export * from "./roles";
 export * from "./auth";
@@ -41,6 +42,8 @@ export type Receptionist = InferSelectModel<typeof receptionist>;
 export type MedicalFile = InferSelectModel<typeof medicalFile>;
 export type Consultation = InferSelectModel<typeof consultation>;
 export type Prescription = InferSelectModel<typeof prescription>;
+export type Account = InferSelectModel<typeof account>;
+export type Session = InferSelectModel<typeof session>;
 export type Tables =
   | "user"
   | "doctor"

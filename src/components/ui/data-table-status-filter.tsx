@@ -14,13 +14,6 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
-// Define all status types
-type TaskStatusType = "pending" | "ongoing" | "completed" | "cancelled";
-type PostStatusType = "draft" | "published" | "inactive" | "archived";
-
-// Union type for all possible statuses
-type StatusType = TaskStatusType | PostStatusType;
-
 // Define the config types
 type StatusConfig = {
   label: string;
@@ -110,6 +103,7 @@ export function DataTableStatusFilter<TData>({
   const statusCounts: Record<string, number> = {};
   statuses.forEach((status) => {
     statusCounts[status] = allRows.filter(
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (row) => (row.original as any).status === status,
     ).length;
   });
@@ -119,6 +113,7 @@ export function DataTableStatusFilter<TData>({
   const selectedStatusCounts: Record<string, number> = {};
   statuses.forEach((status) => {
     selectedStatusCounts[status] = selectedRows.filter(
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (row) => (row.original as any).status === status,
     ).length;
   });

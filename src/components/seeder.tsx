@@ -2,6 +2,7 @@
 import LoadingBtn from "@/components/loading-btn";
 import { Button } from "@/components/ui/button";
 import { reset, seed } from "@/lib/db/seed";
+import { useQueryClient } from "@tanstack/react-query";
 import { Bean, ChevronLeft, ChevronRight, Trash2 } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -10,6 +11,7 @@ export default function Seeder() {
   const [isSeedLoading, setIsSeedLoading] = useState<boolean>(false);
   const [isResetLoading, setIsResetLoading] = useState<boolean>(false);
   const [isExpanded, setIsExpanded] = useState<boolean>(false);
+  const queryClient = useQueryClient()
 
   const clearStorageAndCookies = () => {
     // Clear localStorage & sessionStorage
@@ -50,6 +52,7 @@ export default function Seeder() {
     clearStorageAndCookies();
     const { message, error } = await reset();
     if (message) {
+      queryClient.invalidateQueries({ queryKey: ['session'] })
       toast(message);
       setIsResetLoading(false);
     }
@@ -71,7 +74,7 @@ export default function Seeder() {
       </Button>
       
       <div 
-        className={`transition-all duration-300 overflow-hidden border-y-2 border-l-2 border-zinc-800 ${
+        className={`transition-all duration-300 overflow-hidden bg-background border-y-2 border-l-2 border-zinc-800 ${
           isExpanded ? "w-64" : "w-0"
         }`}
       >

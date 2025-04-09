@@ -31,15 +31,11 @@ import {
   PaintBucketIcon,
   StrikethroughIcon,
   UnderlineIcon,
-  WandSparklesIcon,
 } from 'lucide-react';
 
-import { MoreDropdownMenu } from '@/components/plate-ui/more-dropdown-menu';
 
-import { AIToolbarButton } from './ai-toolbar-button';
 import { AlignDropdownMenu } from './align-dropdown-menu';
 import { ColorDropdownMenu } from './color-dropdown-menu';
-import { CommentToolbarButton } from './comment-toolbar-button';
 import { EmojiDropdownMenu } from './emoji-dropdown-menu';
 import { ExportToolbarButton } from './export-toolbar-button';
 import { FontSizeToolbarButton } from './font-size-toolbar-button';

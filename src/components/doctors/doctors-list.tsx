@@ -15,8 +15,6 @@ import { DateRange } from "react-day-picker";
 import { z } from "zod";
 import { useState } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
-import DashboardLayout from "@/app/(authenticated)/dashboard/_components/dashboard-layout";
-import { Card } from "@/components/ui/card";
 
 export default function DoctorsList({
   book,

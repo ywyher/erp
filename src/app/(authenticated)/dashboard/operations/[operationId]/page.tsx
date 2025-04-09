@@ -3,15 +3,19 @@ import OperationTabs from "@/app/(authenticated)/dashboard/operations/[operation
 import { getDoctorData, getPatientData } from "@/app/(authenticated)/dashboard/operations/[operationId]/actions";
 import { getSession } from "@/lib/auth-client";
 import { getOperationDocument } from "@/lib/db/queries";
-import { Consultation, MedicalFile, OperationData, User } from "@/lib/db/schema";
+import { Consultation, MedicalFile, Operation as TOperation, OperationData, User } from "@/lib/db/schema";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 
+type Params = Promise<{ operationId: TOperation['id'] }>
+
 export default async function Operation({
-  params: { operationId },
+  params,
 }: {
-  params: { operationId: string };
+  params: Params
 }) {
+  const { operationId } = await params;
+
   const { data } = await getSession({
     fetchOptions: {
       headers: await headers(),

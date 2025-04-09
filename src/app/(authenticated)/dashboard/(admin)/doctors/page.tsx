@@ -7,7 +7,7 @@ import { DataTable } from "@/components/ui/data-table";
 import { Stethoscope } from "lucide-react";
 
 export default async function Doctors() {
-  const doctors = await getDoctors({ merge: true })
+  const doctors = await getDoctors()
 
   return (
     <DashboardLayout title="Manage Doctors">

@@ -30,7 +30,7 @@ export async function updateSchedule({
 
       return { error: null, message: "Schedule updated successfully" };
     });
-  } catch (error) {
+  } catch {
     return { error: "Failed", message: null };
   }
 }

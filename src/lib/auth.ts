@@ -49,7 +49,7 @@ export const auth = betterAuth({
     google: {
       clientId: (process.env.GOOGLE_CLIENT_ID as string) || "",
       clientSecret: (process.env.GOOGLE_CLIENT_SECRET as string) || "",
-      mapProfileToUser: (profile) => {
+      mapProfileToUser: () => {
           return {
             provider: 'google',
           }
@@ -132,6 +132,7 @@ export const auth = betterAuth({
     phoneNumber({
       sendOTP: async ({ phoneNumber, code }) => {
         const email = "yassienwyh0@gmail.com";
+        console.log(`code`, phoneNumber);
         console.log(`code`, code);
         // console.log(`${process.env.APP_URL}/api/auth/verify/email?email=${email}&otp=${code}`)
 

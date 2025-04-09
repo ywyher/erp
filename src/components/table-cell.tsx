@@ -27,10 +27,11 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet"
-import DynamicIcon from "@/components/dynamic-icon";
+import DynamicIcon from "@/components/dynamic-icon"
+import { format } from "date-fns";
 
-interface TableCellProps {
-  row: Row<any>;
+interface TableCellProps<TData> {
+  row: Row<TData>;
   value: string;
   header: string;
   dialog?: boolean;
@@ -41,7 +42,7 @@ interface TableCellProps {
   json?: boolean
 }
 
-export default function TableCell({
+export default function TableCell<TData>({
   row,
   value,
   header,
@@ -51,14 +52,20 @@ export default function TableCell({
   readMore = false,
   maxChars = 24,
   json
-}: TableCellProps) {
+}: TableCellProps<TData>) {
   const isMobile = useIsMobile()
+
+  const richEditor = useCreateEditor({
+    value: editor ? row.getValue('content') : undefined,
+    readOnly: true,
+  });
 
   const cellValue = row.getValue(value);
 
+
   const hasEmailColumn = row
     .getAllCells()
-    .some((cell) => cell.column.id === "email");
+    .some(cell => cell.column.id === "email");
   const emailValue = hasEmailColumn ? row.getValue("email") : null;
 
   if (cellValue == null || (emailValue && isFakeEmail(emailValue as string))) {
@@ -67,6 +74,10 @@ export default function TableCell({
 
   if (isBoolean) {
     return cellValue === true ? "Yes" : "No";
+  }
+
+  if (value === "startTime" || value == "endTime") {
+    return format(cellValue as string, "HH:mm") || "None";
   }
 
   if (value === "schedules") {
@@ -131,15 +142,10 @@ export default function TableCell({
   }
 
   if (editor) {
-    const editor = useCreateEditor({
-      value: row.getValue('content'),
-      readOnly: true,
-    })
-
     const child = (
       <DndProvider backend={HTML5Backend}>
         <Plate
-          editor={editor}
+          editor={richEditor}
           readOnly
         >
           <EditorContainer className="border rounded-md">

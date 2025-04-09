@@ -3,14 +3,12 @@
 import {
   DeleteObjectCommand,
   PutObjectCommand,
-  S3Client,
 } from "@aws-sdk/client-s3";
 import { headers } from "next/headers";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { getSession } from "@/lib/auth-client";
 import crypto from "crypto";
 import { s3 } from "@/lib/utils";
-import { error } from "console";
 
 const generateFileName = (bytes = 32) =>
   crypto.randomBytes(bytes).toString("hex");
@@ -102,11 +100,13 @@ export async function deleteFile(fileName: string) {
       message: "File deleted!",
       error: null,
     }
-  } catch (error: any) {
-    // console.error(`Error deleting file from S3: ${name}`, error);
-    return {
-      message: null,
-      error: error.message || "Failed to delete file!",
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      console.error(`Error deleting file from S3: ${name}`, error);
+      return { message: null, error: error.message };
+    } else {
+      console.error(`Unknown error deleting file from S3: ${name}`);
+      return { message: null, error: "Failed to delete file!" };
     }
   }
 }

@@ -213,7 +213,7 @@ export const BlockDiscussion: RenderNodeWrapper<CommentsConfig> = (props) => {
     return;
   }
 
-  return (props) => (
+  const WrappedBlockCommentsContent = (props: PlateRenderElementProps) => (
     <BlockCommentsContent
       blockPath={blockPath}
       commentNodes={commentNodes}
@@ -222,6 +222,10 @@ export const BlockDiscussion: RenderNodeWrapper<CommentsConfig> = (props) => {
       {...props}
     />
   );
+  
+  WrappedBlockCommentsContent.displayName = 'WrappedBlockCommentsContent';
+  
+  return WrappedBlockCommentsContent;
 };
 
 const BlockCommentsContent = ({

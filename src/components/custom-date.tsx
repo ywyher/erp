@@ -5,7 +5,6 @@ import { TimePicker } from "@/components/ui/datetime-picker";
 import { toast } from "sonner";
 import { Calendar } from "@/components/ui/calendar";
 import LoadingBtn from "@/components/loading-btn";
-import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 
 type CustomDate = {
@@ -47,7 +46,6 @@ export default function CustomDate({ onClick }: CustomDate) {
     );
 
     onClick(adjustedTime);
-    setIsLoading(false);
   };
 
   const handleCurrentDate = () => {

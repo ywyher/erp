@@ -43,6 +43,7 @@ import {
   useOpenState,
 } from './dropdown-menu';
 import { ToolbarButton } from './toolbar';
+import { TElement } from '@udecode/plate';
 
 const turnIntoItems = [
   {
@@ -119,7 +120,7 @@ export function TurnIntoDropdownMenu(props: DropdownMenuProps) {
   const value = useSelectionFragmentProp({
     defaultValue: ParagraphPlugin.key,
     structuralTypes: STRUCTURAL_TYPES,
-    getProp: (node) => getBlockType(node as any),
+    getProp: (node) => getBlockType(node as TElement),
   });
   const selectedItem = React.useMemo(
     () =>

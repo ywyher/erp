@@ -6,7 +6,6 @@ import { Input } from "@/components/ui/input";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { uploadPfp } from "@/app/actions";
 import Pfp from "@/components/pfp";
-import { useImageStore } from "@/app/store";
 import { toast } from "sonner";
 import { useFileUpload } from "@/hooks/use-file-upload";
 import LoadingBtn from "@/components/loading-btn";
@@ -17,8 +16,7 @@ export default function UploadPfp() {
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const queryClient = useQueryClient();
-  const setTrigger = useImageStore((state) => state.setTrigger);
-  const { handleUpload, progresses } = useFileUpload();
+  const { handleUpload } = useFileUpload();
 
   const { data: user, isLoading: isPending } = useQuery({
     queryKey: ["session", "uploadPfp"],

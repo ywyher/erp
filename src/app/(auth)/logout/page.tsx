@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useCallback, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { getSession, signOut } from "@/lib/auth-client";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -17,22 +17,22 @@ export default function Logout() {
     },
   });
 
+  
+  const handleLogout = useCallback(async () => {
+    if (!user) return;
+    await signOut();
+    queryClient.invalidateQueries({ queryKey: ["session"] });
+    router.push("/");
+    return;
+  }, [router, user, queryClient]);
+  
   useEffect(() => {
     if (!user) {
       router.push("/");
     } else {
       handleLogout();
     }
-  }, [router, user]);
-
-  const handleLogout = async () => {
-    if (!user) return;
-    await signOut();
-    queryClient.invalidateQueries({ queryKey: ["session"] });
-    router.push("/");
-    return;
-  };
-
+  }, [router, user, handleLogout]);
   return (
     <div className="flex h-screen items-center justify-center">
       <div className="text-center">

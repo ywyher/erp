@@ -1,7 +1,6 @@
 import UserMedicalFiles from "@/app/(authenticated)/dashboard/_components/user-data/medical-files";
 import ConsultationData from "@/app/(authenticated)/dashboard/operations/[operationId]/_components/consultation-data";
 import PrescriptionTabs from "@/app/(authenticated)/dashboard/operations/[operationId]/_components/prescription-tabs";
-import Prescription from "@/components/prescription";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import UserCard from "@/components/user-card";
 import { Consultation, MedicalFile, User } from "@/lib/db/schema";
@@ -20,7 +19,7 @@ export default function PatientData({
   return (
     <Tabs defaultValue="personal">
       <TabsList>
-        <TabsTrigger value="personal">Patient's Personal data</TabsTrigger>
+        <TabsTrigger value="personal">Patient&apos;s Personal data</TabsTrigger>
         {consultation && (
           <TabsTrigger value="consultation">Consultation</TabsTrigger>
         )}

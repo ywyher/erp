@@ -28,6 +28,7 @@ import { Spinner } from './spinner';
 import { formatBytes } from '@/lib/utils';
 import { useFileUpload } from '@/hooks/use-file-upload';
 import { useProcessStore } from '@/components/editor/store';
+import Image from 'next/image';
 
 const CONTENT: Record<
   string,
@@ -62,13 +63,14 @@ const CONTENT: Record<
 export const MediaPlaceholderElement = withHOC(
   PlaceholderProvider,
   withRef<typeof PlateElement>(
-    ({ children, className, nodeProps, ...props }, ref) => {
+    ({ children, className, ...props }, ref) => {
       const editor = props.editor;
       const element = props.element as TPlaceholderElement;
 
       const { api } = useEditorPlugin(PlaceholderPlugin);
 
       const { handleUpload, isUploading, progresses } = useFileUpload();
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const [uploadedFile, setUploadedFile] = useState<any>(null);
       const [uploadingFile, setUploadingFile] = useState<File | null>(null);
 
@@ -102,7 +104,10 @@ export const MediaPlaceholderElement = withHOC(
 
           replaceCurrentPlaceholder(firstFile);
 
-          restFiles.length > 0 && (editor as any).tf.insert.media(restFiles);
+          if(restFiles.length > 0) {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            (editor as any).tf.insert.media(restFiles);
+          }
         },
       });
 
@@ -251,8 +256,9 @@ export function ImageProgress({
 
   return (
     <div className={cn('relative', className)} contentEditable={false}>
-      <img
+      <Image
         ref={imageRef}
+        fill
         className="h-auto w-full rounded-sm object-cover"
         alt={file.name}
         src={objectUrl}

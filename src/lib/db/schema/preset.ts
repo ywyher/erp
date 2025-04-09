@@ -1,5 +1,5 @@
-import { jsonb, pgEnum, pgTable, text, timestamp } from "drizzle-orm/pg-core";
-import { doctor, user } from "./roles";
+import { jsonb, pgTable, text, timestamp } from "drizzle-orm/pg-core";
+import { doctor } from "./roles";
 import { relations } from "drizzle-orm";
 
 export const preset = pgTable("preset", {

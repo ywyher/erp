@@ -2,7 +2,7 @@ import DashboardLayout from "@/app/(authenticated)/dashboard/_components/dashboa
 import StatCard from "@/app/(authenticated)/dashboard/_components/stat-cart";
 import { Button } from "@/components/ui/button";
 import { DataTable } from "@/components/ui/data-table";
-import { Layers, Newspaper } from "lucide-react";
+import { Layers } from "lucide-react";
 import Link from "next/link";
 import { presetTableColumns } from "@/app/(authenticated)/dashboard/presets/columns";
 import { getPresets } from "@/app/(authenticated)/dashboard/presets/actions";

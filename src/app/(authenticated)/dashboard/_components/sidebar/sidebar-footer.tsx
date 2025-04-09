@@ -1,6 +1,6 @@
 "use client";
 
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -8,7 +8,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { getSession, signOut } from "@/lib/auth-client";
+import { getSession } from "@/lib/auth-client";
 
 import {
   SidebarFooter as CSidebarFooter,
@@ -18,12 +18,9 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 import { ChevronUp, LogOut, Settings } from "lucide-react";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import Pfp from "@/components/pfp";
 import { useState } from "react";
-import { Separator } from "@/components/ui/separator";
-import { Button } from "@/components/ui/button";
 
 export default function SidebarFooter() {
   const router = useRouter();

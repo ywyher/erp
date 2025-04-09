@@ -3,7 +3,7 @@
 import { presetSchema } from "@/app/(authenticated)/dashboard/presets/types";
 import { getSession } from "@/lib/auth-client";
 import db from "@/lib/db";
-import { Doctor, doctor, OperationData, Preset, preset, User, user } from "@/lib/db/schema";
+import { Doctor, doctor, OperationData, Preset, preset, User } from "@/lib/db/schema";
 import { generateId } from "@/lib/funcs";
 import { eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";

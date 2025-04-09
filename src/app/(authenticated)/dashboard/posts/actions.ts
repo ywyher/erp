@@ -2,7 +2,7 @@
 
 import { getSession } from "@/lib/auth-client"
 import db from "@/lib/db"
-import { admin, Post, post, User, user } from "@/lib/db/schema"
+import { Post, post, User, user } from "@/lib/db/schema"
 import { generateId } from "@/lib/funcs"
 import { eq } from "drizzle-orm"
 import { headers } from "next/headers"
@@ -10,6 +10,7 @@ import { v4 as uuidv4 } from 'uuid';
 import slugify from 'slugify'
 import { deleteFile } from "@/lib/s3";
 import { revalidatePath } from "next/cache";
+import { PostContentItem } from "@/app/(authenticated)/dashboard/posts/types";
 
 export const getPosts = async ({ id, role }: { id: User['id'], role: User['role'] }) => {
     let posts;
@@ -78,9 +79,9 @@ export async function createPost({ title, content, status, category, thumbnail, 
             error: null,
             message: "Post created successfully!"
         }
-    } catch (error: any) {
+    } catch (error: unknown) {
         return {
-          error: error.message || "Couldn't create the post",
+          error: error instanceof Error ? error.message : "Couldn't create the post",
           message: null,
         };
     }
@@ -121,9 +122,9 @@ export async function updatePost({ title, content, status, category, thumbnail, 
             error: null,
             message: "Post updated successfully!"
         }
-    } catch (error: any) {
+    } catch (error: unknown) {
         return {
-          error: error.message || "Couldn't updated the post",
+          error: error instanceof Error ? error.message : "Couldn't update the post",
           message: null,
         };
       }
@@ -136,7 +137,7 @@ export async function deletePost({ id }: { id: Post['id'] }) {
     // Assuming you want the first post's content
     const editorFileNames = Array.from(
         new Set(
-        (postData.content as any[]).filter(con => 
+        (postData.content as PostContentItem[]).filter(con => 
             con.type === 'img' || 
             con.type === 'video' || 
             con.type === 'file' || 

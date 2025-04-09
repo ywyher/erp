@@ -4,12 +4,6 @@ import type { MedicalFile } from "@/lib/db/schema";
 import { getFileUrl } from "@/lib/funcs";
 import { useMemo } from "react";
 
-type Video = {
-  src: string;
-  alt: string;
-  type: string;
-};
-
 export default function Videos({ files }: { files: MedicalFile[] }) {
   const videos = useMemo(
     () =>

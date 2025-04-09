@@ -38,7 +38,6 @@ export async function POST(req: NextRequest) {
     // Generate a temporary file path
     const tempId = uuidv4();
     const tempInputPath = path.join(tmpdir(), `${tempId}.docx`);
-    const tempOutputPath = path.join(tmpdir(), `${tempId}.pdf`);
     
     // Write DOCX file to temp storage
     await fs.writeFile(tempInputPath, inputBuffer);

@@ -12,13 +12,10 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { Dispatch, SetStateAction } from "react";
 import {
   Drawer,
-  DrawerClose,
   DrawerContent,
   DrawerDescription,
-  DrawerFooter,
   DrawerHeader,
   DrawerTitle,
-  DrawerTrigger,
 } from "@/components/ui/drawer";
 
 export default function DialogWrapper({
@@ -59,7 +56,7 @@ export default function DialogWrapper({
               <DrawerHeader className="text-left px-0">
                 <DrawerTitle>Edit profile</DrawerTitle>
                 <DrawerDescription>
-                  Make changes to your profile here. Click save when you're
+                  Make changes to your profile here. Click save when you&apos;re
                   done.
                 </DrawerDescription>
               </DrawerHeader>

@@ -120,7 +120,7 @@ export const TableCellElement = withRef<
                 className={cn(
                   'absolute top-0 z-30 hidden h-full w-1 bg-ring',
                   'right-[-1.5px]',
-                  columnResizeVariants({ colIndex: colIndex as any })
+                  columnResizeVariants({ colIndex: colIndex as 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | null | undefined })
                 )}
               />
               {colIndex === 0 && (

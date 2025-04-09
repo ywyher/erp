@@ -7,7 +7,6 @@ import {
   RowsPhotoAlbum,
 } from "react-photo-album";
 import "react-photo-album/rows.css";
-import type { Photo } from "react-photo-album";
 
 import { useMemo, useRef, useState } from "react";
 import { MedicalFile } from "@/lib/db/schema";

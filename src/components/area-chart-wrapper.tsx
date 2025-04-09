@@ -30,6 +30,7 @@ type TimeRange = "90d" | "30d" | "7d" | "6m" | "1y" | "2y" | "all";
 
 // Define the types for the props
 interface ReusableChartProps {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   data: any[];
   config: ChartConfig;
   dateKey?: string;
@@ -58,7 +59,8 @@ export default function AreaChartWrapper({
 
   // Filter data based on time range
   const filteredData = timeRangeEnabled
-    ? data.filter((item) => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    ? data.filter((item: any) => {
         // If "all" is selected, return all data
         if (timeRange === "all") {
           return true;
@@ -181,7 +183,7 @@ export default function AreaChartWrapper({
                         month: "short",
                         day: "numeric",
                       });
-                } catch (e) {
+                } catch {
                   return value.toString().slice(0, 3);
                 }
               }}

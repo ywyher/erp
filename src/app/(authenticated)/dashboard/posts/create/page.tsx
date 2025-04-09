@@ -3,7 +3,7 @@
 import { FormFieldWrapper } from "@/components/form-field-wrapper";
 import { Form } from "@/components/ui/form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useEffect, useState, useRef } from "react";
+import { useState, useRef } from "react";
 import { useForm } from "react-hook-form";
 import LoadingBtn from "@/components/loading-btn";
 import { z } from "zod";
@@ -23,7 +23,7 @@ import { useProcessStore } from "@/components/editor/store";
 import { Editor } from '@udecode/plate';
 
 export default function CreatePost() {
-  const [open, setOpen] = useState<boolean>(false);
+  const [, setOpen] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [previewUrl, setPreviewUrl] = useState<string>();
   

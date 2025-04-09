@@ -18,12 +18,13 @@ export default function CardLayout({
   contentClassName,
 }: CardLayoutProps) {
   return (
-    <Card className={clsx(
-      "w-full max-w-6xl mx-auto border-none rounded-lg",
-      "py-3 px-6",
-      variant == 'home' && 'bg-transparent shadow-none',
-      className,
-    )}>
+<div className="px-6 w-full">
+  <Card className={clsx(
+    "w-full max-w-6xl mx-auto border-none rounded-lg",
+    "py-3 px-6",
+    variant == 'home' && 'bg-transparent shadow-none',
+    className,
+  )}>
       {title && (
         <CardHeader className={clsx(
           "pb-2 mx-0 px-0",
@@ -49,5 +50,7 @@ export default function CardLayout({
         {children}
       </CardContent>
     </Card>
+</div>
+
   );
 }

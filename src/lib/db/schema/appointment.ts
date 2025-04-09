@@ -1,5 +1,5 @@
-import { pgTable, text, timestamp, boolean, pgEnum } from "drizzle-orm/pg-core";
-import { doctor, receptionist, user } from "./roles";
+import { pgTable, text, timestamp, pgEnum } from "drizzle-orm/pg-core";
+import { doctor, user } from "./roles";
 import { relations } from "drizzle-orm";
 import { medicalFile } from "./medical-file";
 import { consultation } from "./consultation";

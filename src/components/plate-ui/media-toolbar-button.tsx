@@ -2,8 +2,6 @@
 
 import React, { useCallback, useState } from 'react';
 
-import type { DropdownMenuProps } from '@radix-ui/react-dropdown-menu';
-
 import { isUrl } from '@udecode/plate';
 import {
   AudioPlugin,
@@ -83,10 +81,9 @@ const MEDIA_CONFIG: Record<
 };
 
 export function MediaToolbarButton({
-  children,
   nodeType,
   ...props
-}: DropdownMenuProps & { nodeType: string }) {
+}: { nodeType: string }) {
   const currentConfig = MEDIA_CONFIG[nodeType];
 
   const editor = useEditorRef();
@@ -97,6 +94,7 @@ export function MediaToolbarButton({
     accept: currentConfig.accept,
     multiple: true,
     onFilesSelected: ({ plainFiles: updatedFiles }) => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (editor as any).tf.insert.media(updatedFiles);
     },
   });

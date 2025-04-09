@@ -1,10 +1,11 @@
 "use client";
 
-import { Column, ColumnDef, Row, Table } from "@tanstack/react-table";
+import { Column, ColumnDef, Row } from "@tanstack/react-table";
 import { Checkbox } from "@/components/ui/checkbox";
 import { DataTableColumnHeader } from "@/components/ui/data-table-column-header";
 import OperationActions from "@/app/(authenticated)/dashboard/operations/_components/operation-actions";
 import TableCell from "@/components/table-cell";
+import { Operation, User } from "@/lib/db/schema";
 
 const operationColumns = [
   { value: "id", header: "ID" },
@@ -19,7 +20,7 @@ const operationColumns = [
   { value: "role", header: "Role" },
 ];
 
-export const operationTableColumns: ColumnDef<any>[] = [
+export const operationTableColumns: ColumnDef<Operation>[] = [
   {
     id: "select",
     header: ({ table }) => (
@@ -44,17 +45,17 @@ export const operationTableColumns: ColumnDef<any>[] = [
   },
   ...operationColumns.map(({ value, header }) => ({
     accessorKey: value,
-    header: ({ column }: { column: Column<any> }) => (
+    header: ({ column }: { column: Column<Operation> }) => (
       <DataTableColumnHeader column={column} title={header} />
     ),
-    cell: ({ row }: { row: Row<any> }) => (
+    cell: ({ row }: { row: Row<Operation> }) => (
       <TableCell row={row} value={value} header={header} />
     ),
   })),
   {
     id: "actions",
     cell: ({ row }) => {
-      const operation = row.original;
+      const operation = row.original as Operation & { role: User['role'] };
       return (
         <OperationActions
           operationId={operation.id}

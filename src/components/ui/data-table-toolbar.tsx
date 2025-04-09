@@ -1,7 +1,7 @@
 "use client";
 
 import { Table } from "@tanstack/react-table";
-import { X, Trash2, FileDown, Settings, Check } from "lucide-react";
+import { X, Trash2, FileDown, Settings } from "lucide-react";
 import { useState } from "react";
 import { utils, writeFile } from "xlsx";
 
@@ -19,7 +19,6 @@ import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
   DropdownMenuContent,
-  DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { deleteById } from "@/lib/db/mutations";
@@ -89,7 +88,7 @@ export function DataTableToolbar<TData extends { id: string }>({
                   key={filter}
                   className="flex flex-row gap-4 capitalize"
                   checked={filter == activeFilter}
-                  onCheckedChange={(value) => setActiveFilter(filter)}
+                  onCheckedChange={() => setActiveFilter(filter)}
                 >
                   {filter}
                 </DropdownMenuCheckboxItem>

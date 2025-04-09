@@ -53,7 +53,7 @@ export default function UpdateAdmin({
       phoneNumber: user.phoneNumber || "",
       nationalId: user.nationalId || "",
       gender: user.gender || "",
-      dateOfBirth: new Date(user.dateOfBirth) || "",
+      dateOfBirth: new Date(user.dateOfBirth || "") || "",
     };
 
     const changedFields = getChangedFields(sessionData, data);
@@ -75,10 +75,10 @@ export default function UpdateAdmin({
         phoneNumber: user.phoneNumber || "",
         nationalId: user.nationalId || "",
         gender: user.gender || "",
-        dateOfBirth: new Date(user.dateOfBirth) || "",
+        dateOfBirth: new Date(user.dateOfBirth || "") || "",
       });
     }
-  }, [user, form.reset]);
+  }, [user, form]);
 
   const onSubmit = async (data: z.infer<typeof updateUserSchema>) => {
     if (!user) return;

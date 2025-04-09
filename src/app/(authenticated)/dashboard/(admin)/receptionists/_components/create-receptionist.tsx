@@ -1,19 +1,11 @@
 "use client";
 
 import { FormFieldWrapper } from "@/components/form-field-wrapper";
-import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Dispatch, SetStateAction, useState } from "react";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-} from "@/components/ui/dialog";
 import { departments } from "@/app/(authenticated)/dashboard/constants";
 import LoadingBtn from "@/components/loading-btn";
 import ScheduleSelector from "@/app/(authenticated)/dashboard/_components/schedule-selector";
@@ -30,9 +22,6 @@ export default function CreateReceptionist() {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [schedules, setSchedules] = useState<Schedules>({}); // Updated name
   const [selectedDays, setSelectedDays] = useState<string[]>([]); // Updated name for clarity
-  const [tab, setTab] = useState<"account" | "schedules" | "password">(
-    "account",
-  );
   const [open, setOpen] = useState<boolean>(false);
   const router = useRouter();
 

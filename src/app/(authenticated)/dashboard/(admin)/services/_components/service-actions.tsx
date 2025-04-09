@@ -11,7 +11,6 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { MoreHorizontal } from "lucide-react";
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import UpdateService from "@/app/(authenticated)/dashboard/(admin)/services/_components/update-service";
 
 export default function ServiceActions({

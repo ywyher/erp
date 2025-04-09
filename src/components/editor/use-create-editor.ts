@@ -4,9 +4,7 @@ import { FixedToolbarPlugin } from '@/components/editor/plugins/fixed-toolbar-pl
 import { FloatingToolbarPlugin } from '@/components/editor/plugins/floating-toolbar-plugin';
 import { withProps } from '@udecode/cn';
 import { AlignPlugin } from '@udecode/plate-alignment/react';
-import { BasicElementsPlugin } from '@udecode/plate-basic-elements/react';
 import {
-  BasicMarksPlugin,
   BoldPlugin,
   ItalicPlugin,
   StrikethroughPlugin,
@@ -15,8 +13,8 @@ import {
 import { HeadingPlugin, TocPlugin } from '@udecode/plate-heading/react';
 import {
   ParagraphPlugin,
-  PlateElement,
   PlateLeaf,
+  RenderNodeWrapper,
   usePlateEditor,
 } from '@udecode/plate/react';
 import { autoformatPlugin } from '@/components/editor/plugins/auto-format-plugin';
@@ -35,10 +33,6 @@ import { LinkPlugin } from '@udecode/plate-link/react';
 import { LinkElement } from '@/components/plate-ui/link-element';
 import { ParagraphElement } from '@/components/plate-ui/paragraph-element';
 import { MediaVideoElement } from '@/components/plate-ui/media-video-element';
-import { TableCellHeaderPlugin, TableCellPlugin, TablePlugin, TableRowPlugin } from '@udecode/plate-table/react';
-import { TableCellElement, TableCellHeaderElement } from '@/components/plate-ui/table-cell-element';
-import { TableElement } from '@/components/plate-ui/table-element';
-import { TableRowElement } from '@/components/plate-ui/table-row-element';
 import { TocElement } from '@/components/plate-ui/toc-element';
 import { MentionInputPlugin, MentionPlugin } from '@udecode/plate-mention/react';
 import { MentionElement } from '@/components/plate-ui/mention-element';
@@ -51,23 +45,17 @@ import { DatePlugin } from '@udecode/plate-date/react';
 import { DateElement } from '@/components/plate-ui/date-element';
 import { linkPlugin } from '@/components/editor/plugins/link-plugin';
 import { tablePlugin } from '@/components/editor/plugins/table-plugin';
-import emojiMartData from '@emoji-mart/data';
+import emojiMartData, { EmojiMartData } from '@emoji-mart/data';
 import { tocPlugin } from '@/components/editor/plugins/toc-plugin';
-import { SuggestionPlugin } from '@udecode/plate-suggestion/react';
 import { suggestionPlugin } from '@/components/editor/plugins/suggestion-plugin';
 import { SuggestionBelowNodes } from '@/components/plate-ui/suggestion-line-break';
 import { EquationPlugin, InlineEquationPlugin } from '@udecode/plate-math/react';
 import { EquationElement } from '@/components/plate-ui/equation-element';
 import { InlineEquationElement } from '@/components/plate-ui/inline-equation-element';
-import { CalloutPlugin } from '@udecode/plate-callout/react';
-import { IndentPlugin } from '@udecode/plate-indent/react';
-import { IndentListPlugin } from '@udecode/plate-indent-list/react';
-import { ListPlugin } from '@udecode/plate-list/react';
 import { lineHeightPlugin } from '@/components/editor/plugins/line-height-plugin';
 import { TogglePlugin } from '@udecode/plate-toggle/react';
 import { NodeIdPlugin } from '@udecode/plate-node-id';
 import { ToggleElement } from '@/components/plate-ui/toggle-element';
-import { DeletePlugin, SelectOnBackspacePlugin } from '@udecode/plate-select';
 import { mediaPlugins } from '@/components/editor/plugins/media-plugins';
 import { MediaPlaceholderElement } from '@/components/plate-ui/media-placeholder-element';
 import { MediaAudioElement } from '@/components/plate-ui/media-audio-element';
@@ -75,13 +63,10 @@ import { MediaFileElement } from '@/components/plate-ui/media-file-element';
 import { MediaEmbedElement } from '@/components/plate-ui/media-embed-element';
 import { FontBackgroundColorPlugin, FontColorPlugin, FontSizePlugin } from '@udecode/plate-font/react';
 import { ColumnPlugin } from '@udecode/plate-layout/react';
-import { CursorOverlayPlugin } from '@udecode/plate-selection/react';
-import { CursorOverlay } from '@/components/plate-ui/cursor-overlay';
 import { cursorOverlayPlugin } from '@/components/editor/plugins/cursor-overlay-plugin';
-import { DndPlugin } from '@udecode/plate-dnd';
 import { dndPlugins } from '@/components/editor/plugins/dnd-plugins';
 import { indentListPlugins } from '@/components/editor/plugins/indent-list-plugins';
-import { AnyPluginConfig, Value } from '@udecode/plate';
+import { AnyPluginConfig, PluginConfig, Value, WithAnyKey } from '@udecode/plate';
 import { JuicePlugin } from '@udecode/plate-juice';
 import { DocxPlugin } from '@udecode/plate-docx';
 import { CsvPlugin } from '@udecode/plate-csv';
@@ -134,14 +119,14 @@ export const plugins = [
   HorizontalRulePlugin,
   linkPlugin,
   // tablePlugin,
-  EmojiPlugin.configure({ options: { data: emojiMartData as any } }),
+  EmojiPlugin.configure({ options: { data: emojiMartData as EmojiMartData } }),
   MentionPlugin,
   DatePlugin,
   tocPlugin,
   SlashPlugin,
   // Need for the slash plugin to work
   suggestionPlugin.configure({
-    render: { belowNodes: SuggestionBelowNodes as any },
+    render: { belowNodes: SuggestionBelowNodes as RenderNodeWrapper<WithAnyKey<PluginConfig<"suggestion">>> },
   }),
   EquationPlugin,
   InlineEquationPlugin,
@@ -184,18 +169,24 @@ export const plugins = [
    autoformatPlugin,
 ] as const;
 
-export const useCreateEditor = ({ value, readOnly = false }: { value?: Value, readOnly?: boolean }) => {
-  return usePlateEditor({
-    value: value ? value : undefined,
-    override: {
-      components: {
-        ...components,
-      }
+export const useCreateEditor = (
+  { value, readOnly = false }: { value?: Value, readOnly?: boolean },
+  deps: unknown[] = []
+) => {
+  return usePlateEditor(
+    {
+      value: value ? value : undefined,
+      override: {
+        components: {
+          ...components,
+        }
+      },
+      plugins: [
+        ...plugins,
+        !readOnly ? FixedToolbarPlugin : undefined,
+        ...(!readOnly ? dndPlugins : []),
+      ].filter(Boolean) as AnyPluginConfig[],
     },
-    plugins: [
-      ...plugins,
-      !readOnly ? FixedToolbarPlugin : undefined,
-      ...(!readOnly ? dndPlugins : []),
-    ].filter(Boolean) as AnyPluginConfig[],
-  });
+    deps // Pass the deps array to usePlateEditor
+  );
 };

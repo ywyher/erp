@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useMemo } from "react";
 import { motion } from "framer-motion";
 import OperationDocumentUrl from "@/app/(authenticated)/dashboard/settings/_components/operation-document";
 
@@ -20,7 +20,7 @@ export const SettingsSidebar: React.FC<SettingsSidebarProps> = ({
   operationDocument,
 }) => {
   // Define your settings sections
-  const sections: Section[] = [
+  const sections: Section[] = useMemo(() => [
     {
       id: "operation-document",
       label: "Operation Document",
@@ -36,7 +36,7 @@ export const SettingsSidebar: React.FC<SettingsSidebarProps> = ({
       ),
     },
     // Add more sections as needed
-  ];
+  ], [operationDocument, userId]);
 
   // Initialize with stored value or default to 0
   const [activeSection, setActiveSection] = useState<number>(() => {

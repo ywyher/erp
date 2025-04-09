@@ -5,7 +5,6 @@ import {
   SidebarContent,
   SidebarHeader,
   SidebarSeparator,
-  SidebarTrigger,
 } from "@/components/ui/sidebar";
 import SidebarFooter from "@/app/(authenticated)/dashboard/_components/sidebar/sidebar-footer";
 import AdminDashboard from "@/app/(authenticated)/dashboard/_components/sidebar/admin/admin-sidebar";

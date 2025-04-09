@@ -3,11 +3,11 @@ import AppointmentTabs from "@/app/(authenticated)/dashboard/appointments/[appoi
 import { getSession } from "@/lib/auth-client";
 import db from "@/lib/db";
 import {
+  Appointment as TAppointment,
   Consultation,
   Doctor,
   MedicalFile,
   Prescription,
-  medicalFile as TMedicalFile,
   User,
 } from "@/lib/db/schema";
 import { medicalFile } from "@/lib/db/schema/medical-file";
@@ -65,11 +65,15 @@ const getUserData = async (appointmentId: string) => {
   };
 };
 
+type Params = Promise<{ appointmentId: TAppointment['id'] }>
+
 export default async function Appointment({
-  params: { appointmentId },
+  params,
 }: {
-  params: { appointmentId: string };
+  params: Params;
 }) {
+  const { appointmentId } = await params
+
   const {
     patient,
     medicalFiles,

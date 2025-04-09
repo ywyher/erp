@@ -11,14 +11,12 @@ import {
 
 import CardLayout from "@/components/card-layout";
 import { useCallback, useEffect, useState, useMemo } from "react";
-import PostCard from "@/components/post-card";
 import { useQuery } from "@tanstack/react-query";
-import PostCardSkeleton from "@/components/post-card-skeleton";
-import { gradient } from "@/app/page";
 import { getServices } from "@/app/(authenticated)/dashboard/(admin)/services/actions";
 import ServiceCard from "@/components/service-card";
 import { IconName } from "@/components/icons-selector";
 import ServiceCardSkeleton from "@/components/service-card-skeleton";
+import { gradient } from "@/lib/gradiant";
 
 export default function Services() {
     const [scrollProgress, setScrollProgress] = useState(0)

@@ -37,7 +37,6 @@ export default function OperationDataWrapper({
   const { 
     data: presets, 
     isLoading: isPresetsLoading, 
-    error: presetsError 
   } = useQuery({
     queryKey: ['presets', doctorId],
     queryFn: async () => await getPresets({ doctorId })

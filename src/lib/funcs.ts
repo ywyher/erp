@@ -19,20 +19,20 @@ export const checkFieldType = (
 
 export function normalizeData(value: string): string;
 export function normalizeData(
-  value: Record<string, any>,
+  value: Record<string, unknown>,
   type: "object",
-): Record<string, any>;
+): Record<string, unknown>;
 export function normalizeData(
-  value: string | Record<string, any>,
+  value: string | Record<string, unknown>,
   type: "string" | "object" = "string",
-): string | Record<string, any> {
+): string | Record<string, unknown> {
   if (type === "string") {
     return (value as string).trim().toLowerCase().replace(/\s/g, "") || "";
   }
 
   if (type === "object") {
     return Object.fromEntries(
-      Object.entries(value as Record<string, any>).map(([key, val]) => [
+      Object.entries(value as Record<string, unknown>).map(([key, val]) => [
         key,
         typeof val === "string"
           ? key === "name"
@@ -100,7 +100,7 @@ export const groupSchedules = (schedules: Schedule[]) => {
   return groupedSchedules;
 };
 
-export const transformArrToObj = (arr: any[]) => {
+export const transformArrToObj = (arr: string[]) => {
   const transformedArr = arr.map((item) => ({
     value: item as string,
     label: (item.charAt(0).toUpperCase() + item.slice(1)) as string,
@@ -140,7 +140,9 @@ export function excludeField<T extends object, K extends keyof T>(
   obj: T,
   field: K,
 ): Omit<T, K> {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { [field]: _, ...rest } = obj;
+
   return rest;
 }
 
@@ -230,7 +232,7 @@ export function checkVerificationNeeded(user: User): {
   return null; // Instead of returning { type: null, value: null }
 }
 
-export function getChangedFields<T extends Record<string, any>>(
+export function getChangedFields<T extends Record<string, unknown>>(
   originalData: T,
   newData: T,
   normalize: boolean = true,
@@ -289,7 +291,7 @@ export function getDaysInRange(start: Date, end: Date): string[] {
   return [...new Set(result)]; // Remove duplicates
 }
 
-const generateRandomDefaultValues = () => {
+export const generateRandomDefaultValues = () => {
   const generateEgyptianNationalId = () => {
     const century = "2"; // Assuming 21st century, change to "1" for 20th century
     const year = String(Math.floor(Math.random() * 100)).padStart(2, "0"); // Last 2 digits of birth year

@@ -1,9 +1,8 @@
 "use server";
 
-import { createUser, updateUserRole } from "@/lib/db/mutations";
+import { createUser } from "@/lib/db/mutations";
 import db from "@/lib/db";
-import { admin, user } from "@/lib/db/schema";
-import { eq } from "drizzle-orm";
+import { admin } from "@/lib/db/schema";
 import { createUserSchema, updateUserSchema } from "@/app/types";
 import { z } from "zod";
 import { revalidatePath } from "next/cache";
@@ -19,7 +18,7 @@ export async function createAdmin(data: z.infer<typeof createUserSchema>) {
           ("error" in createdUser && createdUser.error) ||
           ("error" in createdUser && !createdUser.userId)
         ) {
-          throw new Error(createdUser.error);
+          throw new Error(createdUser.error || "");
         }
   
         const adminId = generateId();
@@ -39,9 +38,9 @@ export async function createAdmin(data: z.infer<typeof createUserSchema>) {
         revalidatePath("/dashboard/admins");
         return { error: null, message: "Admin created successfully!" };
       });
-    } catch (error: any) {
+    } catch (error: unknown) {
       return {
-        error: error.message || "Something went wrong while creating the user.",
+        error: error instanceof Error ? error.message : "Something went wrong while creating the user.",
         message: null,
       };
     }
@@ -70,9 +69,9 @@ export async function updateAdmin({
         revalidatePath("/dashboard/admins");
         return { message: "Admin updated successfully!", error: null };
       });
-    } catch (error: any) {
+    } catch (error: unknown) {
       return {
-        error: error.message || "Failed to update admin",
+        error: error instanceof Error ? error.message : "Failed to update admin",
         message: null,
       };
     }

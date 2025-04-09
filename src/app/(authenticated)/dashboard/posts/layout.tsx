@@ -1,7 +1,6 @@
 import { getSession } from "@/lib/auth-client";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 export default async function Layout({
   children,

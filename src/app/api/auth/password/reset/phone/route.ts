@@ -1,13 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
-import twilio from "twilio";
+// import twilio from "twilio";
 
 // Use environment variables to store sensitive data securely
-const accountSid = process.env.TWILIO_ACCOUNT_SID || "";
-const authToken = process.env.TWILIO_AUTH_TOKEN || "";
-const twilioPhoneNumber = process.env.TWILIO_PHONE_NUMBER || "";
+// const accountSid = process.env.TWILIO_ACCOUNT_SID || "";
+// const authToken = process.env.TWILIO_AUTH_TOKEN || "";
+// const twilioPhoneNumber = process.env.TWILIO_PHONE_NUMBER || "";
 
 // Initialize the Twilio client
-const client = twilio(accountSid, authToken);
+// const client = twilio(accountSid, authToken);
 
 // Define the handler for POST requests
 export async function POST(req: NextRequest) {

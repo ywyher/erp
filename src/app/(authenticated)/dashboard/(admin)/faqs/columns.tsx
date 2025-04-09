@@ -1,10 +1,11 @@
 "use client";
 
-import { Column, ColumnDef, Row, Table } from "@tanstack/react-table";
+import { Column, ColumnDef, Row } from "@tanstack/react-table";
 import { Checkbox } from "@/components/ui/checkbox";
 import { DataTableColumnHeader } from "@/components/ui/data-table-column-header";
 import TableCell from "@/components/table-cell";
 import FaqActions from "@/app/(authenticated)/dashboard/(admin)/faqs/_components/faq-actions";
+import { Faq } from "@/lib/db/schema";
 
 const faqColumns = [
   { value: "id", header: "ID" },
@@ -13,7 +14,7 @@ const faqColumns = [
   { value: "status", header: "Status" },
 ];
 
-export const faqTableColumns: ColumnDef<any>[] = [
+export const faqTableColumns: ColumnDef<Faq>[] = [
   {
     id: "select",
     header: ({ table }) => (
@@ -38,10 +39,10 @@ export const faqTableColumns: ColumnDef<any>[] = [
   },
   ...faqColumns.map(({ value, header, readMore, maxChars }) => ({
     accessorKey: value,
-    header: ({ column }: { column: Column<any> }) => (
+    header: ({ column }: { column: Column<Faq> }) => (
       <DataTableColumnHeader column={column} title={header} />
     ),
-    cell: ({ row }: { row: Row<any> }) => (
+    cell: ({ row }: { row: Row<Faq> }) => (
       <TableCell row={row} value={value} header={header} readMore={readMore} maxChars={maxChars} />
     ),
   })),

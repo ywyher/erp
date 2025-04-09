@@ -173,7 +173,7 @@ export function FileUploader(props: FileUploaderProps) {
       }
     },
 
-    [files, maxFileCount, multiple, onUpload, setFiles],
+    [files, maxFileCount, multiple, onUpload, setFiles, accept, maxSize],
   );
 
   function onRemove(index: number) {

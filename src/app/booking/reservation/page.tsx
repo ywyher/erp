@@ -1,7 +1,6 @@
 "use client";
 
 import ReservationAppointmentData from "@/app/booking/reservation/_components/reservation-appointment-data";
-import ReservationAttatchFiles from "@/app/booking/reservation/_components/reservation-attatch-files";
 import ReservationNotes from "@/app/booking/reservation/_components/reservation-notes";
 import { getAppointment } from "@/app/booking/reservation/actions";
 import { useAppointmentReservationStore } from "@/components/doctors/store";
@@ -20,7 +19,7 @@ export default function Reserved() {
       router.replace("/dashboard/appointments");
       return;
     }
-  }, [router]);
+  }, [router, reservation]);
 
   const { data: appointmentData, isLoading } = useQuery({
     queryKey: ["reservation", reservation.appointmentId],

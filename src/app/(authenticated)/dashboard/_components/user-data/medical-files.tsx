@@ -1,4 +1,4 @@
-import type { MedicalFile, medicalFile } from "@/lib/db/schema";
+import type { MedicalFile } from "@/lib/db/schema";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import Images from "./images";
 import Videos from "./videos";

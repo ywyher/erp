@@ -30,7 +30,7 @@ export default function UpdateUser({
   const [open, setOpen] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
-  const { data: user, isLoading: isPending } = useQuery({
+  const { data: user } = useQuery({
     queryKey: ["userById", userId],
     queryFn: async () => {
       const data = await getUserById(userId, "user");
@@ -54,7 +54,7 @@ export default function UpdateUser({
       phoneNumber: user.phoneNumber || "",
       nationalId: user.nationalId || "",
       gender: user.gender || "",
-      dateOfBirth: new Date(user.dateOfBirth) || "",
+      dateOfBirth: new Date(user.dateOfBirth || "") || "",
     };
 
     const changedFields = getChangedFields(sessionData, data);
@@ -76,10 +76,10 @@ export default function UpdateUser({
         phoneNumber: user.phoneNumber || "",
         nationalId: user.nationalId || "",
         gender: user.gender || "",
-        dateOfBirth: new Date(user.dateOfBirth) || "",
+        dateOfBirth: new Date(user.dateOfBirth || "") || "",
       });
     }
-  }, [user, form.reset]);
+  }, [user, form]);
 
   const onSubmit = async (data: z.infer<typeof updateUserSchema>) => {
     if (!user) return;

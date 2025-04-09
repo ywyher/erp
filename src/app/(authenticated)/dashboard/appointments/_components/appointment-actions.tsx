@@ -1,7 +1,6 @@
 "use client";
 
 import Delete from "@/app/(authenticated)/dashboard/_components/delete";
-import UpdateUser from "@/app/(authenticated)/dashboard/(admin)/users/_components/update-user";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -14,8 +13,6 @@ import { MoreHorizontal } from "lucide-react";
 import { useState } from "react";
 import { Appointment, User } from "@/lib/db/schema";
 import Link from "next/link";
-import { useQuery } from "@tanstack/react-query";
-import { getSession } from "@/lib/auth-client";
 import { Roles } from "@/app/types";
 import { useRouter } from "next/navigation";
 import { updateAppointmentStatus } from "@/app/(authenticated)/dashboard/appointments/actions";

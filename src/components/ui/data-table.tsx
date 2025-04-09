@@ -8,7 +8,6 @@ import {
   useReactTable,
   getPaginationRowModel,
   SortingState,
-  getSortedRowModel,
   ColumnFiltersState,
   getFilteredRowModel,
   VisibilityState,

@@ -1,7 +1,7 @@
 "use client";
 
 import { Dispatch, SetStateAction, useMemo, useState } from "react";
-import MultipleSelector from "@/components/ui/multi-select";
+import MultipleSelector, { Option } from "@/components/ui/multi-select";
 import { days as daysList } from "@/app/(authenticated)/dashboard/constants";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -47,6 +47,7 @@ const ScheduleItem = ({
         <div className="flex flex-col gap-4">
           <Button onClick={() => addSchedule(day)}>Add Schedule</Button>
           <div className="flex flex-row gap-2">
+            <label>Start Time</label>
             <TimePicker
               date={startTime ? parseTimeStringToDate(startTime) : undefined}
               onChange={(date) =>
@@ -54,10 +55,10 @@ const ScheduleItem = ({
               }
               granularity="minute"
               hourCycle={12}
-              label="Start Time"
             />
           </div>
           <div className="flex flex-row gap-2">
+            <label>End Time</label>
             <TimePicker
               date={endTime ? parseTimeStringToDate(endTime) : undefined}
               onChange={(date) =>
@@ -65,7 +66,6 @@ const ScheduleItem = ({
               }
               granularity="minute"
               hourCycle={12}
-              label="End Time"
             />
           </div>
         </div>
@@ -110,8 +110,8 @@ export default function ScheduleSelector({
   const [startTime, setStartTime] = useState<string | undefined>(undefined);
   const [endTime, setEndTime] = useState<string | undefined>(undefined);
 
-  const handleDaysChange = (selectedOptions: any) => {
-    const selectedValues = selectedOptions.map((option: any) => option.value);
+  const handleDaysChange = (selectedOptions: Option[]) => {
+    const selectedValues = selectedOptions.map((option: Option) => option.value);
 
     setSelectedDays(selectedValues);
     setSchedules((prevSchedules) => {

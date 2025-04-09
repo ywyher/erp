@@ -53,7 +53,7 @@ import { MentionInputElement } from './mention-input-element';
 
 export const useCommentEditor = (
   options: Omit<CreatePlateEditorOptions, 'plugins'> = {},
-  deps: any[] = []
+  deps: unknown[] = []
 ) => {
   const commentEditor = useCreateEditor(
     {
@@ -75,6 +75,7 @@ export const useCommentEditor = (
         },
       },
       plugins: [BasicMarksPlugin],
+      // @ts-expect-error Type mismatch
       value: [],
       ...options,
     },
@@ -112,7 +113,7 @@ export function CommentCreateForm({
   const commentContent = useMemo(
     () =>
       commentValue
-        ? NodeApi.string({ children: commentValue as any, type: 'p' })
+        ? NodeApi.string({ children: commentValue as Value, type: 'p' })
         : '',
     [commentValue]
   );
@@ -129,7 +130,7 @@ export function CommentCreateForm({
 
     if (discussionId) {
       // Get existing discussion
-      const discussion = discussions.find((d: any) => d.id === discussionId);
+      const discussion = discussions.find((d: TDiscussion) => d.id === discussionId);
 
       if (!discussion || !commentValue) return;
 
@@ -152,7 +153,7 @@ export function CommentCreateForm({
 
       // Filter out old discussion and add updated one
       const updatedDiscussions = discussions
-        .filter((d: any) => d.id !== discussionId)
+        .filter((d: TDiscussion) => d.id !== discussionId)
         .concat(updatedDiscussion);
 
       discussionStore.set('discussions', updatedDiscussions);
@@ -195,7 +196,7 @@ export function CommentCreateForm({
 
     const id = newDiscussion.id;
 
-    commentsNodeEntry.forEach(([_, path]) => {
+    commentsNodeEntry.forEach(([, path]) => {
       editor.tf.setNodes(
         {
           [getCommentKey(id)]: true,

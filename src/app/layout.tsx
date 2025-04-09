@@ -6,9 +6,7 @@ import "./globals.css";
 import { ReactQueryProvider } from "@/lib/react-query";
 import { NuqsAdapter } from "nuqs/adapters/next/app";
 import Rules from "@/app/rules";
-import Script from "next/script";
 import Seeder from "@/components/seeder";
-import clsx from "clsx";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -56,8 +54,10 @@ export default async function RootLayout({
                 enableSystem
                 disableTransitionOnChange
               >
+                {process.env.ENV == 'DEVELOPMENT' && (
+                  <Seeder />
+                )}
                 <Rules />
-                <Seeder />
                 {children}
               </ThemeProvider>
             </NuqsAdapter>

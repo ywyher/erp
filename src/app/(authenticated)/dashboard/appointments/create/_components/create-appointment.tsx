@@ -8,7 +8,6 @@ import { useDoctorIdStore, useDateStore } from "@/components/doctors/store";
 import { createAppointment } from "@/app/(authenticated)/dashboard/appointments/actions";
 import { toast } from "sonner";
 import ExistingUser from "@/app/(authenticated)/dashboard/_components/existing-user";
-import NewUser from "@/app/(authenticated)/dashboard/_components/new-user";
 import DateSelector from "@/components/date-selector";
 import DashboardLayout from "@/app/(authenticated)/dashboard/_components/dashboard-layout";
 
@@ -35,51 +34,52 @@ export default function CreateAppointment({
   const { doctorId, setDoctorId } = useDoctorIdStore();
 
   useEffect(() => {
-    async function handleCreateAppointment() {
+    const handleCreateAppointment = async () => {
       if (!doctorId || !date || !patientId || isSubmitting) return;
       setIsSubmitting(true);
-
+  
       try {
         const result = await createAppointment({
-          patientId: patientId,
-          doctorId: doctorId,
+          patientId,
+          doctorId,
           createdBy: role,
           date,
-          status: role == "doctor" ? "ongoing" : "pending",
+          status: role === "doctor" ? "ongoing" : "pending",
           creatorId: id,
         });
-
+  
         if (!result || result.error) {
           toast.error(result?.message);
           setDoctorId(null);
           setDate(null);
           return;
         }
-
+  
         toast(result.message);
         setDoctorId(null);
         setDate(null);
-        if (role == "doctor") {
+        if (role === "doctor") {
           router.push(`/dashboard/appointments/${result.appointmentId}`);
         } else {
           router.push(`/dashboard/appointments`);
         }
-      } catch (err: any) {
-        toast.error(err.message);
+      } catch (err) {
+        toast.error(err instanceof Error ? err.message : "failed");
       } finally {
         setIsSubmitting(false);
       }
-    }
-
+    };
+  
     handleCreateAppointment();
-  }, [doctorId, date, patientId, id, role, router]),
-    // Set the date for the doctor role and open dialog
-    useEffect(() => {
-      if (role === "doctor" && patientId && doctorWorkId) {
-        setDoctorId(doctorWorkId);
-        setOpen(true);
-      }
-    }, [patientId, role, doctorWorkId, setDoctorId]);
+  }, [doctorId, date, patientId, id, role, router, isSubmitting, setDate, setDoctorId]);
+  
+  // Set the date for the doctor role and open dialog
+  useEffect(() => {
+    if (role === "doctor" && patientId && doctorWorkId) {
+      setDoctorId(doctorWorkId);
+      setOpen(true);
+    }
+  }, [patientId, role, doctorWorkId, setDoctorId]);
 
   return (
     <DashboardLayout>

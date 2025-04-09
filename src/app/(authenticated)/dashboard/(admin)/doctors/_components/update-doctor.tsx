@@ -1,31 +1,23 @@
 "use client";
 
 import { FormFieldWrapper } from "@/components/form-field-wrapper";
-import { Button } from "@/components/ui/button";
 import {
   Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
 } from "@/components/ui/form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { updateDoctorSchema } from "@/app/(authenticated)/dashboard/(admin)/doctors/types";
 import {
-  days as daysList,
   specialties,
 } from "@/app/(authenticated)/dashboard/constants";
 import LoadingBtn from "@/components/loading-btn";
-import { Schedules } from "@/app/(authenticated)/dashboard/types";
 import { useRouter } from "next/navigation";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import UpdatePassword from "@/components/update-password";
 import { useQuery } from "@tanstack/react-query";
 import { getUserById } from "@/lib/db/queries";
-import { Doctor, Schedule } from "@/app/types";
+import { Doctor } from "@/app/types";
 import { User } from "@/lib/auth-client";
 import { getChangedFields, isFakeEmail, normalizeData } from "@/lib/funcs";
 import { updateDoctor } from "@/app/(authenticated)/dashboard/(admin)/doctors/actions";
@@ -46,7 +38,7 @@ export default function UpdateDoctor({
   const [open, setOpen] = useState<boolean>(false);
   const router = useRouter();
 
-  const { data: user, isLoading: isPending } = useQuery({
+  const { data: user } = useQuery({
     queryKey: ["userById", userId],
     queryFn: async () => {
       const data = await getUserById(userId, "doctor");
@@ -68,10 +60,10 @@ export default function UpdateDoctor({
         nationalId: user.user.nationalId || "",
         specialty: user.doctor.specialty || "",
         gender: user.user.gender || "",
-        dateOfBirth: new Date(user.user.dateOfBirth) || "",
+        dateOfBirth: new Date(user.user.dateOfBirth || "") || "",
       });
     }
-  }, [user]);
+  }, [user, form]);
 
   const onCheckChangedFields = async (
     data: z.infer<typeof updateDoctorSchema>,
@@ -86,7 +78,7 @@ export default function UpdateDoctor({
       nationalId: user.user.nationalId || "",
       specialty: user.doctor.specialty || "",
       gender: user.user.gender || "",
-      dateOfBirth: new Date(user.user.dateOfBirth) || "",
+      dateOfBirth: new Date(user.user.dateOfBirth || "") || "",
     };
 
     const changedFields = getChangedFields(sessionData, data);
@@ -120,9 +112,11 @@ export default function UpdateDoctor({
 
       toast(result?.message);
       setOpen(false);
+      setPopOpen(false);
       router.push("/dashboard/doctors");
     } finally {
       setIsLoading(false);
+      setPopOpen(false);
     }
   };
 

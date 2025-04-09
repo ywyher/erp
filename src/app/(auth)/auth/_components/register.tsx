@@ -7,9 +7,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useAuthStore } from "@/app/(auth)/store";
 import LoadingBtn from "@/components/loading-btn";
 import { useState } from "react";
-import { redirect, useRouter } from "next/navigation";
-import { emailOtp, phoneNumber, signUp } from "@/lib/auth-client";
-import { useQueryClient } from "@tanstack/react-query";
+import { useRouter } from "next/navigation";
+import { signUp } from "@/lib/auth-client";
 import { generateFakeField } from "@/lib/funcs";
 import { z } from "zod";
 import { FormFieldWrapper } from "@/components/form-field-wrapper";
@@ -21,10 +20,8 @@ export default function Register() {
   const context = useAuthStore((state) => state.context);
   const setOperation = useAuthStore((state) => state.setOperation);
   const setPassword = useAuthStore((state) => state.setPassword);
-  const setOtpExists = useAuthStore((state) => state.setOtpExists);
 
   const router = useRouter();
-  const queryClient = useQueryClient();
 
   const form = useForm<z.infer<typeof registerSchema>>({
     resolver: zodResolver(registerSchema),
@@ -37,7 +34,7 @@ export default function Register() {
 
   const handleRegister = async (data: z.infer<typeof registerSchema>) => {
     if (!value) return;
-    // setIsLoading(true);
+    setIsLoading(true)
     if (context == "email") {
       const username = generateFakeField("username");
       const name = generateFakeField("name") || "";
@@ -61,6 +58,7 @@ export default function Register() {
           onError: (ctx) => {
             console.error(ctx.error.message)
             toast.error(ctx.error.message);
+            setIsLoading(false)
           },
         },
       );

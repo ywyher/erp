@@ -1,6 +1,5 @@
 "use server";
 
-import { getSession } from "@/lib/auth-client";
 import db from "@/lib/db";
 import {
   appointment,
@@ -12,7 +11,6 @@ import {
 } from "@/lib/db/schema";
 import { generateId } from "@/lib/funcs";
 import { eq } from "drizzle-orm";
-import { headers } from "next/headers";
 
 export const getAppointment = async (appointmentId: Appointment["id"]) => {
   const [appointmentData] = await db

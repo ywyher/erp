@@ -1,10 +1,11 @@
 "use client";
 
-import { Column, ColumnDef, Row, Table } from "@tanstack/react-table";
+import { Column, ColumnDef, Row } from "@tanstack/react-table";
 import { Checkbox } from "@/components/ui/checkbox";
 import { DataTableColumnHeader } from "@/components/ui/data-table-column-header";
 import TableCell from "@/components/table-cell";
 import PostActions from "@/app/(authenticated)/dashboard/posts/_components/post-actions";
+import { Post } from "@/lib/db/schema";
 
 const postColumns = [
   { value: "id", header: "ID" },
@@ -16,7 +17,7 @@ const postColumns = [
   { value: "status", header: "Status" },
 ];
 
-export const postTableColumns: ColumnDef<any>[] = [
+export const postTableColumns: ColumnDef<Post>[] = [
   {
     id: "select",
     header: ({ table }) => (
@@ -41,10 +42,10 @@ export const postTableColumns: ColumnDef<any>[] = [
   },
   ...postColumns.map(({ value, header, editor, readMore, maxChars }) => ({
     accessorKey: value,
-    header: ({ column }: { column: Column<any> }) => (
+    header: ({ column }: { column: Column<Post> }) => (
       <DataTableColumnHeader column={column} title={header} />
     ),
-    cell: ({ row }: { row: Row<any> }) => (
+    cell: ({ row }: { row: Row<Post> }) => (
       <TableCell 
         row={row} 
         value={value} 
@@ -58,7 +59,7 @@ export const postTableColumns: ColumnDef<any>[] = [
   {
     id: "actions",
     cell: ({ row }) => {
-      const post = row.original;
+      const post = row.original as Post;
       return (
         <PostActions
           post={post}

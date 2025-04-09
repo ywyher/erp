@@ -6,12 +6,7 @@ import { tableMap, Tables, updateUserSchema } from "@/app/types";
 import db from ".";
 import {
   account,
-  appointment,
-  doctor,
   medicalFile,
-  post,
-  schedule,
-  service,
   session,
   User,
   user,
@@ -127,13 +122,17 @@ export async function createUser({
         error: null,
       };
     });
-  } catch (error: any) {
-    return {
-      error: error.message || "Something went wrong while creating the user.",
-      message: null,
-      userId: null,
-    };
+  }  catch (error: unknown) {
+  // Type guard to check if error is an Error object
+  if (error instanceof Error) {
+    console.error(`Error deleting file from S3: ${name}`, error);
+    return { message: null, error: error.message, userId: null };
+  } else {
+    // Handle case where error is not an Error object
+    console.error(`Unknown error deleting file from S3: ${name}`);
+    return { message: null, error: "Failed to delete file!", userId: null };
   }
+}
 }
 
 export async function updateUser({
@@ -239,14 +238,27 @@ export async function updateUser({
       userId: updatedUser[0].id,
       error: null,
     };
-  } catch (error: any) {
-    return {
-      success: false,
-      message: null,
-      userId: null,
-      error: error.message,
-    };
-  }
+  } catch (error: unknown) {
+    // Type guard to check if error is an Error object
+    if (error instanceof Error) {
+      console.error(`Error deleting file from S3: ${name}`, error);
+      return { 
+        success: false,
+        message: null,
+        userId: null,
+        error: error.message
+      };
+    } else {
+      // Handle case where error is not an Error object
+      console.error(`Unknown error deleting file from S3: ${name}`);
+      return { 
+        success: false,
+        message: null,
+        userId: null,
+        error: "Failed to delete file!" 
+      };
+    }
+  } 
 }
 
 export async function updateUserRole({
@@ -282,13 +294,6 @@ export async function deleteById(id: string, tableName: Tables) {
 
   if (!table) {
     throw new Error(`Invalid table name: ${tableName}`);
-  }
-
-  if(tableName === 'service') {
-    const [data] = await db.select({ thmubnail: service.thumbnail }).from(service)
-      .where(eq(service.id, id))
-
-    await deleteFile(data.thmubnail)
   }
 
   if(tableName === 'post') {

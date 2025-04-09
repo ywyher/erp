@@ -42,7 +42,7 @@ export default function PresetData({
             try {
               const result = await extractPlaceholders(operationDocument);
               setPlaceholders(result);
-            } catch (error) {
+            } catch {
               toast.error("Failed to load document placeholders");
             } finally {
               setIsLoadingPlaceholders(false);
@@ -61,7 +61,7 @@ export default function PresetData({
                 }
             })
         }
-    }, [preset, operation])
+    }, [preset, operation, form])
 
     const handleOperationData = async (data: z.infer<typeof presetSchema>) => {
         setIsLoading(true);

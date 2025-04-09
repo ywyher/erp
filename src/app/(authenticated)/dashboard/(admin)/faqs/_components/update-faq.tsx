@@ -14,7 +14,7 @@ import { getFaqData, updateFaq } from "@/app/(authenticated)/dashboard/(admin)/f
 import { Faq } from "@/lib/db/schema";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { socialStatuses } from "@/lib/constants";
-import { getChangedFields, getFileUrl } from "@/lib/funcs";
+import { getChangedFields } from "@/lib/funcs";
 import { faqSchema } from "@/app/(authenticated)/dashboard/(admin)/faqs/types";
 
 export default function UpdateFaq({ faqId }: { faqId: Faq['id'] }) {

@@ -1,10 +1,11 @@
 "use client";
 
-import { Column, ColumnDef, Row, Table } from "@tanstack/react-table";
+import { Column, ColumnDef, Row } from "@tanstack/react-table";
 import { Checkbox } from "@/components/ui/checkbox";
 import { DataTableColumnHeader } from "@/components/ui/data-table-column-header";
 import TableCell from "@/components/table-cell";
 import PresetActions from "@/app/(authenticated)/dashboard/presets/_components/preset-actions";
+import { Preset } from "@/lib/db/schema";
 
 const presetColumns = [
   { value: "id", header: "ID" },
@@ -13,7 +14,7 @@ const presetColumns = [
   { value: "data", header: "Data", json: true },
 ];
 
-export const presetTableColumns: ColumnDef<any>[] = [
+export const presetTableColumns: ColumnDef<Preset>[] = [
   {
     id: "select",
     header: ({ table }) => (
@@ -38,10 +39,10 @@ export const presetTableColumns: ColumnDef<any>[] = [
   },
   ...presetColumns.map(({ value, header, readMore, json, maxChars }) => ({
     accessorKey: value,
-    header: ({ column }: { column: Column<any> }) => (
+    header: ({ column }: { column: Column<Preset> }) => (
       <DataTableColumnHeader column={column} title={header} />
     ),
-    cell: ({ row }: { row: Row<any> }) => (
+    cell: ({ row }: { row: Row<Preset> }) => (
       <TableCell 
         row={row} 
         value={value} 
@@ -55,7 +56,7 @@ export const presetTableColumns: ColumnDef<any>[] = [
   {
     id: "actions",
     cell: ({ row }) => {
-      const preset = row.original;
+      const preset = row.original as Preset;
       return (
         <PresetActions
           preset={preset}

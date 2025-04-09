@@ -18,11 +18,9 @@ export default function Auth() {
   const router = useRouter();
   const [port, setPort] = useState<"check" | "register" | "login">("check");
 
-  const value = useAuthStore((state) => state.value);
-  const context = useAuthStore((state) => state.context);
   const resetAuthStore = useAuthStore((state) => state.reset);
 
-  const { data: user, isLoading } = useQuery({
+  const { data: user } = useQuery({
     queryKey: ["session", "auth"],
     queryFn: async () => {
       const { data } = await getSession();
@@ -35,7 +33,7 @@ export default function Auth() {
       router.replace("/");
       return;
     }
-  }, [user]);
+  }, [user, router]);
 
   const handleGoBack = () => {
     resetAuthStore();

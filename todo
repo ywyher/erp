@@ -37,8 +37,6 @@
 
 # useMediaQuery hook and change the maxItemPerPage for the pagination system depending on the device !!
 
-# Error: Route "/dashboard/operations/[operationId]" used `params.operationId`. `params` should be awaited before using its properties. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis
-
 <!-- Priorty 0 -->
 
 # add the ability for the patient to add personal data like whiehg height and so onn

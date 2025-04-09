@@ -15,3 +15,18 @@ export const postSchema = z.object({
   category: z.enum(postCategoryStatuses),
   thumbnail: z.instanceof(File, { message: "Invalid file type" }),
 });
+
+export type PostContentItem = 
+  | { 
+      id: string;
+      type: "h1" | "p" | "blockquote" | "img" | "video" | "file" | "audio"; // Various content types
+      children: { text: string }[]; // Each content element can have children with text
+      indent?: number;
+      listStyleType?: "todo" | "ordered" | "unordered";
+      listStart?: number;
+      checked?: boolean;
+      url?: string; // Used for img, file, video, audio
+      name?: string; // Name for img, file, video, audio
+      isUpload?: boolean;
+      placeholderId?: string;
+  };

@@ -15,6 +15,7 @@ import { Roles } from "@/app/types";
 import UserCard from "@/components/user-card";
 import { DoctorCard } from "@/components/doctors/doctor-card";
 import { Eye } from "lucide-react";
+import { Doctor, Schedule, User } from "@/lib/db/schema";
 
 export default function UserDataDialog({
   userId,
@@ -23,20 +24,21 @@ export default function UserDataDialog({
   userId: string;
   role: Roles;
 }) {
-  const [userData, setUserData] = useState<any>(null);
+  const [userData, setUserData] = useState<User | { user: User, doctor: Doctor, schedules: Schedule[] } | null>();
 
   const fetchUserData = async () => {
     if (role == "user") {
       const data = await getUserById(userId, role);
-      setUserData(data);
+      setUserData(data as User);
     } else if (role == "doctor") {
       const mainUserId = await getWorkerUserId(userId, "doctor");
 
       if (!mainUserId) return;
 
       const data = await getUserById(mainUserId, role);
-      setUserData(data);
+      setUserData(data as { user: User, doctor: Doctor, schedules: Schedule[] });
     }
+
   };
 
   return (
@@ -57,9 +59,9 @@ export default function UserDataDialog({
         {userData ? (
           <div>
             {(role == "user" || role == "admin") ? (
-              <UserCard data={userData} />
+              <UserCard data={userData as User} />
             ) : (
-              <DoctorCard data={userData} />
+              <DoctorCard data={userData as { user: User, doctor: Doctor, schedules: Schedule[] }} />
             )}
           </div>
         ) : (

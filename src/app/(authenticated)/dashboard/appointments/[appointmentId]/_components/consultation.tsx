@@ -12,12 +12,6 @@ import { FormFieldWrapper } from "@/components/form-field-wrapper";
 import LoadingBtn from "@/components/loading-btn";
 import {
   Form,
-  FormItem,
-  FormLabel,
-  FormControl,
-  FormDescription,
-  FormMessage,
-  FormField,
 } from "@/components/ui/form";
 import type {
   Appointment,
@@ -27,7 +21,7 @@ import type {
   User,
 } from "@/lib/db/schema";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Dispatch, SetStateAction, useEffect, useState } from "react";
+import { Dispatch, SetStateAction, useCallback, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import type { z } from "zod";
 import {
@@ -39,7 +33,6 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-  AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import DateSelector from "@/components/date-selector";
@@ -144,7 +137,7 @@ export default function Consultation({
     }
   };
 
-  const handleFinish = async () => {
+  const handleFinish = useCallback(async () => {
     const data = form.getValues();
     await handleFinishConsultation({
       history: data.history,
@@ -170,7 +163,7 @@ export default function Consultation({
       creatorId,
     });
     setShowAlert(false); // Close the alert dialog
-  };
+  }, [form, appointmentId, consultationId, creatorId, doctorId, operation, operationDate, patientId, prescriptions, reset]);
 
   useEffect(() => {
     form.reset({
@@ -180,13 +173,13 @@ export default function Consultation({
       radiologies,
       medicines,
     });
-  }, [history, diagnosis, laboratories, radiologies, medicines]);
+  }, [history, diagnosis, laboratories, radiologies, medicines, form]);
 
   useEffect(() => {
     if (operationDate) {
       handleFinish();
     }
-  }, [operationDate]);
+  }, [operationDate, handleFinish]);
 
   return (
     <>

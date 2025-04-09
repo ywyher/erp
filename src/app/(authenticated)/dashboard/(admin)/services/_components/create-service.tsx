@@ -13,12 +13,10 @@ import DialogWrapper from "@/app/(authenticated)/dashboard/_components/dialog-wr
 import { serviceSchema } from "@/app/(authenticated)/dashboard/(admin)/services/types";
 import { createService } from "@/app/(authenticated)/dashboard/(admin)/services/actions";
 import { socialStatuses } from "@/lib/constants";
-import { IconName } from "@/components/icons-selector";
 
 export default function CreateService() {
   const [open, setOpen] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [selectedIcon, setSelectedIcon] = useState<IconName | null>(null)
   
   const form = useForm<z.infer<typeof serviceSchema>>({
     resolver: zodResolver(serviceSchema),

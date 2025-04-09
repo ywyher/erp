@@ -23,7 +23,7 @@ export function useFileUpload() {
     checksum: string,
   ) => {
     const response = await fetch(
-      "http://localhost:3000/api/upload/get-presigned-url",
+      `${process.env.APP_URL}/api/upload/get-presigned-url`,
       {
         method: "POST",
         headers: {
@@ -96,16 +96,14 @@ export function useFileUpload() {
         size,
         type,   
       };
-    } catch (error: any) {
-      // Error will already be shown via toast in the catch blocks above
-      // We just need to return the error data
+    } catch (error: unknown) {
       return {
         key: '',
         url: '',
         name: file.name,
         size: file.size,
         type: file.type,
-        error: error.message || "Failed to upload file"
+        error: error instanceof Error ? error.message : "Failed to upload file"
       };
     } finally {
       setIsUploading(false);

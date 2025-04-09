@@ -37,12 +37,12 @@ export default function SettingsForm() {
   });
 
   useEffect(() => {
-    async () => {
+    (async () => {
       if (user && !isPending) {
         const context = await getUserRegistrationType(user.id);
         setRegisteredWith(context);
       }
-    };
+    })();
     if (user && !isPending) {
       form.reset({
         name: user.name || "",
@@ -54,7 +54,7 @@ export default function SettingsForm() {
         dateOfBirth: user.dateOfBirth ? new Date(user.dateOfBirth) : "",
       });
     }
-  }, [user]);
+  }, [user, form ,isPending]);
 
   const onCheckChangedFields = async (
     data: z.infer<typeof updateUserSchema>,

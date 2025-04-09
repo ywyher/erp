@@ -54,7 +54,7 @@ export default function Rules() {
     };
 
     handleRules();
-  }, [user, router, isLoading, pathname]);
+  }, [user, router, isLoading, pathname, setContext, setOperation, setValue]);
 
   return null;
 }

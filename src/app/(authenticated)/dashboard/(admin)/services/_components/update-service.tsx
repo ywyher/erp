@@ -14,7 +14,7 @@ import { getServiceData, updateService } from "@/app/(authenticated)/dashboard/(
 import { Service } from "@/lib/db/schema";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { socialStatuses } from "@/lib/constants";
-import { getChangedFields, getFileUrl } from "@/lib/funcs";
+import { getChangedFields } from "@/lib/funcs";
 import { serviceSchema } from "@/app/(authenticated)/dashboard/(admin)/services/types";
 
 export default function UpdateService({ serviceId }: { serviceId: Service['id'] }) {

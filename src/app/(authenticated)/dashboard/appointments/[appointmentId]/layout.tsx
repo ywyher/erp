@@ -4,14 +4,16 @@ import { redirect } from "next/navigation";
 import { Appointment } from "@/lib/db/schema";
 import { getAppointmentStatus } from "@/app/(authenticated)/dashboard/appointments/[appointmentId]/actions";
 
+type Params = Promise<{ appointmentId: Appointment['id'] }>
+
 export default async function Layout({
   children,
   params,
 }: {
   children: React.ReactNode;
-  params: { appointmentId: Appointment["id"] };
+  params: Params;
 }) {
-  const { appointmentId } = params;
+  const { appointmentId } = await params
 
   const reqHeaders = await headers();
 

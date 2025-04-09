@@ -19,7 +19,7 @@ type TGetPosts = {
     page = 1,
     limit = 10
   }: TGetPosts) {
-    let conditions = [];
+    const conditions = [];
     
     if (authors && authors.length > 0) {
       conditions.push(inArray(post.authorId, authors));

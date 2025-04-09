@@ -2,19 +2,11 @@
 
 import { Column, ColumnDef, Row } from "@tanstack/react-table";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Button } from "@/components/ui/button";
 import { DataTableColumnHeader } from "@/components/ui/data-table-column-header";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import { isFakeEmail } from "@/lib/funcs";
 import React from "react";
 import AdminAction from "@/app/(authenticated)/dashboard/(admin)/admins/_components/admin-actions";
 import TableCell from "@/components/table-cell";
+import { User } from "@/lib/db/schema";
 
 // Define admin columns with proper types
 const adminColumns: {
@@ -31,7 +23,7 @@ const adminColumns: {
   { value: "nationalId", header: "National Id" },
 ];
 
-export const adminTableColumns: ColumnDef<any>[] = [
+export const adminTableColumns: ColumnDef<User>[] = [
   {
     id: "select",
     header: ({ table }) => (
@@ -56,10 +48,10 @@ export const adminTableColumns: ColumnDef<any>[] = [
   },
   ...adminColumns.map(({ value, header, dialog, isBoolean }) => ({
     accessorKey: value,
-    header: ({ column }: { column: Column<any, any> }) => (
+    header: ({ column }: { column: Column<User> }) => (
       <DataTableColumnHeader column={column} title={header} />
     ),
-    cell: ({ row }: { row: Row<any> }) => (
+    cell: ({ row }: { row: Row<User> }) => (
       <TableCell
         row={row}
         value={value}

@@ -1,6 +1,5 @@
 "use client";
 
-import AuthLayout from "@/app/(auth)/auth/_components/auth-layout";
 import {
   Form,
   FormControl,
@@ -16,7 +15,6 @@ import {
 } from "@/components/ui/input-otp";
 import { UseFormReturn } from "react-hook-form";
 import LoadingBtn from "@/components/loading-btn";
-import { Button } from "@/components/ui/button";
 import { z } from "zod";
 import { verifyOtpSchema } from "@/app/(auth)/types";
 

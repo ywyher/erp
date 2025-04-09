@@ -2,19 +2,11 @@
 
 import { Column, ColumnDef, Row } from "@tanstack/react-table";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Button } from "@/components/ui/button";
 import { DataTableColumnHeader } from "@/components/ui/data-table-column-header";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import { isFakeEmail } from "@/lib/funcs";
 import React from "react";
 import UserActions from "@/app/(authenticated)/dashboard/(admin)/users/_components/user-actions";
 import TableCell from "@/components/table-cell";
+import { User } from "@/lib/db/schema";
 
 const userColumns = [
   { value: "id", header: "Id" },
@@ -28,7 +20,7 @@ const userColumns = [
   { value: "provider", header: "Provider" },
 ];
 
-export const userTableColumns: ColumnDef<any>[] = [
+export const userTableColumns: ColumnDef<User>[] = [
   {
     id: "select",
     header: ({ table }) => (
@@ -64,10 +56,10 @@ export const userTableColumns: ColumnDef<any>[] = [
       isBoolean?: boolean;
     }) => ({
       accessorKey: value,
-      header: ({ column }: { column: Column<any, any> }) => (
+      header: ({ column }: { column: Column<User> }) => (
         <DataTableColumnHeader column={column} title={header} />
       ),
-      cell: ({ row }: { row: Row<any> }) => (
+      cell: ({ row }: { row: Row<User> }) => (
         <TableCell
           row={row}
           value={value}

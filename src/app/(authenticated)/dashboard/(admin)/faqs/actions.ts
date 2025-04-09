@@ -56,9 +56,9 @@ export async function createFaq({ data }: { data: z.infer<typeof faqSchema> }) {
             error: null,
             message: "Faq created successfully!"
         }
-    } catch (error: any) {
+    } catch (error: unknown) {
         return {
-          error: error.message || "Couldn't create the faq",
+          error: error instanceof Error ? error.message : "Couldn't create the faq",
           message: null,
         };
       }
@@ -81,9 +81,9 @@ export async function updateFaq({ data, faqId }: { data: z.infer<typeof faqSchem
             error: null,
             message: "Faq created successfully!"
         }
-    } catch (error: any) {
+    } catch (error: unknown) {
         return {
-          error: error.message || "Couldn't create the faq",
+          error: error instanceof Error ? error.message : "Couldn't create the faq",
           message: null,
         };
       }

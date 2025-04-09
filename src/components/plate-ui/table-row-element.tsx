@@ -39,6 +39,7 @@ export const TableRowElement = withRef<typeof PlateElement>(
           PathApi.parent(dropEntry[1])
         ),
       onDropHandler: (_, { dragItem }) => {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const dragElement = (dragItem as any).element;
 
         if (dragElement) {
@@ -68,7 +69,7 @@ export const TableRowElement = withRef<typeof PlateElement>(
   }
 );
 
-function RowDragHandle({ dragRef }: { dragRef: React.Ref<any> }) {
+function RowDragHandle({ dragRef }: { dragRef: React.Ref<HTMLButtonElement> }) {
   const editor = useEditorRef();
   const element = useElement();
 

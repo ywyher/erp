@@ -5,10 +5,7 @@ import { appointmentTableColumns } from "@/app/(authenticated)/dashboard/appoint
 import { Button } from "@/components/ui/button";
 import { DataTable } from "@/components/ui/data-table";
 import { getSession } from "@/lib/auth-client";
-import db from "@/lib/db";
 import { User } from "@/lib/db/schema";
-import { format } from "date-fns";
-import { eq } from "drizzle-orm";
 import { CalendarCheck } from "lucide-react";
 import { headers } from "next/headers";
 import Link from "next/link";

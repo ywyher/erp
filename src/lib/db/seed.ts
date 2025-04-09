@@ -314,7 +314,7 @@ export async function seed() {
       .returning();
 
     // Create a receptionist
-    const receptionist = await db
+    await db
       .insert(schema.receptionist)
       .values({
         id: generateId(),
@@ -531,15 +531,31 @@ export async function seed() {
       updatedAt: new Date()
     });
     
+    await Promise.all(
+      Array.from({ length: 8 }).map((_, idx) =>
+        db.insert(schema.faq).values({
+          id: generateId(),
+          creatorId: admin[0].id,
+          question: idx.toString(),
+          answer: idx.toString(),
+          status: "published",
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        })
+      )
+    );
+    
     console.log("Seed data inserted successfully!");
     return {
       message: "Seed data inserted successfully!",
     };
-  } catch (error: any) {
-    console.error("Error seeding data:", error.message);
-    reset()
-    return {
-      error: error.message,
-    };
+  }  catch (error: unknown) {
+    console.error(`Error:`, error);
+    if (error instanceof Error) {
+      return { message: null, error: error.message };
+    } else {
+      console.error(`Unknown error:`);
+      return { message: null, error: error };
+    }
   }
 }

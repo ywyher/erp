@@ -2,11 +2,16 @@ import { getPost } from "@/app/posts/actionts";
 import Post from "@/components/post";
 import { Post as TPost } from "@/lib/db/schema";
 
+type Params = Promise<{ slug: TPost['slug'] }>
+
 export default async function PostPage({
-  params: { slug },
+  params,
 }: {
-  params: { slug: string };
+  params: Params;
 }) {
+
+  const { slug } = await params
+
     const post = await getPost(slug);
 
     return (

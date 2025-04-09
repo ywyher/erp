@@ -159,8 +159,21 @@ export const createUserSchema = applySharedRefinements(
 // 1️⃣ Explicitly define Tables type
 export type Tables = keyof typeof tableMap;
 
-// 2️⃣ Ensure tableMap is correctly typed
-export const tableMap: Record<string, any> = {
+
+export const tableMap: Record<string, 
+  | typeof user
+  | typeof receptionist
+  | typeof doctor
+  | typeof schedule
+  | typeof session
+  | typeof account
+  | typeof appointment
+  | typeof operation
+  | typeof service
+  | typeof post
+  | typeof preset
+  | typeof faq
+> = {
   user,
   receptionist,
   doctor,

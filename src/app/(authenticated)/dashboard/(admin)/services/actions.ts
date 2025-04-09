@@ -56,9 +56,9 @@ export async function createService({ data }: { data: z.infer<typeof serviceSche
             error: null,
             message: "Service created successfully!"
         }
-    } catch (error: any) {
+    } catch (error: unknown) {
         return {
-          error: error.message || "Couldn't create the service",
+          error: error instanceof Error ? error.message : "Couldn't create the service",
           message: null,
         };
       }
@@ -81,9 +81,9 @@ export async function updateService({ data, serviceId }: { data: z.infer<typeof 
             error: null,
             message: "Service created successfully!"
         }
-    } catch (error: any) {
+    } catch (error: unknown) {
         return {
-          error: error.message || "Couldn't create the service",
+          error: error instanceof Error ? error.message : "Couldn't create the service",
           message: null,
         };
       }

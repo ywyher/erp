@@ -46,7 +46,7 @@ export default function OperationTabs({
     if (operationData && operationData.data) {
       setOperationData(operationData.data);
     }
-  }, [operationData]);
+  }, [operationData, setOperationData]);
 
   return (
     <Tabs
@@ -55,7 +55,7 @@ export default function OperationTabs({
       className="w-full pt-4"
     >
       <TabsList>
-        <TabsTrigger value="patient-data">Patient's data</TabsTrigger>
+        <TabsTrigger value="patient-data">Patient&apos;s data</TabsTrigger>
         <TabsTrigger value="operation-data">Operation data</TabsTrigger>
         {operationData?.data && (
           <TabsTrigger value="document-viewer">Document Viewer</TabsTrigger>

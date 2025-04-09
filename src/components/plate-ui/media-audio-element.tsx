@@ -12,7 +12,7 @@ import { Caption, CaptionTextarea } from './caption';
 export const MediaAudioElement = withHOC(
   ResizableProvider,
   withRef<typeof PlateElement>(
-    ({ children, className, nodeProps, ...props }, ref) => {
+    ({ children, className, ...props }, ref) => {
       const { align = 'center', readOnly, unsafeUrl } = useMediaState();
 
       return (

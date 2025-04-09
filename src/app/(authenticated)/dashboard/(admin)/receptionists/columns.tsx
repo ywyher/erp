@@ -7,6 +7,29 @@ import { DataTableColumnHeader } from "@/components/ui/data-table-column-header"
 import React from "react";
 import ReceptionistAction from "@/app/(authenticated)/dashboard/(admin)/receptionists/_components/receptionist-actions";
 import TableCell from "@/components/table-cell";
+import { Receptionist, Schedule } from "@/lib/db/schema";
+
+type ReceptionistWithDetails = {
+  id: string;
+  name: string;
+  username: string | null;
+  displayUsername: string | null;
+  email: string | null;
+  phoneNumber: string | null;
+  nationalId: string | null;
+  gender: string | null;
+  dateOfBirth: string | null;
+  phoneNumberVerified: boolean;
+  emailVerified: boolean;
+  onBoarding: boolean;
+  image: string | null;
+  role: string;
+  provider: string;
+  createdAt: Date;
+  updatedAt: Date;
+  receptionist: Receptionist
+  schedules: Schedule[];
+}
 
 const receptionistColumns = [
   { value: "name", header: "Name" },
@@ -20,7 +43,7 @@ const receptionistColumns = [
   { value: "schedules", header: "Schedules", dialog: true },
 ];
 
-export const receptionistTableColumns: ColumnDef<any>[] = [
+export const receptionistTableColumns: ColumnDef<ReceptionistWithDetails>[] = [
   {
     id: "select",
     header: ({ table }) => (
@@ -54,10 +77,10 @@ export const receptionistTableColumns: ColumnDef<any>[] = [
       dialog?: boolean;
     }) => ({
       accessorKey: value,
-      header: ({ column }: { column: Column<any, any> }) => (
+      header: ({ column }: { column: Column<ReceptionistWithDetails> }) => (
         <DataTableColumnHeader column={column} title={header} />
       ),
-      cell: ({ row }: { row: Row<any> }) => (
+      cell: ({ row }: { row: Row<ReceptionistWithDetails> }) => (
         <TableCell
           row={row}
           value={value}

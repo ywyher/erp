@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { ReactElement } from 'react';
 
 import type { DropdownMenuProps } from '@radix-ui/react-dropdown-menu';
 
@@ -35,7 +35,7 @@ export function ModeDropdownMenu(props: DropdownMenuProps) {
 
   if (isSuggesting) value = 'suggestion';
 
-  const item: any = {
+  const item: { editing: ReactElement, suggestion: ReactElement, viewing: ReactElement } = {
     editing: (
       <>
         <Pen />
@@ -64,7 +64,7 @@ export function ModeDropdownMenu(props: DropdownMenuProps) {
           tooltip="Editing mode"
           isDropdown
         >
-          {item[value]}
+          {item[value as "editing" | "viewing" | "suggestion"]}
         </ToolbarButton>
       </DropdownMenuTrigger>
 

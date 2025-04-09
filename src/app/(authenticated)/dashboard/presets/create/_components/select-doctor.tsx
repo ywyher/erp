@@ -5,12 +5,12 @@ import InputSkeleton from "@/components/input-skeleton"
 import { Combobox } from "@/components/ui/combobox"
 import { Doctor } from "@/lib/db/schema"
 import { useQuery } from "@tanstack/react-query"
-import { Dispatch, SetStateAction, useEffect } from "react"
+import { Dispatch, SetStateAction } from "react"
 
 export default function SelectDoctor({ setSelectedDoctor }: {
     setSelectedDoctor: Dispatch<SetStateAction<Doctor['id']>>
 }) {
-    const { data: doctors, error, isLoading } = useQuery({
+    const { data: doctors, isLoading } = useQuery({
         queryKey: ["preset-fetching-doctors"],
         queryFn: async () => {
             return await getDoctors()

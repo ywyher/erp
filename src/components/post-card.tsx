@@ -1,5 +1,6 @@
 "use client"
 
+import { PostContentItem } from "@/app/(authenticated)/dashboard/posts/types";
 import { Badge } from "@/components/ui/badge";
 import { Post, User } from "@/lib/db/schema";
 import { getFileUrl } from "@/lib/funcs";
@@ -14,8 +15,8 @@ export default function PostCard({ post }: { post: Post & { author: User } }) {
 
     // Memoize content extraction to avoid recalculation on re-renders
     const content = useMemo(() => {
-        const contentItem = (post.content as any[]).find(
-            (item) => item.type === "p" && item.children?.[0]?.text?.trim()
+        const contentItem = (post.content as PostContentItem[]).find(
+            item => item.type === "p" && item.children?.[0]?.text?.trim()
         );
         return contentItem?.children[0]?.text || "";
     }, [post.content]);

@@ -1,46 +1,30 @@
 "use server";
 
 import { Roles, tableMap } from "@/app/types";
-import { auth } from "@/lib/auth";
 import pluralize from "pluralize"; // Install with: npm install pluralize
 import db from "@/lib/db";
 import {
-  appointment,
   Doctor,
   doctor,
-  post,
-  Post,
   receptionist,
   Receptionist,
   Schedule,
   schedule,
-  Service,
-  session,
   settings,
   Tables,
   user,
   User
 } from "@/lib/db/schema";
-import { deleteFile } from "@/lib/s3";
 import {
   and,
-  ConsoleLogWriter,
   eq,
-  gte,
   inArray,
   like,
-  lte,
   or,
   sql,
 } from "drizzle-orm";
-import { revalidatePath } from "next/cache";
-import { headers } from "next/headers";
-import { medicalFile } from "./schema/medical-file";
-import { getDaysInRange, getFileUrl } from "@/lib/funcs";
+import { getDaysInRange } from "@/lib/funcs";
 import { operationDocumentKey } from "@/app/(authenticated)/dashboard/settings/keys";
-import { DateRange } from "react-day-picker";
-import { format } from "date-fns";
-import { service } from "./schema/service";
 
 export async function getUserProvider(
   userId: string,
@@ -303,11 +287,16 @@ export const getOperationDocument = async ({
       name: operationDocument.value,
       error: null,
     };
-  } catch (error: any) {
-    return {
-      name: null,
-      error: error.message,
-    };
+  } catch (error: unknown) {
+    // Type guard to check if error is an Error object
+    if (error instanceof Error) {
+      console.error(`Error deleting file from S3: ${name}`, error);
+      return { message: null, error: error.message };
+    } else {
+      // Handle case where error is not an Error object
+      console.error(`Unknown error deleting file from S3: ${name}`);
+      return { message: null, error: "Failed to delete file!" };
+    }
   }
 };
 
@@ -439,7 +428,7 @@ export async function getQuantityByDay({
       const tableConditions = conditions?.[tableName] || [];
       tableConditions.forEach((condition) => {
         // Get the field from the table schema
-        const field = table[condition.field];
+        const field = table[condition.field as keyof typeof table];
         if (!field) {
           throw new Error(
             `Invalid field name for table ${tableName}: ${condition.field}`,

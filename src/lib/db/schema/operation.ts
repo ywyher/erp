@@ -1,5 +1,5 @@
 import { jsonb, pgEnum, pgTable, text, timestamp } from "drizzle-orm/pg-core";
-import { doctor, receptionist, user } from "./roles";
+import { doctor, user } from "./roles";
 import { relations } from "drizzle-orm";
 import { appointment, createdByEnum } from "./appointment";
 import { statusEnum } from "@/lib/db/schema/enums";

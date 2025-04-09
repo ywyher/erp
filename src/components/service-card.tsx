@@ -1,7 +1,6 @@
 import DynamicIcon from "@/components/dynamic-icon";
 import { IconName } from "@/components/icons-selector";
 import { Card, CardContent } from "@/components/ui/card";
-import { Skeleton } from "@/components/ui/skeleton";
 import { Service } from "@/lib/db/schema";
 import { cn } from "@/lib/utils";
 

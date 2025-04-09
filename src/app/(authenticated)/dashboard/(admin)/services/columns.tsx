@@ -1,10 +1,11 @@
 "use client";
 
-import { Column, ColumnDef, Row, Table } from "@tanstack/react-table";
+import { Column, ColumnDef, Row } from "@tanstack/react-table";
 import { Checkbox } from "@/components/ui/checkbox";
 import { DataTableColumnHeader } from "@/components/ui/data-table-column-header";
 import ServiceActions from "@/app/(authenticated)/dashboard/(admin)/services/_components/service-actions";
 import TableCell from "@/components/table-cell";
+import { Service } from "@/lib/db/schema";
 
 const serviceColumns = [
   { value: "id", header: "ID" },
@@ -13,7 +14,7 @@ const serviceColumns = [
   { value: "status", header: "Status" },
 ];
 
-export const serviceTableColumns: ColumnDef<any>[] = [
+export const serviceTableColumns: ColumnDef<Service>[] = [
   {
     id: "select",
     header: ({ table }) => (
@@ -38,10 +39,10 @@ export const serviceTableColumns: ColumnDef<any>[] = [
   },
   ...serviceColumns.map(({ value, header }) => ({
     accessorKey: value,
-    header: ({ column }: { column: Column<any> }) => (
+    header: ({ column }: { column: Column<Service> }) => (
       <DataTableColumnHeader column={column} title={header} />
     ),
-    cell: ({ row }: { row: Row<any> }) => (
+    cell: ({ row }: { row: Row<Service> }) => (
       <TableCell row={row} value={value} header={header} />
     ),
   })),

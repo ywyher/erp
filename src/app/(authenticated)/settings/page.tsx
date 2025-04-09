@@ -33,7 +33,7 @@ export default function Settings() {
 
   return (
     <div>
-      <Header />
+      <Header className="mb-0" />
       <VerifyAlert />
       {user && (
         <div className="
@@ -41,7 +41,7 @@ export default function Settings() {
           flex flex-col gap-5 w-full
           p-6 mx-auto 
           sm:p-8 md:w-[70%] lg:w-[60%] xl:w-[50%] 2xl:w-[40%]
-          shadow-lg 
+          shadow-lg
           rounded-es-2xl rounded-ee-2xl
         ">
           {provider == "credential" ? (

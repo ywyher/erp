@@ -84,17 +84,22 @@ export const DraggableAboveNodes: RenderNodeWrapper = (props) => {
 
   if (!enabled) return;
 
-  return (props) => <Draggable {...props} />;
+  // Fix: Add name to this anonymous function component
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const DraggableWrapper = (props: any) => <Draggable {...props} />;
+  DraggableWrapper.displayName = 'DraggableWrapper';
+  return DraggableWrapper;
 };
 
 export const Draggable = withRef<'div', PlateRenderElementProps>(
-  ({ className, ...props }, ref) => {
+  ({ ...props }, ref) => {
     const { children, editor, element, path } = props;
     const blockSelectionApi =
       editor.getApi(BlockSelectionPlugin).blockSelection;
     const { isDragging, previewRef, handleRef } = useDraggable({
       element,
       onDropHandler: (_, { dragItem }) => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const id = (dragItem as any).id;
 
         if (blockSelectionApi && id) {
@@ -155,6 +160,8 @@ export const Draggable = withRef<'div', PlateRenderElementProps>(
     );
   }
 );
+// Fix #1: Add display name to Draggable
+Draggable.displayName = 'Draggable';
 
 const Gutter = React.forwardRef<
   HTMLDivElement,
@@ -212,6 +219,8 @@ const Gutter = React.forwardRef<
     </div>
   );
 });
+// Fix #2: Add display name to Gutter
+Gutter.displayName = 'Gutter';
 
 const DragHandle = React.memo(() => {
   const editor = useEditorRef();
@@ -233,6 +242,7 @@ const DragHandle = React.memo(() => {
     </TooltipButton>
   );
 });
+DragHandle.displayName = 'DragHandle';
 
 const DropLine = React.memo(
   React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
@@ -258,3 +268,5 @@ const DropLine = React.memo(
     }
   )
 );
+// Fix #3: Add display name to DropLine
+DropLine.displayName = 'DropLine';
