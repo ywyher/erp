@@ -1,30 +1,35 @@
 "use client";
 
-import { useForm } from "react-hook-form";
+import { FieldErrors, useForm } from "react-hook-form";
 import { Form } from "@/components/ui/form";
 import { authSchema } from "@/app/(auth)/types";
 import { zodResolver } from "@hookform/resolvers/zod";
 import LoadingBtn from "@/components/loading-btn";
-import { checkFieldType, normalizeData } from "@/lib/funcs";
-import { useAuthStore } from "@/app/(auth)/store";
+import { checkIdentifier, normalizeData } from "@/lib/funcs";
 import { signIn } from "@/lib/auth-client";
 import { Dispatch, useState } from "react";
-import { checkFieldAvailability } from "@/lib/db/queries";
+import { checkFieldAvailability, isFieldVerified } from "@/lib/db/queries";
 import { z } from "zod";
 import { FormFieldWrapper } from "@/components/form-field-wrapper";
 import { toast } from "sonner";
 import Google from "@/components/svg/google";
+import { AuthIdentifier, AuthPort } from "@/components/auth/auth";
+import { useIsMobile } from "@/hooks/use-mobile";
 
+
+type CheckProps = {
+  setPort: Dispatch<React.SetStateAction<AuthPort>>;
+  setIdentifierValue: Dispatch<React.SetStateAction<string>>;
+  setIdentifier: Dispatch<React.SetStateAction<AuthIdentifier | null>>;
+}
 
 export default function Check({
   setPort,
-}: {
-  setPort: Dispatch<React.SetStateAction<"check" | "register" | "login">>;
-}) {
+  setIdentifierValue,
+  setIdentifier,
+}: CheckProps) {
   const [isLoading, setIsLoading] = useState(false);
-
-  const setValue = useAuthStore((state) => state.setValue);
-  const setContext = useAuthStore((state) => state.setContext);
+  const isMobile = useIsMobile()
 
   const form = useForm<z.infer<typeof authSchema>>({
     resolver: zodResolver(authSchema),
@@ -33,56 +38,50 @@ export default function Check({
     },
   });
 
-  const checkField = (field: string) => {
-    const fieldType = checkFieldType(field);
-    return fieldType as "phoneNumber" | "email" | "username" | "unknown";
-  };
-
   const handleCheck = async (data: z.infer<typeof authSchema>) => {
     setIsLoading(true);
 
     data.field = normalizeData(data.field);
-    const fieldType = checkField(data.field);
+    const identifier = checkIdentifier(data.field);
 
-    if (fieldType == "unknown") {
-      toast.error("Only email or phone number");
+    if (identifier == "unknown") {
+      toast.error("Please use email or phone number or username");
       setIsLoading(false);
       return;
     }
 
     const { isAvailable } = await checkFieldAvailability({
-      field: fieldType,
+      field: identifier,
       value: data.field,
     });
 
+    const { isVerified } = await isFieldVerified({ field: 'email', value: data.field })
+
     if (!isAvailable) {
-      if (fieldType == "email") {
-        setContext("email");
-      } else if (fieldType == "phoneNumber") {
-        setContext("phoneNumber");
-      } else {
-        setContext("username");
-      }
-      setValue(data.field);
+      setIdentifier(identifier);
+      setIdentifierValue(data.field);
       setPort("login");
     }
 
-    if (isAvailable && fieldType == "email") {
-      setValue(data.field);
-      setContext("email");
-      setPort("register");
-    } else if (isAvailable && fieldType == "phoneNumber") {
-      setValue(data.field);
-      setContext("phoneNumber");
-      setPort("register");
-    } else if (isAvailable && fieldType == "username") {
-      toast.error(
-        "Username authentication only available as a login option...",
-      );
+    if (isAvailable) {
+      if(identifier == "email") {
+        setIdentifierValue(data.field);
+        setIdentifier("email");
+        setPort("register");
+      }else {
+        toast.error("You can only register using email")
+      }
     }
 
     setIsLoading(false);
   };
+
+  const handleError = (errors: FieldErrors<z.infer<typeof authSchema>>) => {
+    const position = isMobile ? "top-center" : "bottom-right"
+    if (errors.field) {
+      toast.error(errors.field.message, { position });
+    }
+  }
 
   const onGoogleLogin = async () => {
     setIsLoading(true);
@@ -118,15 +117,16 @@ export default function Check({
         </div>
       </div>
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(handleCheck)} className="space-y-4">
+        <form onSubmit={form.handleSubmit(handleCheck, handleError)} className="space-y-4">
           <div>
             <FormFieldWrapper
               form={form}
               name="field"
               placeholder="Email Or Phone number Or Username"
+              showError={false}
             />
           </div>
-          <LoadingBtn isLoading={isLoading}>Submit</LoadingBtn>
+          <LoadingBtn isLoading={isLoading}>Continue</LoadingBtn>
         </form>
       </Form>
     </div>

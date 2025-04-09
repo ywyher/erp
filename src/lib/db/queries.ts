@@ -52,16 +52,32 @@ export async function checkFieldAvailability({
   value: string;
   dbInstance?: typeof db;
 }) {
-  const doesFieldExists = await dbInstance.query.user.findFirst({
+  const data = await dbInstance.query.user.findFirst({
     where: (user, { eq }) => eq(user[field], value),
   });
 
   return {
-    isAvailable: doesFieldExists?.createdAt ? false : true,
+    isAvailable: data?.id ? false : true,
     error:
-      doesFieldExists?.createdAt &&
-      doesFieldExists?.id !== value &&
+      data?.id &&
+      data?.id !== value &&
       `${field} already exists!`,
+  };
+}
+
+export async function isFieldVerified({
+  field,
+  value
+}: {
+  field: "email" | "phoneNumber",
+  value: string,
+}) {
+  const data = await db.query.user.findFirst({
+    where: (user, { eq }) => eq(user[field], value),
+  });
+
+  return {
+    isVerified: field === 'email' ? Boolean(data?.emailVerified) : Boolean(data?.phoneNumberVerified)
   };
 }
 
@@ -564,4 +580,16 @@ export async function getEmployeeId(
 
     return receptionistData.id;
   }
+}
+
+export async function getEmailByPhoneNumber({ phoneNumber }: { phoneNumber: string }) {
+  const [data] = await db.select().from(user).where(eq(user.phoneNumber, phoneNumber))
+
+  return data.email
+}
+
+export async function getEmailByUsername({ username }: { username: string }) {
+  const [data] = await db.select().from(user).where(eq(user.username, username))
+
+  return data.email
 }

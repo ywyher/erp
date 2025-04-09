@@ -3,7 +3,7 @@ import { phoneNumberRegex, emailRegex, usernameRegex } from "@/app/types";
 import { Schedule, User } from "@/lib/db/schema";
 import { nanoid } from "nanoid";
 
-export const checkFieldType = (
+export const checkIdentifier = (
   column: string,
 ): "email" | "phoneNumber" | "username" | "unknown" => {
   if (emailRegex.test(column)) {

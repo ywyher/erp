@@ -12,9 +12,9 @@ export const auth = betterAuth({
   }),
   emailAndPassword: {
     enabled: true,
-    maxPasswordLength: 10,
+    maxPasswordLength: 8,
     minPasswordLength: 1,
-    autoSignIn: true,
+    autoSignIn: false,
     sendResetPassword: async ({ url, user }) => {
       try {
         const response = await fetch(
@@ -173,16 +173,6 @@ export const auth = betterAuth({
 
         // return data;
       },
-
-      // signUpOnVerification: {
-      //     getTempEmail: (phoneNumber) => {
-      //         return `${phoneNumber}@${process.env.APP_NAME}.com`
-      //     },
-      //     //optionally you can alos pass `getTempName` function to generate a temporary name for the user
-      //     getTempName: (phoneNumber) => {
-      //         return phoneNumber //by default it will use the phone number as the name
-      //     },
-      // }
     }),
   ],
 });

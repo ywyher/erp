@@ -65,6 +65,7 @@ interface FormFieldWrapperProps {
   maxLength?: number;
   onFileChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
   editorRef?: RefObject<TEditor | null>;
+  showError?: boolean;
 }
 
 export const FormFieldWrapper: React.FC<FormFieldWrapperProps> = ({
@@ -81,7 +82,8 @@ export const FormFieldWrapper: React.FC<FormFieldWrapperProps> = ({
   disableSearch = true,
   maxLength = 250,
   onFileChange,
-  editorRef
+  editorRef,
+  showError = true,
 }) => {
   const [open, setOpen] = useState<boolean>(false);
   const [showPassword, setShowPassword] = useState<boolean>(false);
@@ -359,7 +361,9 @@ export const FormFieldWrapper: React.FC<FormFieldWrapperProps> = ({
               )}
             </div>
           </FormControl>
-          <FormMessage>{errorMessage}</FormMessage>
+          {showError && (
+            <FormMessage>{errorMessage}</FormMessage>
+          )}
         </FormItem>
       )}
     />

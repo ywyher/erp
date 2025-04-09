@@ -42,12 +42,10 @@ export const usernameRegex = /^[a-zA-Z][a-zA-Z0-9._]{2,19}$/;
 
 // Password Schema (without superRefine)
 export const basePasswordSchema = z.object({
-  password: z.string().min(3, {
-    message: "Password must be at least 3 characters.",
+  password: z.string().min(8, {
+    message: "Password must be at least 8 characters.",
   }),
-  confirmPassword: z.string().min(3, {
-    message: "Password must be at least 3 characters.",
-  }),
+  confirmPassword: z.string()
 });
 
 export const passwordSchema = basePasswordSchema.superRefine((data, ctx) => {
@@ -62,12 +60,12 @@ export const passwordSchema = basePasswordSchema.superRefine((data, ctx) => {
 
 // Base User Schema (Shared fields)
 export const baseUserSchema = z.object({
-  name: z.string().toLowerCase().min(2, {
-    message: "Name must be at least 2 characters.",
+  name: z.string().toLowerCase().min(3, {
+    message: "Name must be at least 3 characters.",
   }),
   email: z.string().email().toLowerCase().optional(),
-  username: z.string().toLowerCase().trim().min(2, {
-    message: "Username must be at least 2 characters.",
+  username: z.string().toLowerCase().trim().min(3, {
+    message: "Username must be at least 3 characters.",
   }),
   gender: z.enum(genders),
   dateOfBirth: z.date(),

@@ -10,9 +10,11 @@ import { Menu } from "@/components/header/menu";
 import Links from "@/components/header/links";
 import Logo from "@/components/logo";
 import { Button } from "@/components/ui/button";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import clsx from "clsx";
 import { Avatar } from "@/components/plate-ui/avatar";
+import DialogWrapper from "@/components/dialog-wrapper";
+import Auth from "@/components/auth/auth";
 
 // Skeleton loading component for right actions
 const RightActionsSkeleton = () => (
@@ -23,6 +25,8 @@ const RightActionsSkeleton = () => (
 );
 
 export default function Header({ className = "" }: { className?: string }) {
+  const [authOpen, setAuthOpen] = useState<boolean>(true)
+
   const { data: user, isLoading } = useQuery({
     queryKey: ["session", "header"],
     queryFn: async () => {
@@ -44,11 +48,14 @@ export default function Header({ className = "" }: { className?: string }) {
         {user ? (
           <Menu user={user} isMobile={isMobile} />
         ) : (
-          <Link href="/auth">
-            <Button variant="outline" className="rounded-full">
-              Auth
-            </Button>
-          </Link>
+          <DialogWrapper 
+            open={authOpen}
+            onOpenChange={() => setAuthOpen(!authOpen)}
+            title="Authenticate"
+            trigger={<Button variant="outline" className="rounded-full">Auth</Button>}
+          >
+            <Auth />
+          </DialogWrapper>
         )}
       </div>
     );
