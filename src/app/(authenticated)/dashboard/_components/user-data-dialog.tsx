@@ -11,7 +11,6 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { getUserById, getWorkerUserId } from "@/lib/db/queries";
-import { Roles } from "@/app/types";
 import UserCard from "@/components/user-card";
 import { DoctorCard } from "@/components/doctors/doctor-card";
 import { Eye } from "lucide-react";
@@ -22,7 +21,7 @@ export default function UserDataDialog({
   role,
 }: {
   userId: string;
-  role: Roles;
+  role: User['role'];
 }) {
   const [userData, setUserData] = useState<User | { user: User, doctor: Doctor, schedules: Schedule[] } | null>();
 

@@ -15,19 +15,6 @@ import {
 import { service } from "@/lib/db/schema/service";
 import { z } from "zod";
 
-import * as schema from '@/lib/db/schema/index'
-import { type NeonHttpDatabase } from "drizzle-orm/neon-http";
-import { type PgTransaction } from "drizzle-orm/pg-core"; // core transaction type
-import { PostgresJsDatabase } from "drizzle-orm/postgres-js";
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export type DBInstance = 
-  PostgresJsDatabase<typeof schema> 
-| NeonHttpDatabase<typeof schema> 
-| PgTransaction<any, typeof schema, any>;
-
-export type Roles = "admin" | "user" | "doctor" | "receptionist";
-
 export const emailRegex = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/;
 export const phoneNumberRegex = /^(0\d{2}[\s-]?\d{7}|\d{11})$/;
 export const nationalIdRegex =

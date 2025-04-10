@@ -11,9 +11,8 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { MoreHorizontal } from "lucide-react";
 import { useState } from "react";
-import { Operation } from "@/lib/db/schema";
+import { Operation, User } from "@/lib/db/schema";
 import Link from "next/link";
-import { Roles } from "@/app/types";
 import { useRouter } from "next/navigation";
 import { updateOperationStatus } from "@/app/(authenticated)/dashboard/operations/actions";
 
@@ -24,7 +23,7 @@ export default function OperationActions({
 }: {
   operationId: string;
   status: Operation["status"];
-  role: Roles;
+  role: User['role'];
 }) {
   const router = useRouter();
   const [open, setOpen] = useState<boolean>(false);

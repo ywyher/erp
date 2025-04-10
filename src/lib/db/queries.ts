@@ -1,8 +1,8 @@
 "use server";
 
-import { DBInstance, Roles, tableMap } from "@/app/types";
+import { tableMap } from "@/app/types";
 import pluralize from "pluralize"; // Install with: npm install pluralize
-import db from "@/lib/db/index";
+import db, { DBInstance } from "@/lib/db/index";
 import {
   Doctor,
   doctor,
@@ -81,7 +81,7 @@ export async function isFieldVerified({
   };
 }
 
-export async function getUserById(userId: string, role: Roles) {
+export async function getUserById(userId: string, role: User['role']) {
   if (role == "user") {
     const result = await db.query.user.findFirst({
       where: (user, { eq }) => eq(user.id, userId),
@@ -125,7 +125,7 @@ export async function getUserById(userId: string, role: Roles) {
   }
 }
 
-export async function listUsers(role: Roles, merge: boolean = false) {
+export async function listUsers(role: User['role'], merge: boolean = false) {
   let users;
 
   if (role === "user") {
@@ -203,7 +203,7 @@ export async function listUsers(role: Roles, merge: boolean = false) {
   return users;
 }
 
-export async function searchUsers(query: string, role: Roles | "all") {
+export async function searchUsers(query: string, role: User['role'] | "all") {
   const lowerQuery = `%${query.toLowerCase()}%`;
 
   // Create the base conditions for the query

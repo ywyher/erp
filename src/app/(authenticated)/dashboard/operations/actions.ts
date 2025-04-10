@@ -1,6 +1,6 @@
 "use server";
 
-import db from "@/lib/db/index";
+import db, { DBInstance } from "@/lib/db/index";
 import {
   Appointment,
   doctor,
@@ -22,7 +22,6 @@ import { GetObjectCommand } from "@aws-sdk/client-s3";
 import { s3 } from "@/lib/utils";
 import { format } from "date-fns";
 import { operationDataSchema } from "@/app/(authenticated)/dashboard/operations/types";
-import { DBInstance } from "@/app/types";
 
 export const getOperations = async (userId: User["id"], role: User["role"]) => {
   let operations;

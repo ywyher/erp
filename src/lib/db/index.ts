@@ -7,12 +7,19 @@ import { neon, NeonQueryFunction } from "@neondatabase/serverless";
 import { drizzle as drizzleNeon, NeonHttpDatabase } from "drizzle-orm/neon-http";
 
 import * as schema from "./schema";
+import { PgTransaction } from "drizzle-orm/pg-core";
 
 type DatabaseClient = 
   | PostgresJsDatabase<typeof schema>
   | NeonHttpDatabase<typeof schema> & {
     $client: NeonQueryFunction<false, false>;
   }
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type DBInstance = 
+  PostgresJsDatabase<typeof schema> 
+| NeonHttpDatabase<typeof schema> 
+| PgTransaction<any, typeof schema, any>;
 
 const environment = process.env.ENV || "DEVELOPMENT";
 

@@ -2,8 +2,8 @@
 
 import { z } from "zod";
 import { checkFieldAvailability } from "./queries";
-import { DBInstance, tableMap, Tables, updateUserSchema } from "@/app/types";
-import db from "./index";
+import { tableMap, Tables, updateUserSchema } from "@/app/types";
+import db, { DBInstance } from "./index";
 import {
   account,
   medicalFile,
