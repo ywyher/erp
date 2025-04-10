@@ -15,7 +15,6 @@ import PostCard from "@/components/post-card";
 import { useQuery } from "@tanstack/react-query";
 import { getPosts } from "@/components/home/actions";
 import PostCardSkeleton from "@/components/post-card-skeleton";
-import { gradient } from "@/lib/gradiant";
 
 export default function Posts() {
     const [scrollProgress, setScrollProgress] = useState(0)

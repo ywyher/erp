@@ -16,7 +16,6 @@ import { getServices } from "@/app/(authenticated)/dashboard/(admin)/services/ac
 import ServiceCard from "@/components/service-card";
 import { IconName } from "@/components/icons-selector";
 import ServiceCardSkeleton from "@/components/service-card-skeleton";
-import { gradient } from "@/lib/gradiant";
 
 export default function Services() {
     const [scrollProgress, setScrollProgress] = useState(0)
