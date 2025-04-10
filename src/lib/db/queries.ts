@@ -2,7 +2,7 @@
 
 import { Roles, tableMap } from "@/app/types";
 import pluralize from "pluralize"; // Install with: npm install pluralize
-import db from "@/lib/db";
+import db from "@/lib/db/index.local";
 import {
   Doctor,
   doctor,

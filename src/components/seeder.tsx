@@ -1,7 +1,7 @@
 "use client";
 import LoadingBtn from "@/components/loading-btn";
 import { Button } from "@/components/ui/button";
-import { reset, seed } from "@/lib/db/seed";
+import { reset, seed } from "@/lib/db/seed.local";
 import { useQueryClient } from "@tanstack/react-query";
 import { Bean, ChevronLeft, ChevronRight, Trash2 } from "lucide-react";
 import { useState } from "react";

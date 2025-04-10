@@ -2,7 +2,7 @@
 
 import { PrescriptionTypes } from "@/app/(authenticated)/dashboard/appointments/[appointmentId]/types";
 import { consultationSchema } from "@/app/(authenticated)/dashboard/appointments/types";
-import db from "@/lib/db";
+import db from "@/lib/db/index.local";
 import {
   appointment,
   Appointment,

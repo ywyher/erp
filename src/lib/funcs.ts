@@ -163,8 +163,8 @@ export function groupSchedulesByDay(
 }
 
 export const getFileUrl = (name: string) => {
-  if (name == "pfp.jpg") {
-    return `/images/${name}`;
+  if (name == "default") {
+    return `/images/pfp.jpg`;
   }
   if (name?.includes("https") || name?.includes("http")) {
     return name;

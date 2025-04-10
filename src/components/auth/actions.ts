@@ -1,6 +1,6 @@
 "use server";
 
-import db from "@/lib/db";
+import db from "@/lib/db/index.local";
 import { User, user } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
 import { PgColumn } from "drizzle-orm/pg-core";

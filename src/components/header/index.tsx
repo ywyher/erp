@@ -63,7 +63,6 @@ export default function Header({ className = "" }: { className?: string }) {
             <>
               {isLoading ? (
                 <div className="flex items-center gap-4">
-                  <ThemeToggle />
                   <Avatar className={'bg-foreground rounded-full animate-pulse'} />
                 </div>
               ): (

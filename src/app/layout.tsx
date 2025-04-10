@@ -6,6 +6,7 @@ import "./globals.css";
 import { ReactQueryProvider } from "@/lib/react-query";
 import { NuqsAdapter } from "nuqs/adapters/next/app";
 import Seeder from "@/components/seeder";
+import Script from "next/script";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -44,7 +45,9 @@ export default async function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
-        {/* <Script src="//unpkg.com/react-scan/dist/auto.global.js" strategy="afterInteractive" /> */}
+        {process.env.ENV == 'DEVELOPMENT' && (
+          <Script src="//unpkg.com/react-scan/dist/auto.global.js" strategy="afterInteractive" />
+        )}
       </head>
       <body
         className={`

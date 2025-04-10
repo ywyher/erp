@@ -2,7 +2,7 @@
 
 import { createUser } from "@/lib/db/mutations";
 import { Schedules } from "@/app/(authenticated)/dashboard/types";
-import db from "@/lib/db";
+import db from "@/lib/db/index.local";
 import { receptionist, schedule, user } from "@/lib/db/schema";
 import { generateId, transformSchedulesToRecords } from "@/lib/funcs";
 import { revalidatePath } from "next/cache";

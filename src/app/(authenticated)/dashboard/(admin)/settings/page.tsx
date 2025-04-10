@@ -1,7 +1,7 @@
 import DashboardLayout from "@/app/(authenticated)/dashboard/_components/dashboard-layout";
 import { SettingsSidebar } from "@/app/(authenticated)/dashboard/(admin)/settings/_components/settings-tabs";
 import { getSession } from "@/lib/auth-client";
-import db from "@/lib/db";
+import db from "@/lib/db/index.local";
 import { getOperationDocument } from "@/lib/db/queries";
 import { headers } from "next/headers";
 import { forbidden } from "next/navigation";

@@ -65,6 +65,7 @@ export default function Services() {
           className="relative flex flex-col justify-center h-fit w-full"
           variant="home"
         >
+          
           {gradient('middle')}
           <Carousel
             setApi={setApi}

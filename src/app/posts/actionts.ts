@@ -1,6 +1,6 @@
 'use server'
 
-import db from "@/lib/db"
+import db from "@/lib/db/index.local"
 import { Post, post, user } from "@/lib/db/schema";
 import { and, count, eq, inArray, like, or } from "drizzle-orm";
 

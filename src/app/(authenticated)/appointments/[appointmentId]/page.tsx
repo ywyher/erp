@@ -3,7 +3,7 @@ import AppointmentTabs from "@/app/(authenticated)/dashboard/appointments/[appoi
 import CardLayout from "@/components/card-layout";
 import Header from "@/components/header";
 import { getSession } from "@/lib/auth-client";
-import db from "@/lib/db";
+import db from "@/lib/db/index.local";
 import {
   Appointment as TAppointment,
   Consultation,

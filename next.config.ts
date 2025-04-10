@@ -6,7 +6,7 @@ const nextConfig: NextConfig = {
     remotePatterns: [
       {
         protocol: "https",
-        hostname: "pub-d074aa57b59b465ebc13b907eca3345b.r2.dev",
+        hostname: new URL(process.env.NEXT_PUBLIC_S3_DEV_URL!).hostname,
         port: "",
         pathname: "/**",
       },

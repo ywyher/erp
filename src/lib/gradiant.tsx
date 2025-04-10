@@ -26,7 +26,7 @@ export const gradient = (pos: 'middle' | 'top-left' | 'bottom-right') => {
       return (
         <div className="absolute inset-0 -z-10 pointer-events-none">
           <div className="
-            absolute bottom-10 right-0
+            absolute bottom-0 right-0
             translate-x-1/4 translate-y-1/4
             h-[300px] w-[200px]
             rounded-full bg-secondary opacity-50 blur-[80px]

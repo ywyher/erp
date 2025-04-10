@@ -1,6 +1,6 @@
 "use server";
 
-import db from "@/lib/db";
+import db from "@/lib/db/index.local";
 import { doctor, schedule, user } from "@/lib/db/schema";
 import { getDaysInRange } from "@/lib/funcs";
 import { and, eq, sql, inArray, or, like, SQL } from "drizzle-orm";

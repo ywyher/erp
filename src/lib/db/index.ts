@@ -1,13 +1,11 @@
-import { drizzle } from "drizzle-orm/postgres-js"; // the way we connect
-import * as schema from "./schema"; // getting the schema
-import postgres from "postgres"; // getting the database driver
+import { drizzle } from "drizzle-orm/neon-http";
+import { neon } from "@neondatabase/serverless";
+import { config } from "dotenv";
+import * as schema from "./schema";
 
-import { type PostgresJsDatabase } from "drizzle-orm/postgres-js";
+config({ path: ".env" });
 
-export const client = postgres(process.env.POSTGRES_URL as string, { max: 1 });
-export const db: PostgresJsDatabase<typeof schema> = drizzle(client, {
-  schema,
-  logger: true /* to log all the sql query we make */,
-});
+const sql = neon(process.env.DATABASE_URL!);
+export const db = drizzle({ client: sql, schema: schema });
 
 export default db;
