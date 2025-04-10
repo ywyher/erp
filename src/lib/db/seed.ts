@@ -228,7 +228,6 @@ export async function seed() {
         role: "doctor",
         gender: 'male',
         dateOfBirth: '2003-01-20',
-        onBoarding: false,
         provider: 'email',
         createdAt: new Date(),
         updatedAt: new Date(),
@@ -274,7 +273,6 @@ export async function seed() {
         gender: 'male',
         provider: 'email',
         dateOfBirth: '1971-07-14',
-        onBoarding: false,
         createdAt: new Date(),
         updatedAt: new Date(),
       })
@@ -307,7 +305,6 @@ export async function seed() {
         provider: 'email',
         gender: 'female',
         dateOfBirth: '2008-01-20',
-        onBoarding: false,
         createdAt: new Date(),
         updatedAt: new Date(),
       })
@@ -352,7 +349,6 @@ export async function seed() {
         gender: 'female',
         provider: 'email',
         dateOfBirth: '205-02-25',
-        onBoarding: false,
         createdAt: new Date(),
         updatedAt: new Date(),
       })
@@ -550,7 +546,6 @@ export async function seed() {
       message: "Seed data inserted successfully!",
     };
   }  catch (error: unknown) {
-    console.error(`Error:`, error);
     if (error instanceof Error) {
       return { message: null, error: error.message };
     } else {

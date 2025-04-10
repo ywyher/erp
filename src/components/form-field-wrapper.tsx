@@ -117,10 +117,13 @@ export const FormFieldWrapper: React.FC<FormFieldWrapperProps> = ({
       control={form.control}
       name={name}
       defaultValue={defaultValue ? defaultValue : ""}
-      render={({ field }) => (
+      render={({ field, fieldState }) => (
         <FormItem className="w-full">
           {label && (
-            <FormLabel className="capitalize">
+            <FormLabel className={cn(
+              "capitalize",
+              fieldState.error && "text-red-500"
+            )}>
               {label}{" "}
               {optional && (
                 <span className="text-sm text-muted">(Optional)</span>

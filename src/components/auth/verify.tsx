@@ -18,6 +18,7 @@ import { emailOtp, signIn } from "@/lib/auth-client";
 import LoadingBtn from "@/components/loading-btn";
 import { useQueryClient } from "@tanstack/react-query";
 import { getEmailByPhoneNumber, getEmailByUsername } from "@/lib/db/queries";
+import { Button } from "@/components/ui/button";
 
 export const verifySchema = z.object({
     otp: z.string().min(6, "OTP is required."),
@@ -79,32 +80,47 @@ export default function Verify({
             return;
         } 
 
-        let authData;
-        if (identifier == "email") {
-            authData = await signIn.email({
-                email: identifierValue,
-                password: password,
-            });
-        } else if (identifier == "phoneNumber") {
-            authData = await signIn.phoneNumber({
-                phoneNumber: identifierValue,
-                password: password,
-            });
-        } else if (identifier == "username") {
-            authData = await signIn.username({
-                username: identifierValue,
-                password: password,
-            });
-        }
-    
-        if(authData?.error) {
+        const { error: signInError } = await signIn.email({
+            email: email,
+            password: password,
+        });
+
+        if(signInError) {
             setIsLoading(false);
-            toast.error(authData?.error.message);
+            toast.error(signInError.message);
         }
 
         queryClient.invalidateQueries({ queryKey: ["session"] })
         setOpen(false)
         setPort('check')
+    }
+
+    const handleResendOtp = async () => {
+        let email: string | null = identifierValue
+        if(identifier == 'username') {
+            email = await getEmailByUsername({ username: identifierValue }) || null
+        }else if(identifier == 'phoneNumber') {
+            email = await getEmailByPhoneNumber({ phoneNumber: identifierValue }) || null
+        }
+
+        if(!email) {
+            toast.error("Failed to get email")
+            return
+        }
+
+        const { error } = await emailOtp.sendVerificationOtp({
+            email: email,
+            type: "email-verification"
+        })
+
+        if(error) {
+            toast.error(error.message)
+            return;
+        }
+
+        toast.message("OTP Sent...", {
+            description: "May take 1-5 mintues"
+        })
     }
 
     const onError = (errors: FieldErrors<FormValues>) => {
@@ -115,50 +131,63 @@ export default function Verify({
     }
 
     return (
-        <Form {...form}>
-            <form
-                onSubmit={form.handleSubmit(onSubmit, onError)}
-                className="flex flex-col gap-4 justify-center items-center w-full max-w-sm mx-auto"
-            >
-                <FormField
-                    control={form.control}
-                    name="otp"
-                    render={({ field }) => (
-                        <FormItem className="w-full">
-                        <FormLabel className="text-center block text-lg mb-2 font-semibold">
-                            One-Time Password
-                        </FormLabel>
-                        <FormControl>
-                            <InputOTP
-                                maxLength={6}
-                                {...field}
-                            >
-                            <InputOTPGroup className="flex flex-row gap-3">
-                                {[...Array(6)].map((_, index) =>
-                                    index === 2 ? (
-                                        <React.Fragment key={index}>
+        <>
+            <Form {...form}>
+                <form
+                    onSubmit={form.handleSubmit(onSubmit, onError)}
+                    className="flex flex-col gap-4 justify-center items-center w-full max-w-sm mx-auto"
+                >
+                    <FormField
+                        control={form.control}
+                        name="otp"
+                        render={({ field }) => (
+                            <FormItem className="w-full">
+                            <FormLabel className="text-center block text-lg mb-2 font-semibold">
+                                One-Time Password
+                            </FormLabel>
+                            <FormControl>
+                                <InputOTP
+                                    maxLength={6}
+                                    {...field}
+                                >
+                                <InputOTPGroup className="flex flex-row gap-3">
+                                    {[...Array(6)].map((_, index) =>
+                                        index === 2 ? (
+                                            <React.Fragment key={index}>
+                                                <InputOTPSlot
+                                                    index={index}
+                                                    className="w-11 h-12 text-xl text-center border rounded-md focus:ring-2 focus:ring-primary transition-all"
+                                                />
+                                                <InputOTPSeparator className="mx-2 text-lg" />
+                                            </React.Fragment>
+                                        ) : (
                                             <InputOTPSlot
-                                                index={index}
-                                                className="w-11 h-12 text-xl text-center border rounded-md focus:ring-2 focus:ring-primary transition-all"
+                                            key={index}
+                                            index={index}
+                                            className="w-11 h-12 text-xl text-center border rounded-md focus:ring-2 focus:ring-primary transition-all"
                                             />
-                                            <InputOTPSeparator className="mx-2 text-lg" />
-                                        </React.Fragment>
-                                    ) : (
-                                        <InputOTPSlot
-                                        key={index}
-                                        index={index}
-                                        className="w-11 h-12 text-xl text-center border rounded-md focus:ring-2 focus:ring-primary transition-all"
-                                        />
-                                    )
-                                )}
-                            </InputOTPGroup>
-                            </InputOTP>
-                        </FormControl>
-                        </FormItem>
-                    )}
-                />
-                <LoadingBtn isLoading={isLoading} className="w-full mt-4">Verify</LoadingBtn>
-            </form>
-        </Form>
+                                        )
+                                    )}
+                                </InputOTPGroup>
+                                </InputOTP>
+                            </FormControl>
+                            </FormItem>
+                        )}
+                    />
+                    <LoadingBtn isLoading={isLoading} className="w-full">Verify</LoadingBtn>
+                </form>
+            </Form>
+            <div 
+                className="w-full max-w-sm mx-auto mt-2"
+            >
+                <Button 
+                    variant="link" 
+                    onClick={() => handleResendOtp()}
+                    className="w-fit text-start m-0 p-0"
+                >
+                    Didnt recieve an email ?
+                </Button>
+            </div>
+        </>
     )
 }

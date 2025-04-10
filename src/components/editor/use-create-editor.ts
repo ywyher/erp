@@ -73,6 +73,7 @@ import { CsvPlugin } from '@udecode/plate-csv';
 import { MarkdownPlugin } from '@udecode/plate-markdown';
 import { TrailingBlockPlugin } from '@udecode/plate-trailing-block';
 import { deletePlugins } from '@/components/editor/plugins/delete-plugins';
+import { BlockSelectionPlugin } from '@udecode/plate-selection/react';
 
 const components = {
   [BlockquotePlugin.key]: BlockquoteElement,
@@ -132,6 +133,7 @@ export const plugins = [
   InlineEquationPlugin,
   tablePlugin,
   HighlightPlugin,
+  BlockSelectionPlugin,
 
   ...indentListPlugins,
 

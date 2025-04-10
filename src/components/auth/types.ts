@@ -1,3 +1,4 @@
+import { nationalIdRegex, phoneNumberRegex } from "@/app/types";
 import { genders } from "@/lib/constants";
 import { z } from "zod";
 
@@ -15,8 +16,8 @@ export const authSchema = z.object({
 
 export const loginSchema = z.object({
   field: z.string().min(3, "Field must at least be 3 characters."),
-  password: z.string().min(3, {
-    message: "Password must be at least 3 characters.",
+  password: z.string().min(1, {
+    message: "Password is required.",
   }),
 });
 
@@ -27,7 +28,7 @@ export const registerSchema = z
     name: z.string().toLowerCase().min(3, {
       message: "Name must be at least 3 characters.",
     }),
-    email: z.string().email().toLowerCase().optional(),
+    email: z.string().email().toLowerCase(),
     username: z.string().toLowerCase().trim().min(3, {
       message: "Username must be at least 3 characters.",
     }),
@@ -44,12 +45,30 @@ export const registerSchema = z
       message: "Password must be at least 8 characters.",
     }),
   })
-  .superRefine(({ confirmPassword, password }, ctx) => {
+  .superRefine(({ confirmPassword, password, phoneNumber, nationalId }, ctx) => {
     if (confirmPassword !== password) {
       ctx.addIssue({
         code: "custom",
         message: "The passwords did not match",
         path: ["confirmPassword"],
       });
+    }
+    if (phoneNumber) {
+      if(!phoneNumber.match(phoneNumberRegex)) {
+        ctx.addIssue({
+          code: "custom",
+          message: "Incorrect password format",
+          path: ["phoneNumber"],
+        });
+      }
+    }
+    if (nationalId) {
+      if(!nationalId.match(nationalIdRegex)) {
+        ctx.addIssue({
+          code: "custom",
+          message: "Incorrect nationalId format",
+          path: ["nationalId"],
+        });
+      }
     }
   });

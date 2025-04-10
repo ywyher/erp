@@ -38,7 +38,6 @@ export default async function Appointments() {
               hiddenColumns={["id", "role", "type", "createdBy"]}
             />
           </div>
-          
           <div className="fixed bottom-0 left-0 w-full z-10">
             <div className="container mx-auto p-4">
               <Button className="w-full shadow-md">

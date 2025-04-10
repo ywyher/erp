@@ -1,6 +1,6 @@
 "use client";
 
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -8,7 +8,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { getSession } from "@/lib/auth-client";
+import { getSession, signOut } from "@/lib/auth-client";
 
 import {
   SidebarFooter as CSidebarFooter,
@@ -21,12 +21,13 @@ import { ChevronUp, LogOut, Settings } from "lucide-react";
 import { useRouter } from "next/navigation";
 import Pfp from "@/components/pfp";
 import { useState } from "react";
+import { toast } from "sonner";
 
 export default function SidebarFooter() {
   const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
   const { state } = useSidebar();
-
+  
   const { data: user, isLoading } = useQuery({
     queryKey: ["session", "dashboardSidebarFooter"],
     queryFn: async () => {
@@ -34,6 +35,21 @@ export default function SidebarFooter() {
       return data?.user || null;
     },
   });
+  
+  const queryClient = useQueryClient()
+
+  const handleLogout = async () => {
+    const { error } = await signOut()
+    
+    if(error) {
+      toast.error(error.message)
+      return;
+    }
+
+    queryClient.invalidateQueries({ queryKey: ['session'] })
+    router.push('/')
+  }
+
 
   if (isLoading) return <div>Loading...</div>;
 
@@ -59,9 +75,9 @@ export default function SidebarFooter() {
                 ) : (
                   <DropdownMenuTrigger
                     className="
-                                            items-center rounded-lg transition
-                                            hover:bg-white hover:bg-opacity-10
-                                        "
+                      items-center rounded-lg transition
+                      hover:bg-white hover:bg-opacity-10
+                    "
                   >
                     <Pfp image={user.image || ""} />
                   </DropdownMenuTrigger>
@@ -83,7 +99,7 @@ export default function SidebarFooter() {
                   </DropdownMenuItem>
                   <DropdownMenuItem
                     className="cursor-pointer"
-                    onClick={() => router.push("/logout")}
+                    onClick={() => handleLogout()}
                   >
                     <LogOut />
                     <span>Log out</span>

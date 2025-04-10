@@ -1,13 +1,9 @@
 "use client";
 
 import Check from "@/components/auth/check";
-import { useEffect, useState } from "react";
+import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import Register from "@/components/auth/register";
 import Login from "@/components/auth/login";
-import { useQuery } from "@tanstack/react-query";
-import { getSession } from "@/lib/auth-client";
-import { useRouter } from "next/navigation";
-import { User } from "@/lib/db/schema";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
 import Verify from "@/components/auth/verify";
@@ -15,12 +11,15 @@ import Verify from "@/components/auth/verify";
 export type AuthPort = "check" | "register" | "login" | "verify"
 export type AuthIdentifier = "email" | "phoneNumber" | "username"
 
-export default function Auth() {
+export default function Auth({
+  setOpen
+}: {
+  setOpen: Dispatch<SetStateAction<boolean>>
+}) {
   const [port, setPort] = useState<AuthPort>("check");
   const [identifierValue, setIdentifierValue] = useState<string>("")
   const [identifier, setIdentifier] = useState<AuthIdentifier | null>(null)
   const [password, setPassword] = useState<string>("")
-  const [open, setOpen] = useState<boolean>(true)
 
   useEffect(() => {
     console.log(identifier, identifierValue, port, password)

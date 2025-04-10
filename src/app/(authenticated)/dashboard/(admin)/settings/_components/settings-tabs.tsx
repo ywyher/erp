@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect, useMemo } from "react";
 import { motion } from "framer-motion";
-import OperationDocumentUrl from "@/app/(authenticated)/dashboard/settings/_components/operation-document";
+import OperationDocumentUrl from "@/app/(authenticated)/dashboard/(admin)/settings/_components/operation-document";
 
 interface Section {
   id: string;
@@ -38,116 +38,138 @@ export const SettingsSidebar: React.FC<SettingsSidebarProps> = ({
     // Add more sections as needed
   ], [operationDocument, userId]);
 
-  // Initialize with stored value or default to 0
-  const [activeSection, setActiveSection] = useState<number>(() => {
-    // Try to get the stored section from localStorage on initial load
-    const stored = localStorage.getItem("activeSettingsSection");
-    return stored ? parseInt(stored, 10) : 0;
-    return 0;
-  });
-
+  // Fix localStorage by ensuring it only runs on client-side
+  const [activeSection, setActiveSection] = useState<number>(0);
   const sectionRefs = useRef<(HTMLDivElement | null)[]>([]);
   const [isScrolling, setIsScrolling] = useState(false);
   const initialLoadRef = useRef(true);
 
-  // Initialize refs array
+  // Safe localStorage getter with browser check
   useEffect(() => {
-    sectionRefs.current = sectionRefs.current.slice(0, sections.length);
+    if (typeof window !== 'undefined') {
+      const stored = localStorage.getItem("activeSettingsSection");
+      if (stored) {
+        const sectionIndex = parseInt(stored, 10);
+        setActiveSection(sectionIndex);
+      }
+
+      // Check URL hash on initial load
+      const hash = window.location.hash.replace("#", "");
+      if (hash) {
+        const sectionIndex = sections.findIndex((section) => section.id === hash);
+        if (sectionIndex !== -1) {
+          setActiveSection(sectionIndex);
+        }
+      }
+    }
+  }, [sections]);
+
+  // Store active section in localStorage whenever it changes
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem("activeSettingsSection", activeSection.toString());
+    }
+  }, [activeSection]);
+
+  // Initialize refs array only when sections change
+  useEffect(() => {
+    sectionRefs.current = Array(sections.length).fill(null);
   }, [sections.length]);
 
-  // On initial load, scroll to the stored active section
+  // Scroll to the active section on initial load
   useEffect(() => {
-    if (initialLoadRef.current && sectionRefs.current[activeSection]) {
+    if (initialLoadRef.current && typeof window !== 'undefined') {
       // Use a small timeout to ensure the DOM is fully loaded
-      setTimeout(() => {
+      const timer = setTimeout(() => {
         sectionRefs.current[activeSection]?.scrollIntoView({
           behavior: "auto",
         });
         initialLoadRef.current = false;
       }, 100);
+      
+      return () => clearTimeout(timer);
     }
   }, [activeSection]);
-
-  // Store active section in localStorage whenever it changes
-  useEffect(() => {
-    localStorage.setItem("activeSettingsSection", activeSection.toString());
-  }, [activeSection]);
-
-  // Check URL hash on load
-  useEffect(() => {
-    const hash = window.location.hash.replace("#", "");
-    if (hash) {
-      const sectionIndex = sections.findIndex((section) => section.id === hash);
-      if (sectionIndex !== -1) {
-        setActiveSection(sectionIndex);
-      }
-    }
-  }, [sections]);
 
   // Scroll to the section when clicking on navigation
   const scrollToSection = (index: number) => {
     setActiveSection(index);
     setIsScrolling(true);
 
-    if (sectionRefs.current[index]) {
+    if (sectionRefs.current[index] && typeof window !== 'undefined') {
       sectionRefs.current[index]?.scrollIntoView({ behavior: "smooth" });
 
       // Update URL hash without triggering a page jump
-      history.pushState(null, "", `#${sections[index].id}`);
+      window.history.pushState(null, "", `#${sections[index].id}`);
 
       // Reset scrolling state after animation completes
-      setTimeout(() => {
+      const timer = setTimeout(() => {
         setIsScrolling(false);
       }, 500);
+      
+      return () => clearTimeout(timer);
     }
   };
 
-  // Update active section based on scroll position
+  // Update active section based on scroll position - with debounce
   useEffect(() => {
+    if (typeof window === 'undefined') return;
+    
+    let scrollTimer: NodeJS.Timeout | null = null;
+    
     const handleScroll = () => {
       if (isScrolling || initialLoadRef.current) return;
+      
+      // Debounce scroll handler for better performance
+      if (scrollTimer) clearTimeout(scrollTimer);
+      
+      scrollTimer = setTimeout(() => {
+        const sectionElements = sectionRefs.current;
+        if (!sectionElements.length) return;
 
-      const sectionElements = sectionRefs.current;
-      if (!sectionElements.length) return;
+        let foundActive = false;
+        
+        // Find the section closest to the top of the viewport
+        for (let i = 0; i < sectionElements.length; i++) {
+          const element = sectionElements[i];
+          if (!element) continue;
 
-      let foundActive = false;
-      // Find the section closest to the top of the viewport
-      for (let i = 0; i < sectionElements.length; i++) {
-        const element = sectionElements[i];
-        if (!element) continue;
-
-        const rect = element.getBoundingClientRect();
-        if (rect.top <= 100 && rect.bottom >= 100) {
-          setActiveSection(i);
-          foundActive = true;
-          break;
+          const rect = element.getBoundingClientRect();
+          if (rect.top <= 100 && rect.bottom >= 100) {
+            setActiveSection(i);
+            foundActive = true;
+            break;
+          }
         }
-      }
 
-      // If we've scrolled past all sections, set the last one as active
-      if (!foundActive && sectionElements[sectionElements.length - 1]) {
-        const lastRect =
-          sectionElements[sectionElements.length - 1]?.getBoundingClientRect();
-        if (lastRect && lastRect.top < 0) {
-          setActiveSection(sectionElements.length - 1);
+        // If we've scrolled past all sections, set the last one as active
+        if (!foundActive && sectionElements[sectionElements.length - 1]) {
+          const lastRect =
+            sectionElements[sectionElements.length - 1]?.getBoundingClientRect();
+          if (lastRect && lastRect.top < 0) {
+            setActiveSection(sectionElements.length - 1);
+          }
         }
-      }
+      }, 50);
     };
 
     window.addEventListener("scroll", handleScroll, { passive: true });
-    return () => window.removeEventListener("scroll", handleScroll);
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+      if (scrollTimer) clearTimeout(scrollTimer);
+    };
   }, [isScrolling, sections]);
 
   return (
     <div className="flex w-full h-screen overflow-hidden bg-background">
-      {/* Left sidebar navigation - wider with improved styling */}
+      {/* Left sidebar navigation */}
       <div className="sticky top-0 w-64 h-screen pt-8 bg-background border-r border-border">
         <div className="px-4 mb-6">
           <h2 className="text-xl font-semibold text-foreground">Settings</h2>
         </div>
 
         <div className="relative h-full px-4">
-          {/* Vertical line connecting all nav items - more subtle */}
+          {/* Vertical line connecting all nav items */}
           <div className="absolute left-8 top-2 bottom-12 w-px bg-border/40 -z-10" />
 
           {/* Navigation items */}
@@ -163,7 +185,7 @@ export const SettingsSidebar: React.FC<SettingsSidebarProps> = ({
                         : "text-muted-foreground hover:text-foreground"
                     }`}
                 >
-                  {/* Animated indicator dot with improved transition */}
+                  {/* Animated indicator dot */}
                   {index === activeSection ? (
                     <motion.div
                       className="absolute left-6 w-2.5 h-2.5 rounded-full bg-primary -translate-x-1/2"
@@ -200,7 +222,7 @@ export const SettingsSidebar: React.FC<SettingsSidebarProps> = ({
       </div>
 
       {/* Right side content - scrollable container */}
-      <div className="flex-1 h-screen overflow-y-auto scrollbar-thin scrollbar-thumb-border scrollbar-track-muted/20">
+      <div className="flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-border scrollbar-track-muted/20">
         {sections.map((section, index) => (
           <div
             key={section.id}

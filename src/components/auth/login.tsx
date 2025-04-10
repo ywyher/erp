@@ -3,18 +3,18 @@
 import { emailOtp, forgetPassword, signIn, signOut } from "@/lib/auth-client"; //import the auth client
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Form } from "@/components/ui/form";
-import { useForm } from "react-hook-form";
-import { loginSchema } from "@/app/(auth)/types";
+import { FieldErrors, useForm } from "react-hook-form";
+import { loginSchema } from "@/components/auth/types";
 import { Dispatch, SetStateAction, useState } from "react";
 import LoadingBtn from "@/components/loading-btn";
 import { z } from "zod";
 import { FormFieldWrapper } from "@/components/form-field-wrapper";
 import { toast } from "sonner";
-import { useRouter } from "next/navigation";
-import { getEmail } from "@/app/(auth)/actions";
+import { getEmail } from "@/components/auth/actions";
 import { useQueryClient } from "@tanstack/react-query";
 import { AuthIdentifier, AuthPort } from "@/components/auth/auth";
 import { getEmailByPhoneNumber, getEmailByUsername, isFieldVerified } from "@/lib/db/queries";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 type LoginProps = {
   identifierValue: string 
@@ -32,8 +32,8 @@ export default function Login({
   setPassword
 }: LoginProps) {
   const [isLoading, setIsLoading] = useState(false);
-  const router = useRouter();
   const queryClient = useQueryClient();
+  const isMobile = useIsMobile();
 
   const form = useForm<z.infer<typeof loginSchema>>({
     resolver: zodResolver(loginSchema),
@@ -45,7 +45,7 @@ export default function Login({
 
   if (!identifierValue) return <>Loading...</>;
 
-  const login = async (data: z.infer<typeof loginSchema>) => {
+  const handleLogin = async (data: z.infer<typeof loginSchema>) => {
     setIsLoading(true);
     
     let authData;
@@ -72,21 +72,22 @@ export default function Login({
       return;
     }
 
-    const { isVerified } = await isFieldVerified({ field: 'email', value: identifierValue })
+    let email: string | null = identifierValue
+    if(identifier == 'username') {
+      email = await getEmailByUsername({ username: data.field }) || null
+    }else if(identifier == 'phoneNumber') {
+      email = await getEmailByPhoneNumber({ phoneNumber: data.field }) || null
+    }
+
+    if(!email) {
+      toast.error("Failed to get email")
+      return
+    }
+
+    const { isVerified } = await isFieldVerified({ field: 'email', value: email })
 
     if(!isVerified) {
       await signOut();
-      let email: string | null = identifierValue
-      if(identifier == 'username') {
-        email = await getEmailByUsername({ username: data.field }) || null
-      }else if(identifier == 'phoneNumber') {
-        email = await getEmailByPhoneNumber({ phoneNumber: data.field }) || null
-      }
-
-      if(!email) {
-        toast.error("Failed to get email")
-        return
-      }
 
       const { error } = await emailOtp.sendVerificationOtp({
         email: email,
@@ -110,13 +111,18 @@ export default function Login({
 
   const resetPassword = async () => {
     if (!identifierValue) return;
-    let email;
+    let email: string | null = identifierValue;
     if (identifier != "email") {
-      email = await getEmail({ value: identifierValue, field: identifier as 'username' | 'phoneNumber' })
+      email = await getEmail({ value: identifierValue, field: identifier as 'username' | 'phoneNumber' }) || null
+    }
+
+    if(!email) {
+      toast.error("Failed to get email")
+      return
     }
 
     const { error } = await forgetPassword({
-      email: identifier == 'email' ? identifierValue : email as string,
+      email: email,
       redirectTo: "/reset-password",
     });
 
@@ -127,11 +133,20 @@ export default function Login({
     }
   };
 
+  const handleError = (errors: FieldErrors<z.infer<typeof loginSchema>>) => {
+    const position = isMobile ? "top-center" : "bottom-right"
+    const firstError = Object.values(errors)[0];
+
+    if (firstError?.message) {
+      toast.error(firstError.message, { position });
+    }
+  }
+
   return (
     <div>
       <Form {...form}>
         <form
-          onSubmit={form.handleSubmit(login)}
+          onSubmit={form.handleSubmit(handleLogin, handleError)}
           className="flex flex-col gap-4"
         >
           <div className="flex flex-col gap-2">
@@ -140,12 +155,14 @@ export default function Login({
               disabled={true}
               name="field"
               label={identifier || ""}
+              showError={false}
             />
             <FormFieldWrapper
               form={form}
               type="password"
               name="password"
               label="Password"
+              showError={false}
             />
             <div>
               Forget Your Password,{" "}

@@ -1,7 +1,6 @@
 import { getFileUrl } from "@/lib/funcs";
 import { useState } from "react";
 import { toast } from "sonner";
-import { UploadedFile } from "types/file";
 
 async function computeSHA256(file: File): Promise<string> {
   const arrayBuffer = await file.arrayBuffer();
@@ -11,6 +10,14 @@ async function computeSHA256(file: File): Promise<string> {
     .map((b) => b.toString(16).padStart(2, "0"))
     .join("");
   return hashHex;
+}
+
+interface UploadedFile {
+  key: string;    // Unique identifier
+  url: string;    // Public URL of the uploaded file
+  name: string;   // Original filename
+  size: number;   // File size in bytes
+  type: string;   // MIME type
 }
 
 export function useFileUpload() {
@@ -23,7 +30,7 @@ export function useFileUpload() {
     checksum: string,
   ) => {
     const response = await fetch(
-      `${process.env.APP_URL}/api/upload/get-presigned-url`,
+      `${process.env.NEXT_PUBLIC_APP_URL}/api/upload/get-presigned-url`,
       {
         method: "POST",
         headers: {

@@ -2,12 +2,10 @@
 
 import { DndPlugin } from '@udecode/plate-dnd';
 import { PlaceholderPlugin } from '@udecode/plate-media/react';
-import { NodeIdPlugin } from '@udecode/plate-node-id';
 
 import { DraggableAboveNodes } from '@/components/plate-ui/draggable';
 
 export const dndPlugins = [
-  NodeIdPlugin,
   DndPlugin.configure({
     options: {
       enableScroller: true,

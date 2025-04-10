@@ -19,7 +19,6 @@ type DoctorWithDetails = {
   dateOfBirth: string | null;
   phoneNumberVerified: boolean;
   emailVerified: boolean;
-  onBoarding: boolean;
   image: string | null;
   role: string;
   provider: string;

@@ -4,7 +4,7 @@ import { FormFieldWrapper } from "@/components/form-field-wrapper";
 import { Form } from "@/components/ui/form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useState, useRef } from "react";
-import { useForm } from "react-hook-form";
+import { FieldErrors, useForm } from "react-hook-form";
 import LoadingBtn from "@/components/loading-btn";
 import { z } from "zod";
 import { toast } from "sonner";
@@ -21,12 +21,14 @@ import { createPost } from "@/app/(authenticated)/dashboard/posts/actions";
 import { socialStatuses } from "@/lib/constants";
 import { useProcessStore } from "@/components/editor/store";
 import { Editor } from '@udecode/plate';
+import { useIsMobile } from "@/hooks/use-mobile";
 
 export default function CreatePost() {
   const [, setOpen] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [previewUrl, setPreviewUrl] = useState<string>();
   
+  const isMobile = useIsMobile()
   const editorRef = useRef<Editor | null>(null);
 
   const router = useRouter();
@@ -113,16 +115,20 @@ export default function CreatePost() {
     }
   };
 
-  // const onError = () => {
-  //   console.error(form.formState.errors)
-  //   toast.error(Object.values(form.formState.errors)[0].message);
-  // };
+  const onError = (errors: FieldErrors<z.infer<typeof postSchema>>) => {
+    const position = isMobile ? "top-center" : "bottom-right"
+    const firstError = Object.values(errors)[0];
+
+    if (firstError?.message) {
+      toast.error(firstError.message, { position });
+    }
+  }
 
   return (
     <DashboardLayout title="Create a post">
       <Form {...form}>
         <form
-          onSubmit={form.handleSubmit(onSubmit)}
+          onSubmit={form.handleSubmit(onSubmit, onError)}
           className="flex flex-col gap-5"
         >
           <div className="flex flex-col gap-3 max-w-[95%]">
@@ -154,13 +160,14 @@ export default function CreatePost() {
                 type="file"
                 accept="image/*"
                 onFileChange={handleFileChange}
+                showError={false}
               />
             )}
-            <FormFieldWrapper form={form} name="title" label="Title" />
-            <FormFieldWrapper form={form} name="status" label="Status" type="select" options={socialStatuses} />
-            <FormFieldWrapper form={form} name="category" label="Category" type="select" options={postCategoryStatuses} />
-            <FormFieldWrapper form={form} name="tags" label="Tags" type="tags" />
-            <FormFieldWrapper form={form} name="content" label="Editor" type="editor" editorRef={editorRef} />
+            <FormFieldWrapper form={form} showError={false} name="title" label="Title" />
+            <FormFieldWrapper form={form} showError={false} name="status" label="Status" type="select" options={socialStatuses} />
+            <FormFieldWrapper form={form} showError={false} name="category" label="Category" type="select" options={postCategoryStatuses} />
+            <FormFieldWrapper form={form} showError={false} name="tags" label="Tags" type="tags" />
+            <FormFieldWrapper form={form} showError={false} name="content" label="Editor" type="editor" editorRef={editorRef} />
           </div>
           <LoadingBtn isLoading={isLoading || isProcessing}>Create</LoadingBtn>
         </form>

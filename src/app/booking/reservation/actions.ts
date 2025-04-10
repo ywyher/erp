@@ -27,7 +27,6 @@ export const getAppointment = async (appointmentId: Appointment["id"]) => {
           nationalId: user.nationalId,
           phoneNumberVerified: user.phoneNumberVerified,
           emailVerified: user.emailVerified,
-          onBoarding: user.onBoarding,
           image: user.image,
           role: user.role,
           createdAt: user.createdAt,

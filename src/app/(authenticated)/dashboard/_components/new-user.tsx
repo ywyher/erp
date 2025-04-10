@@ -11,7 +11,7 @@ import { Form } from "@/components/ui/form";
 import { FormFieldWrapper } from "@/components/form-field-wrapper";
 import LoadingBtn from "@/components/loading-btn";
 import { z } from "zod";
-import { updateUserSchema } from "@/app/types";
+import { applySharedRefinements, baseUserSchema } from "@/app/types";
 import { Dispatch, SetStateAction, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -30,6 +30,9 @@ import {
   DrawerTrigger,
 } from "@/components/ui/drawer";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { genders } from "@/lib/constants";
+
+const newUserSchema = applySharedRefinements(baseUserSchema);
 
 export default function NewUser({
   setCreatedUserId,
@@ -39,14 +42,14 @@ export default function NewUser({
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [open, setOpen] = useState<boolean>(false);
 
-  const form = useForm<z.infer<typeof updateUserSchema>>({
-    resolver: zodResolver(updateUserSchema),
+  const form = useForm<z.infer<typeof newUserSchema>>({
+    resolver: zodResolver(newUserSchema),
   });
   
   const isMobile = useIsMobile();
 
   const handleCreateUser = async (
-    data: z.infer<typeof updateUserSchema> & { password?: string },
+    data: z.infer<typeof newUserSchema> & { password?: string },
   ) => {
     setIsLoading(true);
     data.password = data.nationalId;
@@ -69,19 +72,39 @@ export default function NewUser({
   const child = (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(handleCreateUser)} className="flex flex-col gap-2">
-        <FormFieldWrapper form={form} name="name" label="Name" />
-        <FormFieldWrapper
-          defaultValue={generateFakeField("username")}
-          form={form}
-          name="username"
-          label="Username"
-        />
-        <FormFieldWrapper form={form} name="email" label="Email" />
-        <FormFieldWrapper
-          form={form}
-          name="phoneNumber"
-          label="Phone Number"
-        />
+        <div className="flex flex-row gap-2">
+          <FormFieldWrapper form={form} name="name" label="Name" />
+          <FormFieldWrapper
+            defaultValue={generateFakeField("username")}
+            form={form}
+            name="username"
+            label="Username"
+          />
+        </div>
+        <div className="flex flex-row gap-2">
+          <FormFieldWrapper form={form} name="email" label="Email" />
+          <FormFieldWrapper
+            form={form}
+            name="phoneNumber"
+            label="Phone Number"
+            optional
+          />
+        </div>
+        <div className="flex flex-row gap-2">
+          <FormFieldWrapper
+            form={form}
+            name="dateOfBirth"
+            label="Date of birth"
+            type="date"
+          />
+          <FormFieldWrapper 
+            form={form}
+            name="gender"
+            label="gender"
+            type="select"
+            options={genders}
+          />
+        </div>
         <FormFieldWrapper
           form={form}
           name="nationalId"

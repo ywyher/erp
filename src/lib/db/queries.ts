@@ -24,7 +24,7 @@ import {
   sql,
 } from "drizzle-orm";
 import { getDaysInRange } from "@/lib/funcs";
-import { operationDocumentKey } from "@/app/(authenticated)/dashboard/settings/keys";
+import { operationDocumentKey } from "@/app/(authenticated)/dashboard/(admin)/settings/keys";
 
 export async function getUserProvider(
   userId: string,
@@ -296,8 +296,9 @@ export const getOperationDocument = async ({
       .from(settings)
       .where(eq(settings.key, operationDocumentKey));
 
-    if (!operationDocument)
+    if (!operationDocument) {
       throw new Error("Document not uploaded, Contact the admin to upload the document!");
+    }
 
     return {
       name: operationDocument.value,
@@ -306,11 +307,8 @@ export const getOperationDocument = async ({
   } catch (error: unknown) {
     // Type guard to check if error is an Error object
     if (error instanceof Error) {
-      console.error(`Error deleting file from S3: ${name}`, error);
       return { message: null, error: error.message };
     } else {
-      // Handle case where error is not an Error object
-      console.error(`Unknown error deleting file from S3: ${name}`);
       return { message: null, error: "Failed to delete file!" };
     }
   }

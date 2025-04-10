@@ -1,6 +1,6 @@
 "use server";
 
-import { settingSchema } from "@/app/(authenticated)/dashboard/settings/types";
+import { settingSchema } from "@/app/(authenticated)/dashboard/(admin)/settings/types";
 import db from "@/lib/db";
 import { settings, User } from "@/lib/db/schema";
 import { generateId } from "@/lib/funcs";

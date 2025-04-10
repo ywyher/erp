@@ -20,7 +20,7 @@ type DialogWrapperProps = {
   children: React.ReactNode;
   className?: string;
   open: boolean;
-  onOpenChange: Dispatch<SetStateAction<boolean>>;
+  setOpen: Dispatch<SetStateAction<boolean>>;
   trigger?: React.ReactNode; // Optional trigger element
 }
 
@@ -29,14 +29,14 @@ export default function DialogWrapper({
   children, 
   className = "", 
   open, 
-  onOpenChange,
+  setOpen,
   trigger
 }: DialogWrapperProps) {
   const isMobile = useIsMobile();
 
   if (isMobile) {
     return (
-      <Drawer open={open} onOpenChange={onOpenChange}>
+      <Drawer open={open} onOpenChange={setOpen}>
         {trigger && <DrawerTrigger asChild>{trigger}</DrawerTrigger>}
         <DrawerContent className={`
           pb-3
@@ -53,7 +53,7 @@ export default function DialogWrapper({
   }
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog open={open} onOpenChange={setOpen}>
       {trigger && <DialogTrigger asChild>{trigger}</DialogTrigger>}
       <DialogContent className={className}>
         <DialogHeader>

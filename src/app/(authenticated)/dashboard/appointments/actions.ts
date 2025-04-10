@@ -65,10 +65,8 @@ export const getAppointments = async (userId: User["id"], role: User["role"]) =>
     endTime: appointment.endTime, // Keep as Date object
     createdBy: appointment.createdBy || 'user',
     date: format(appointment.startTime, "EEEE, d MMMM"), // Example format
-    // The formatted strings can be used in columns definition or in cell renderers
-    // but don't include them in the main data object
+    role: role
   }));
-
 };
 
 export async function createAppointment({

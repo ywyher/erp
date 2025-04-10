@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { useQuery } from "@tanstack/react-query";
 import { getSession } from "@/lib/auth-client";
 import { ThemeToggle } from "@/components/theme-toggle";
@@ -10,22 +9,14 @@ import { Menu } from "@/components/header/menu";
 import Links from "@/components/header/links";
 import Logo from "@/components/logo";
 import { Button } from "@/components/ui/button";
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import clsx from "clsx";
 import { Avatar } from "@/components/plate-ui/avatar";
 import DialogWrapper from "@/components/dialog-wrapper";
 import Auth from "@/components/auth/auth";
 
-// Skeleton loading component for right actions
-const RightActionsSkeleton = () => (
-  <div className="flex items-center gap-4">
-    <ThemeToggle />
-    <Avatar className={'bg-foreground rounded-full animate-pulse'} />
-  </div>
-);
-
 export default function Header({ className = "" }: { className?: string }) {
-  const [authOpen, setAuthOpen] = useState<boolean>(true)
+  const [authOpen, setAuthOpen] = useState<boolean>(false)
 
   const { data: user, isLoading } = useQuery({
     queryKey: ["session", "header"],
@@ -33,33 +24,9 @@ export default function Header({ className = "" }: { className?: string }) {
       const { data } = await getSession()
       return (data?.user as User) || null;
     },
-    staleTime: 1000 * 60 * 5, // 5 minutes cache
   });
 
   const isMobile = useIsMobile();
-
-  // Memoize the right-side content to prevent unnecessary re-renders
-  const RightActions = useMemo(() => {
-    if (isLoading) return <RightActionsSkeleton />;
-    
-    return (
-      <div className="flex items-center gap-4">
-        <ThemeToggle />
-        {user ? (
-          <Menu user={user} isMobile={isMobile} />
-        ) : (
-          <DialogWrapper 
-            open={authOpen}
-            onOpenChange={() => setAuthOpen(!authOpen)}
-            title="Authenticate"
-            trigger={<Button variant="outline" className="rounded-full">Auth</Button>}
-          >
-            <Auth />
-          </DialogWrapper>
-        )}
-      </div>
-    );
-  }, [user, isMobile, isLoading]);
 
   return (
     <nav
@@ -88,7 +55,32 @@ export default function Header({ className = "" }: { className?: string }) {
           <Links user={user || null} isMobile={isMobile} />
         </div>
 
-        {RightActions}
+        <div className="flex items-center gap-4">
+          <ThemeToggle />
+          {user ? (
+            <Menu user={user} isMobile={isMobile} />
+          ) : (
+            <>
+              {isLoading ? (
+                <div className="flex items-center gap-4">
+                  <ThemeToggle />
+                  <Avatar className={'bg-foreground rounded-full animate-pulse'} />
+                </div>
+              ): (
+                <DialogWrapper 
+                  open={authOpen}
+                  setOpen={setAuthOpen}
+                  title="Authenticate"
+                  trigger={<Button variant="outline" className="rounded-full">Auth</Button>}
+                >
+                  <Auth
+                    setOpen={setAuthOpen}
+                  />
+                </DialogWrapper>
+              )}
+            </>
+          )}
+        </div>
       </div>
     </nav>
   );

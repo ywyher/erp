@@ -3,6 +3,7 @@ import Faq from "@/components/home/faq";
 import Hero from "@/components/home/hero/hero";
 import Posts from "@/components/home/posts";
 import Services from "@/components/home/services";
+import ResetPasswordHandler from "@/components/reset-password-handler";
 
 export default function Home() {
   return (
@@ -16,6 +17,7 @@ export default function Home() {
           <Faq />
         </main>
       </div>
+      <ResetPasswordHandler />
     </div>
   );
 }

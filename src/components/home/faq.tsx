@@ -27,30 +27,6 @@ export default async function Faq() {
             </AccordionContent>
           </AccordionItem>
         ))}
-        {faq.map((item, idx) => (
-          <AccordionItem key={idx} value={`item-${idx + Math.random()}`}>
-            <AccordionTrigger className="text-xl">{item.question}</AccordionTrigger>
-            <AccordionContent className="text-lg">
-              {item.answer}
-            </AccordionContent>
-          </AccordionItem>
-        ))}
-        {faq.map((item, idx) => (
-          <AccordionItem key={idx} value={`item-${idx + Math.random()}`}>
-            <AccordionTrigger className="text-xl">{item.question}</AccordionTrigger>
-            <AccordionContent className="text-lg">
-              {item.answer}
-            </AccordionContent>
-          </AccordionItem>
-        ))}
-        {faq.map((item, idx) => (
-          <AccordionItem key={idx} value={`item-${idx + Math.random()}`}>
-            <AccordionTrigger className="text-xl">{item.question}</AccordionTrigger>
-            <AccordionContent className="text-lg">
-              {item.answer}
-            </AccordionContent>
-          </AccordionItem>
-        ))}
       </Accordion>
     </CardLayout>
   )

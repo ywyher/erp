@@ -102,10 +102,8 @@ export async function deleteFile(fileName: string) {
     }
   } catch (error: unknown) {
     if (error instanceof Error) {
-      console.error(`Error deleting file from S3: ${name}`, error);
       return { message: null, error: error.message };
     } else {
-      console.error(`Unknown error deleting file from S3: ${name}`);
       return { message: null, error: "Failed to delete file!" };
     }
   }

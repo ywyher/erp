@@ -21,6 +21,7 @@ import { CalendarIcon, ChevronLeft, ChevronRight } from "lucide-react";
 import { Dispatch, SetStateAction, useState } from "react";
 import { Drawer, DrawerContent, DrawerDescription, DrawerHeader, DrawerTitle } from "@/components/ui/drawer"
 import { useIsMobile } from "@/hooks/use-mobile";
+import LoadingBtn from "@/components/loading-btn";
 
 export function ScheduleDisplay({
   schedules,
@@ -37,6 +38,7 @@ export function ScheduleDisplay({
   dialog?: boolean;
   maxItemsPerPage?: number;
 }) {
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const [currentPage, setCurrentPage] = useState(1);
 
   const getDayColor = (day: string) => {
@@ -120,15 +122,17 @@ export function ScheduleDisplay({
                       </Badge>
                     </div>
                     {onClick && (
-                      <Button
+                      <LoadingBtn
+                        isLoading={isLoading}
                         variant="outline"
-                        onClick={() =>
+                        onClick={() => {
+                          setIsLoading(true)
                           onClick(parseTimeStringToDate(schedule.startTime))
-                        }
+                        }}
                         className="ml-auto"
                       >
                         Select
-                      </Button>
+                      </LoadingBtn>
                     )}
                   </div>
                 ))}

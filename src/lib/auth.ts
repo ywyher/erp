@@ -12,8 +12,7 @@ export const auth = betterAuth({
   }),
   emailAndPassword: {
     enabled: true,
-    maxPasswordLength: 8,
-    minPasswordLength: 1,
+    minPasswordLength: 8,
     autoSignIn: false,
     sendResetPassword: async ({ url, user }) => {
       try {
@@ -63,12 +62,6 @@ export const auth = betterAuth({
         required: false,
         defaultValue: "",
         input: true,
-      },
-      onBoarding: {
-        type: "boolean",
-        required: false,
-        defaultValue: true,
-        input: false,
       },
       role: {
         type: "string",

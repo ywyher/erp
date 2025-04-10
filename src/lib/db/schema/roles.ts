@@ -25,7 +25,6 @@ export const user = pgTable("user", {
   dateOfBirth: date("dateOfBirth"),
   phoneNumberVerified: boolean("phoneNumberVerified").default(false).notNull(),
   emailVerified: boolean("emailVerified").default(false).notNull(),
-  onBoarding: boolean("onBoarding").default(true).notNull(),
   image: text("image").default("pfp.jpg").notNull(),
   role: roleEnum("role").default("user").notNull(),
   provider: providerEnum("provider").notNull(),

@@ -2,20 +2,18 @@
 
 import { FieldErrors, useForm } from "react-hook-form";
 import { Form } from "@/components/ui/form";
-import { registerSchema } from "@/app/(auth)/types";
+import { registerSchema } from "@/components/auth/types";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useAuthStore } from "@/app/(auth)/store";
 import LoadingBtn from "@/components/loading-btn";
 import { Dispatch, SetStateAction, useState } from "react";
-import { useRouter } from "next/navigation";
 import { emailOtp, signUp } from "@/lib/auth-client";
-import { generateFakeField } from "@/lib/funcs";
 import { z } from "zod";
 import { FormFieldWrapper } from "@/components/form-field-wrapper";
 import { toast } from "sonner";
 import { genders } from "@/lib/constants";
 import { AuthPort } from "@/components/auth/auth";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { checkFieldAvailability } from "@/lib/db/queries";
 
 type RegisterProps = {
   email: string 
@@ -30,20 +28,28 @@ export default function Register({
 }: RegisterProps) {
   const [isLoading, setIsLoading] = useState(false);
   const isMobile = useIsMobile();
-  const router = useRouter();
 
   const form = useForm<z.infer<typeof registerSchema>>({
     resolver: zodResolver(registerSchema),
     defaultValues: {
+      // name: "ywyh",
+      // username: "ywyh",
+      // email: email,
+      // dateOfBirth: new Date(),
+      // gender: 'male',
+      // phoneNumber: "01558854716",
+      // nationalId: "30801201100191",
+      // password: "Eywyh2001@",
+      // confirmPassword: "Eywyh2001@",
+      name: "",
+      username: "",
       email: email,
       dateOfBirth: new Date(),
       gender: 'male',
-      name: "ywyh",
-      username: "ywyh",
-      nationalId: "30801201100191",
-      phoneNumber: "01558854716",
-      password: "Eywyh2001@",
-      confirmPassword: "Eywyh2001@",
+      phoneNumber: "",
+      nationalId: "",
+      password: "",
+      confirmPassword: "",
     },
   });
 
@@ -51,6 +57,31 @@ export default function Register({
     if (!email) return;
     setIsLoading(true)
     setIsLoading(true)
+
+    let phoneNumberState;
+    if(data.phoneNumber) {
+      phoneNumberState = await checkFieldAvailability({ field: 'phoneNumber', value: data.phoneNumber })
+    }
+
+    console.log(phoneNumberState)
+
+    if(phoneNumberState && !phoneNumberState?.isAvailable) {
+      toast.error("Phone number is already registered")
+      setIsLoading(false)
+      return;
+    }
+
+    let nationalIdState;
+    if(data.nationalId) {
+      nationalIdState = await checkFieldAvailability({ field: 'nationalId', value: data.nationalId })
+    }
+
+    if(!nationalIdState?.isAvailable) {
+      toast.error("National id is already registered")
+      setIsLoading(false)
+      return;
+    }
+
     const result = await signUp.email({
         email: email || "",
         name: data.name,
@@ -116,6 +147,7 @@ export default function Register({
               <FormFieldWrapper
                 showError={false}
                 form={form}
+                type="number"
                 name="phoneNumber"
                 label={"PhoneNumber"}
                 placeholder="PhoneNumber"
@@ -125,7 +157,6 @@ export default function Register({
             <div className="flex flex-row gap-2">
               <FormFieldWrapper
                 showError={false}
-                disabled={true}
                 form={form}
                 name="username"
                 label={"Username"}
@@ -157,8 +188,7 @@ export default function Register({
               />
             </div>
             <div>
-              <FormFieldWrapper form={form} name="nationalId" label="National Id" />
-                showError={false}
+              <FormFieldWrapper showError={false} type="number" form={form} name="nationalId" label="National Id" />
             </div>
             <div className="flex flex-row gap-2">
               <FormFieldWrapper

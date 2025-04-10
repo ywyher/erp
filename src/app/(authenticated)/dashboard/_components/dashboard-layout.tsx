@@ -33,7 +33,7 @@ export default function DashboardLayout({
    title,
    className = "",
    tip = "",
-   description = ""
+   description = "",
   }: DashboardLayoutProps) {
   const pathname = usePathname()
   const segments = pathname.split("/").filter(Boolean)

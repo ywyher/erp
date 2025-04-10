@@ -1,6 +1,5 @@
 "use client";
 
-import { useAuthStore } from "@/app/(auth)/store";
 import { createAppointment } from "@/app/(authenticated)/dashboard/appointments/actions";
 import CardLayout from "@/components/card-layout";
 import DoctorsList from "@/components/doctors/doctors-list";
@@ -20,9 +19,6 @@ import { toast } from "sonner";
 
 function BookingContent() {
   const router = useRouter();
-  const setValue = useAuthStore((state) => state.setValue);
-  const setContext = useAuthStore((state) => state.setContext);
-  const setOperation = useAuthStore((state) => state.setOperation);
 
   const { data: user, isLoading } = useQuery({
     queryKey: ["session", "booking"],
@@ -49,10 +45,7 @@ function BookingContent() {
         const verificationNeeded = checkVerificationNeeded(user);
 
         if (verificationNeeded) {
-          setValue(verificationNeeded.value);
-          setContext(verificationNeeded.type);
-          setOperation("verify");
-          router.replace("/verify");
+          toast.error("Please login first.")
           return;
         }
 
@@ -89,7 +82,7 @@ function BookingContent() {
     if (!isLoading && user && doctorId && date) {
       handleCreateAppointment();
     }
-  }, [doctorId, date, user, isLoading, router, setContext, setDate, setDoctorId, setOperation, setReserved, setValue]);
+  }, [doctorId, date, user, isLoading, router, setDate, setDoctorId, setReserved]);
 
   return (
     <CardLayout title="Book an appointment" className="flex flex-col gap-3">

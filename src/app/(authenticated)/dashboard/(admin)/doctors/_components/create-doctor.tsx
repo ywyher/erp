@@ -24,7 +24,7 @@ export default function CreateDoctor() {
   const [schedules, setSchedules] = useState<Schedules>({
     monday: [{ startTime: "02:00", endTime: "03:00" }],
   }); // Updated name
-  const [selectedDays, setSelectedDays] = useState<string[]>(["monday"]); // Updated name for clarity
+  const [selectedDays, setSelectedDays] = useState<string[]>([]); // Updated name for clarity
   const [open, setOpen] = useState<boolean>(false);
   const router = useRouter();
 

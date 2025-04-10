@@ -28,8 +28,8 @@ import { useState } from "react";
 import {
   createSetting,
   updateSetting,
-} from "@/app/(authenticated)/dashboard/settings/actions";
-import type { settingSchema } from "@/app/(authenticated)/dashboard/settings/types";
+} from "@/app/(authenticated)/dashboard/(admin)/settings/actions";
+import type { settingSchema } from "@/app/(authenticated)/dashboard/(admin)/settings/types";
 import type { User } from "@/lib/db/schema";
 import { toast } from "sonner";
 import {
@@ -43,7 +43,7 @@ import {
 import { Upload, Download, AlertTriangle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { getFileUrl } from "@/lib/funcs";
-import { operationDocumentKey } from "@/app/(authenticated)/dashboard/settings/keys";
+import { operationDocumentKey } from "@/app/(authenticated)/dashboard/(admin)/settings/keys";
 
 const schema = z.object({
   file: z.array(z.instanceof(File)),

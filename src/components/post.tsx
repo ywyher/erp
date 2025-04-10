@@ -12,7 +12,6 @@ import Link from "next/link"
 import Image from "next/image"
 import { getFileUrl } from "@/lib/funcs"
 import CardLayout from "@/components/card-layout";
-import Header from "@/components/header";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
@@ -27,9 +26,8 @@ export default function Post({ post, author }: PostProps) {
   const router = useRouter()
 
   return (
-    <div>
-      <Header />
-      <CardLayout className="pt-4 flex items-center justify-center">
+    <>
+      <CardLayout className="pt-4 w-full flex items-center justify-center">
         <div className="flex flex-col items-start">
           <Button 
             variant="link"
@@ -105,6 +103,6 @@ export default function Post({ post, author }: PostProps) {
           </div>
         </div>
       </CardLayout>
-    </div>
+    </>
   )
 }

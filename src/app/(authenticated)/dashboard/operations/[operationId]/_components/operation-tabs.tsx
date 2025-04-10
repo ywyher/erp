@@ -38,7 +38,7 @@ export default function OperationTabs({
 }: OperationTabs) {
   const [activeTab, setActiveTab] = useState<
     "patient-data" | "operation-data" | "document-viewer"
-  >("operation-data");
+  >("patient-data");
 
   const { setOperationData } = useDocumentStore();
 

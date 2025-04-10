@@ -22,22 +22,6 @@ export async function updatePhoneNumberVerified(userId: User["id"]) {
   };
 }
 
-export async function updateOnboarding(userId: User["id"], value: boolean) {
-  const updateOnboarding = await db
-    .update(user)
-    .set({
-      onBoarding: value,
-    })
-    .where(eq(user.id, userId));
-
-  if (updateOnboarding) {
-    return {
-      success: true,
-      message: `Onboarding value updated to ${value}`,
-    };
-  }
-}
-
 export async function getEmail({ value, field }: {
   value: User['username'] | User['phoneNumber'],
   field: "username" | "phoneNumber"
@@ -48,7 +32,7 @@ export async function getEmail({ value, field }: {
     columns: {
       email: true,
     },
-    where: eq(column, value), // Use dynamic field access
+    where: eq(column, value),
   })
 
   return data?.email

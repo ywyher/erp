@@ -26,10 +26,26 @@ import { Separator } from "@/components/ui/separator";
 import { StyledLink } from "@/components/header/styled-link";
 import { User } from "@/lib/db/schema";
 import Links from "@/components/header/links";
+import { signOut } from "@/lib/auth-client";
+import { Button } from "@/components/ui/button";
+import { useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
 
 export function Menu({ user, isMobile }: { user: User; isMobile: boolean }) {
   const router = useRouter();
+  const queryClient = useQueryClient()
 
+  const handleLogout = async () => {
+    const { error } = await signOut()
+    
+    if(error) {
+      toast.error(error.message)
+      return;
+    }
+
+    queryClient.invalidateQueries({ queryKey: ['session'] })
+    router.push('/')
+  }
   if (!user) return;
 
   if (isMobile)
@@ -56,9 +72,10 @@ export function Menu({ user, isMobile }: { user: User; isMobile: boolean }) {
             <StyledLink href="/settings" icon={Settings} isMobile={isMobile}>
               Settings
             </StyledLink>
-            <StyledLink href="/logout" icon={LogOut} isMobile={isMobile}>
+            <Button onClick={() => handleLogout()}>
+              <LogOut />
               Logout
-            </StyledLink>
+            </Button>
           </div>
         </SheetContent>
       </Sheet>
@@ -86,7 +103,7 @@ export function Menu({ user, isMobile }: { user: User; isMobile: boolean }) {
         <DropdownMenuSeparator />
         <DropdownMenuItem
           className="cursor-pointer"
-          onClick={() => router.push("/logout")}
+          onClick={() => handleLogout()}
         >
           <LogOut />
           <span>Log out</span>

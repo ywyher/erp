@@ -10,8 +10,6 @@ import { Post } from "@/lib/db/schema";
 import { useQuery } from "@tanstack/react-query";
 import { parseAsArrayOf, parseAsInteger, parseAsString, useQueryState } from "nuqs";
 import { Suspense, useEffect } from "react";
-
-// Import shadcn Pagination components
 import {
   Pagination,
   PaginationContent,
@@ -22,10 +20,8 @@ import {
   PaginationPrevious,
 } from "@/components/ui/pagination";
 
-// Define posts per page constant
 const POSTS_PER_PAGE = 3;
 
-// Create a client component to handle the search params logic
 function PostsContent() {
   const [title] = useQueryState("title");
   const [authors] = useQueryState('authors', parseAsArrayOf(parseAsString));
@@ -54,8 +50,6 @@ function PostsContent() {
   }, [title, authors, categories, setPage]);
 
   const generatePaginationItems = () => {
-    // Same pagination logic as before
-    // ...
     const items = [];
     
     items.push(
@@ -182,7 +176,6 @@ function PostsContent() {
   );
 }
 
-// Create a loading fallback component
 function PostsLoading() {
   return (
     <div className="flex flex-col gap-5">

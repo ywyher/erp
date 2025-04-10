@@ -87,7 +87,6 @@ export async function createUser({
           gender: data.gender,
           dateOfBirth: data.dateOfBirth.toISOString().split('T')[0],
           role: role,
-          onBoarding: false,
           provider: 'email',
           createdAt: new Date(),
           updatedAt: new Date(),
@@ -125,11 +124,8 @@ export async function createUser({
   }  catch (error: unknown) {
   // Type guard to check if error is an Error object
   if (error instanceof Error) {
-    console.error(`Error deleting file from S3: ${name}`, error);
     return { message: null, error: error.message, userId: null };
   } else {
-    // Handle case where error is not an Error object
-    console.error(`Unknown error deleting file from S3: ${name}`);
     return { message: null, error: "Failed to delete file!", userId: null };
   }
 }
@@ -241,7 +237,6 @@ export async function updateUser({
   } catch (error: unknown) {
     // Type guard to check if error is an Error object
     if (error instanceof Error) {
-      console.error(`Error deleting file from S3: ${name}`, error);
       return { 
         success: false,
         message: null,
@@ -249,8 +244,6 @@ export async function updateUser({
         error: error.message
       };
     } else {
-      // Handle case where error is not an Error object
-      console.error(`Unknown error deleting file from S3: ${name}`);
       return { 
         success: false,
         message: null,

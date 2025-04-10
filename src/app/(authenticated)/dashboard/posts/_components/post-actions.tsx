@@ -12,21 +12,6 @@ import { MoreHorizontal } from "lucide-react";
 import { useState } from "react";
 import Link from "next/link";
 import { Post } from "@/lib/db/schema";
-import {
-  Drawer,
-  DrawerContent,
-  DrawerHeader,
-  DrawerTitle,
-  DrawerTrigger,
-} from "@/components/ui/drawer"
-import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from "@/components/ui/sheet"
-import PostComponent from "@/components/post";
 import { useQuery } from "@tanstack/react-query";
 import { getPostAuthor } from "@/app/(authenticated)/dashboard/posts/actions";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -40,14 +25,14 @@ export default function PostActions({
 }) {
   const [open, setOpen] = useState<boolean>(false);
 
-  const isMobile = useIsMobile();
+  // const isMobile = useIsMobile();
 
-  const { data: author, isLoading: isAuthorLoaidng } = useQuery({
-    queryKey: ['post-data', post.id],
-    queryFn: async () => {
-      return await getPostAuthor({ authorId: post.authorId })
-    }
-  })
+  // const { data: author, isLoading: isAuthorLoaidng } = useQuery({
+  //   queryKey: ['post-data', post.id],
+  //   queryFn: async () => {
+  //     return await getPostAuthor({ authorId: post.authorId })
+  //   }
+  // })
   
   return (
     <DropdownMenu open={open} onOpenChange={setOpen}>
@@ -61,7 +46,7 @@ export default function PostActions({
         <DropdownMenuLabel>Actions</DropdownMenuLabel>
         <DropdownMenuSeparator />
         <div className="flex flex-col gap-2">
-        {(!isAuthorLoaidng && author) && (
+        {/* {(!isAuthorLoaidng && author) && (
             <>
               {isMobile ? (
                 <Drawer>
@@ -70,7 +55,7 @@ export default function PostActions({
                       Preview
                     </Button>
                   </DrawerTrigger>
-                  <DrawerContent className="h-[95vh]">
+                  <DrawerContent className="h-[95vh] w-full">
                     <DrawerHeader>
                       <DrawerTitle className="text-left">Post Preview</DrawerTitle>
                     </DrawerHeader>
@@ -89,7 +74,7 @@ export default function PostActions({
                       Preview
                     </Button>
                   </SheetTrigger>
-                  <SheetContent side='bottom' className="h-[95vh] flex flex-col gap-3">
+                  <SheetContent side='bottom' className="h-[95vh] w-full flex flex-col gap-3">
                     <SheetHeader>
                       <SheetTitle>Post Preview</SheetTitle>
                     </SheetHeader>
@@ -103,12 +88,12 @@ export default function PostActions({
                 </Sheet>
               )}
             </>
-          )}
-          {/* <Link href={`/dashboard/posts/preview/${slug}`}>
+        )} */}
+          <Link href={`/posts/${post.slug}`}>
             <Button className="w-full">
               Preveiw
             </Button>
-          </Link> */}
+          </Link>
           <Link href={`/dashboard/posts/update/${post.slug}`}>
             <Button className="w-full">
               Update

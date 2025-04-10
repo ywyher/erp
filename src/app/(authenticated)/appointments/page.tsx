@@ -22,7 +22,7 @@ export default function Appointments() {
     const { data: appointments, isLoading: isAppointmentLoading } = useQuery({
         queryKey: ['list-appointments', user?.role],
         queryFn: async () => {
-            return await getAppointments(user?.id as User['id']);
+            return await getAppointments(user?.id as User['id'], user?.role as User['role']);
         },
         enabled: user?.id ? true : false
     });

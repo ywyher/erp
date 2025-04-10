@@ -10,7 +10,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { MoreHorizontal } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Appointment, User } from "@/lib/db/schema";
 import Link from "next/link";
 import { Roles } from "@/app/types";
@@ -61,7 +61,7 @@ export default function AppointmentActions({
         <DropdownMenuLabel>Actions</DropdownMenuLabel>
         <DropdownMenuSeparator />
         <div className="flex flex-col gap-2">
-          {role == "doctor" && (status == "pending" || status == "ongoing") && (
+          {(role == "doctor" && (status == "pending" || status == "ongoing") )&& (
             <Button className="w-full" onClick={() => handleStart()}>
               Start
             </Button>
@@ -78,7 +78,10 @@ export default function AppointmentActions({
             </>
           )}
           {status == "completed" && (
-            <Link href={`/dashboard/appointments/${appointmentId}`}>
+            <Link href={
+              role != 'user' ? `/dashboard/appointments/${appointmentId}`
+              : `/appointments/${appointmentId}` 
+            }>
               <Button className="w-full">Details/Edit</Button>
             </Link>
           )}

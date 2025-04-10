@@ -2,13 +2,13 @@
 
 import { FieldErrors, useForm } from "react-hook-form";
 import { Form } from "@/components/ui/form";
-import { authSchema } from "@/app/(auth)/types";
+import { authSchema } from "@/components/auth/types";
 import { zodResolver } from "@hookform/resolvers/zod";
 import LoadingBtn from "@/components/loading-btn";
 import { checkIdentifier, normalizeData } from "@/lib/funcs";
 import { signIn } from "@/lib/auth-client";
 import { Dispatch, useState } from "react";
-import { checkFieldAvailability, isFieldVerified } from "@/lib/db/queries";
+import { checkFieldAvailability } from "@/lib/db/queries";
 import { z } from "zod";
 import { FormFieldWrapper } from "@/components/form-field-wrapper";
 import { toast } from "sonner";
@@ -54,8 +54,6 @@ export default function Check({
       field: identifier,
       value: data.field,
     });
-
-    const { isVerified } = await isFieldVerified({ field: 'email', value: data.field })
 
     if (!isAvailable) {
       setIdentifier(identifier);

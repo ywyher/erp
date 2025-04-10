@@ -1,5 +1,5 @@
 import DashboardLayout from "@/app/(authenticated)/dashboard/_components/dashboard-layout";
-import { SettingsSidebar } from "@/app/(authenticated)/dashboard/settings/_components/settings-tabs";
+import { SettingsSidebar } from "@/app/(authenticated)/dashboard/(admin)/settings/_components/settings-tabs";
 import { getSession } from "@/lib/auth-client";
 import db from "@/lib/db";
 import { getOperationDocument } from "@/lib/db/queries";

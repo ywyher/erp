@@ -7,7 +7,6 @@ import UploadPfp from "@/components/uploadPfp";
 import Header from "@/components/header";
 import SettingsForm from "@/app/(authenticated)/settings/_components/settings-form";
 import { getUserProvider } from "@/lib/db/queries";
-import VerifyAlert from "@/components/verify-alert";
 import UpdatePassword from "@/components/update-password";
 
 export default function Settings() {
@@ -34,7 +33,6 @@ export default function Settings() {
   return (
     <div>
       <Header className="mb-0" />
-      <VerifyAlert />
       {user && (
         <div className="
           bg-background
