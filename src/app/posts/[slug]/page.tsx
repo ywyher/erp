@@ -4,13 +4,12 @@ import Post from "@/components/post";
 import { Post as TPost } from "@/lib/db/schema";
 import type { Metadata } from "next";
 
-type Params = {
-  params: { slug: TPost["slug"] };
-};
+type Params = Promise<{ slug: TPost['slug'] }>
+
 
 // Metadata function — runs before the page loads
-export async function generateMetadata({ params }: Params): Promise<Metadata> {
-  const { slug } = params;
+export async function generateMetadata({ params }: { params: Params }): Promise<Metadata> {
+  const { slug } = await params;
   const postData = await getPost(slug);
 
   if (!postData?.post) {
@@ -39,8 +38,8 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
   };
 }
 
-export default async function PostPage({ params }: Params) {
-  const { slug } = params;
+export default async function PostPage({ params }: { params: Params }) {
+  const { slug } = await params;
   const post = await getPost(slug);
 
   return (
