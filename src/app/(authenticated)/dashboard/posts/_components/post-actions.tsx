@@ -12,9 +12,6 @@ import { MoreHorizontal } from "lucide-react";
 import { useState } from "react";
 import Link from "next/link";
 import { Post } from "@/lib/db/schema";
-import { useQuery } from "@tanstack/react-query";
-import { getPostAuthor } from "@/app/(authenticated)/dashboard/posts/actions";
-import { useIsMobile } from "@/hooks/use-mobile";
 import Delete from "@/app/(authenticated)/dashboard/_components/delete";
 
 

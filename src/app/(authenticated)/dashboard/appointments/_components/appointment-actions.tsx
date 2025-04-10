@@ -10,7 +10,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { MoreHorizontal } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Appointment, User } from "@/lib/db/schema";
 import Link from "next/link";
 import { Roles } from "@/app/types";

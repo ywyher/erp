@@ -1,4 +1,3 @@
-import DashboardLayout from "@/app/(authenticated)/dashboard/_components/dashboard-layout";
 import AppointmentTabs from "@/app/(authenticated)/dashboard/appointments/[appointmentId]/_components/appointment-tabs";
 import CardLayout from "@/components/card-layout";
 import Header from "@/components/header";
