@@ -55,7 +55,7 @@ export const auth = betterAuth({
       }
     },
   },
-  trustedOrigins: ["http://perfect-health.net", "https://vercel.com"],
+  trustedOrigins: [process.env.APP_URL!],
   user: {
     additionalFields: {
       username: {

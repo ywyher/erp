@@ -12,7 +12,7 @@ export async function POST(req: Request) {
         from: `Acme <${process.env.RESEND_FROM_EMAIL}>`, // Use your verified domain
         to: email, // Pass the recipient's email dynamically
         subject: 'Hello world',
-        react: SendOtpEmailTemplate({ firstName: 'John', otp: otp }),
+        react: SendOtpEmailTemplate({ otp: otp }),
     });
 
     if (error) {

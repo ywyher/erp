@@ -21,7 +21,7 @@ export async function POST(req: NextRequest) {
       from: `Acme <${process.env.RESEND_FROM_EMAIL}>`, // Use your verified domain
       to: [email], // Pass the recipient's email dynamically
       subject: "Hello world",
-      react: await ForgetPassowrdEmailTemplate({ firstname: name, url: url }),
+      react: await ForgetPassowrdEmailTemplate({ url: url }),
     });
 
     if (error) {

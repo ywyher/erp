@@ -1,52 +1,37 @@
 'use server'
 
+import { auth } from "@/lib/auth";
 import db from "@/lib/db";
-import { admin, user } from "@/lib/db/schema";
+import { admin } from "@/lib/db/schema";
 import { generateId } from "@/lib/funcs";
 
 async function main() {
   console.log("🌱 Starting database seeding...");
-  
-  const existingAdmin = await db.query.user.findFirst({
-    where: (user, { eq }) => eq(user.username, "admin"),
-  });
 
-  if (!existingAdmin) {
-    console.log("Creating admin user...");
-    
-    const adminUser = await db
-      .insert(user)
-      .values({
-        id: generateId(),
-        name: "admin",
-        username: "admin",
-        email: "admin@gmail.com",
-        phoneNumber: "01024824716",
-        nationalId: "30801201100191",
-        phoneNumberVerified: true,
-        emailVerified: true,
-        role: "admin",
-        gender: 'male',
-        provider: 'email',
-        dateOfBirth: '1971-07-14',
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      }).returning()
+  const { user } = await auth.api.signUpEmail({
+    body: {
+      email: "admin@perfect-health.net",
+      password: "Pmssa16771@",
+      name: "admin",
+      dateOfBirth: new Date().toISOString().split('T')[0],
+      displayUsername: 'admin',
+      gender: 'male',
+      nationalId: '30801201100191',
+      phoneNumber: '01024824716',
+      role: "admin",
+      username: 'admin',
+      provider: 'email'
+    }
+  })
 
-    await db
-      .insert(admin)
-      .values({
-        id: generateId(),
-        userId: adminUser[0].id,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      })
-      .returning();
-    
-    console.log("Admin user created successfully");
-  } else {
-    console.log("Admin user already exists, skipping");
-  }
+  await db
+    .insert(admin)
+    .values({
+      id: generateId(),
+      userId: user.id,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+  })
 
   console.log("✅ Database seeding completed");
 }
