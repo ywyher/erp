@@ -27,13 +27,13 @@ export default function Right() {
                 ease-in-out
             ">
                 <FloatingCard 
-                    title="Well Qualified Doctors" 
+                    title="Well qualified doctors" 
                     description='Treat with care'
                     Icon={Users}
                     className="-top-16 -left-24 rotate-[-5deg]"
                 />
                 <FloatingCard
-                    title="Book an Appointment" 
+                    title="Book an appointment" 
                     description='At your fingertips'
                     Icon={Clock}
                     className="
