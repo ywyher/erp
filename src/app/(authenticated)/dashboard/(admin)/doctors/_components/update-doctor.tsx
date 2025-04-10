@@ -17,8 +17,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import UpdatePassword from "@/components/update-password";
 import { useQuery } from "@tanstack/react-query";
 import { getUserById } from "@/lib/db/queries";
-import { Doctor } from "@/app/types";
-import { User } from "@/lib/auth-client";
 import { getChangedFields, isFakeEmail, normalizeData } from "@/lib/funcs";
 import { updateDoctor } from "@/app/(authenticated)/dashboard/(admin)/doctors/actions";
 import UpdateSchedule from "@/app/(authenticated)/dashboard/_components/update-schedule";
@@ -26,6 +24,7 @@ import { z } from "zod";
 import { toast } from "sonner";
 import DialogWrapper from "@/app/(authenticated)/dashboard/_components/dialog-wrapper";
 import { genders } from "@/lib/constants";
+import { Doctor, User } from "@/lib/db/schema";
 
 export default function UpdateDoctor({
   setPopOpen,
