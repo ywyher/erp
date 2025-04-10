@@ -64,8 +64,22 @@ export default function Posts() {
           className="relative flex flex-col justify-center h-fit w-full"
           variant="home"
         >
-          {gradient('top-left')}
-          {gradient('bottom-right')}
+          <div className="absolute inset-0 -z-10 pointer-events-none">
+            <div className="
+              absolute top-[25%] left-0
+              -translate-x-1/3 -translate-y-1/3
+              h-[300px] w-[300px]
+              rounded-full bg-primary opacity-50 blur-[80px]
+            "></div>
+          </div>
+          <div className="absolute inset-0 -z-10 pointer-events-none">
+            <div className="
+              absolute bottom-0 right-0
+              translate-x-1/4 translate-y-1/4
+              h-[300px] w-[200px]
+              rounded-full bg-secondary opacity-50 blur-[80px]
+            "></div>
+          </div>
           <Carousel
             setApi={setApi}
             opts={{

@@ -8,6 +8,15 @@ import { generateId } from "@/lib/funcs";
 async function main() {
   console.log("🌱 Starting database seeding...");
 
+  const exists = await db.query.user.findFirst({
+    where: (user, { eq }) => eq(user.email, 'admin@perfect-health.net')
+  })
+
+  if(exists?.id) {
+    console.log("🌱 User already exists...");
+    return;
+  }
+
   const { user } = await auth.api.signUpEmail({
     body: {
       email: "admin@perfect-health.net",

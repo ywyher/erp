@@ -65,8 +65,14 @@ export default function Services() {
           className="relative flex flex-col justify-center h-fit w-full"
           variant="home"
         >
-          
-          {gradient('middle')}
+          <div className="absolute inset-0 -z-10 pointer-events-none">
+            <div className="
+              absolute left-1/2 top-1/2
+              -translate-x-1/2 -translate-y-1/2
+              md:h-[400px] md:w-[60%] w-[100%] h-[700px]
+              rounded-full bg-primary opacity-30 blur-[80px]
+            "></div>
+          </div>
           <Carousel
             setApi={setApi}
             opts={{
