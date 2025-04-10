@@ -55,6 +55,7 @@ export const auth = betterAuth({
       }
     },
   },
+  trustedOrigins: [process.env.APP_URL!],
   user: {
     additionalFields: {
       username: {
