@@ -1,7 +1,7 @@
 "use server";
 
 import { passwordSchema } from "@/app/types";
-import db from "@/lib/db/index.local";
+import db from "@/lib/db/index";
 import { account, User } from "@/lib/db/schema";
 import { hashPassword } from "@/lib/password";
 import { eq } from "drizzle-orm";

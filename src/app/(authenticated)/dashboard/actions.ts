@@ -1,6 +1,6 @@
 "use server";
 
-import db from "@/lib/db/index.local";
+import db from "@/lib/db/index";
 import { schedule, User } from "@/lib/db/schema";
 import { transformSchedulesToRecords } from "@/lib/funcs";
 import { eq } from "drizzle-orm";

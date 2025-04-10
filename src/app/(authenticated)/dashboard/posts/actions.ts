@@ -1,7 +1,7 @@
 "use server";
 
 import { getSession } from "@/lib/auth-client"
-import db from "@/lib/db/index.local"
+import db from "@/lib/db/index"
 import { Post, post, User, user } from "@/lib/db/schema"
 import { generateId } from "@/lib/funcs"
 import { eq } from "drizzle-orm"

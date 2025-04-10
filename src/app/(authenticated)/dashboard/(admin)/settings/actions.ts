@@ -1,7 +1,7 @@
 "use server";
 
 import { settingSchema } from "@/app/(authenticated)/dashboard/(admin)/settings/types";
-import db from "@/lib/db/index.local";
+import db from "@/lib/db/index";
 import { settings, User } from "@/lib/db/schema";
 import { generateId } from "@/lib/funcs";
 import { deleteFile } from "@/lib/s3";

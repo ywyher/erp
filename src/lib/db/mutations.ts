@@ -3,7 +3,7 @@
 import { z } from "zod";
 import { checkFieldAvailability } from "./queries";
 import { tableMap, Tables, updateUserSchema } from "@/app/types";
-import db from "./index.local";
+import db from "./index";
 import {
   account,
   medicalFile,

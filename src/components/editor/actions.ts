@@ -1,6 +1,6 @@
 'use server'
 
-import db from "@/lib/db/index.local"
+import db from "@/lib/db/index"
 import { user } from "@/lib/db/schema"
 import { eq, or } from "drizzle-orm"
 

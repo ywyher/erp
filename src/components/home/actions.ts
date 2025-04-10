@@ -1,6 +1,6 @@
 'use server'
 
-import db from "@/lib/db/index.local"
+import db from "@/lib/db/index"
 import { faq, Post, post, service } from "@/lib/db/schema"
 import { and, eq } from "drizzle-orm";
 

@@ -1,7 +1,7 @@
 "use server";
 
 import { createUser } from "@/lib/db/mutations";
-import db from "@/lib/db/index.local";
+import db from "@/lib/db/index";
 import { admin } from "@/lib/db/schema";
 import { createUserSchema, updateUserSchema } from "@/app/types";
 import { z } from "zod";

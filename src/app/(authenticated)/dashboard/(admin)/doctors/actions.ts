@@ -2,7 +2,7 @@
 
 import { createUser, updateUser } from "@/lib/db/mutations";
 import { Schedules } from "@/app/(authenticated)/dashboard/types";
-import db from "@/lib/db/index.local";
+import db from "@/lib/db/index";
 import { doctor, schedule, user, User } from "@/lib/db/schema";
 import { generateId, transformSchedulesToRecords } from "@/lib/funcs";
 import { eq } from "drizzle-orm";

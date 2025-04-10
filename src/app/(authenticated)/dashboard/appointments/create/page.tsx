@@ -1,6 +1,6 @@
 import CreateAppointment from "@/app/(authenticated)/dashboard/appointments/create/_components/create-appointment";
 import { getSession } from "@/lib/auth-client";
-import db from "@/lib/db/index.local";
+import db from "@/lib/db/index";
 import { doctor, Schedule, schedule, User } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
 import { headers } from "next/headers";

@@ -1,6 +1,6 @@
 import CreateOperation from "@/app/(authenticated)/dashboard/operations/create/_components/create-operation";
 import { getSession, User } from "@/lib/auth-client";
-import db from "@/lib/db/index.local";
+import db from "@/lib/db/index";
 import { doctor } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
 import { headers } from "next/headers";
