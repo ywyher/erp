@@ -20,7 +20,11 @@ import { type NeonHttpDatabase } from "drizzle-orm/neon-http";
 import { type PgTransaction } from "drizzle-orm/pg-core"; // core transaction type
 import { PostgresJsDatabase } from "drizzle-orm/postgres-js";
 
-export type DBInstance = PostgresJsDatabase<typeof schema> | NeonHttpDatabase<typeof schema> | PgTransaction<any, typeof schema, any>;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type DBInstance = 
+  PostgresJsDatabase<typeof schema> 
+| NeonHttpDatabase<typeof schema> 
+| PgTransaction<any, typeof schema, any>;
 
 export type Roles = "admin" | "user" | "doctor" | "receptionist";
 
