@@ -15,10 +15,10 @@ type DatabaseClient =
     $client: NeonQueryFunction<false, false>;
   }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type DBInstance = 
-  PostgresJsDatabase<typeof schema> 
+PostgresJsDatabase<typeof schema> 
 | NeonHttpDatabase<typeof schema> 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 | PgTransaction<any, typeof schema, any>;
 
 const environment = process.env.ENV || "DEVELOPMENT";
