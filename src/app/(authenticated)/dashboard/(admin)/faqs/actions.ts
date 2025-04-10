@@ -48,7 +48,7 @@ export async function createFaq({ data }: { data: z.infer<typeof faqSchema> }) {
             creatorId,
             createdAt: new Date(),
             updatedAt: new Date(),
-        }).returning({ id: faq.id })
+        }).returning()
 
         if(!createdFaq.id) throw new Error("Couldn't create the faq");
 
@@ -73,7 +73,7 @@ export async function updateFaq({ data, faqId }: { data: z.infer<typeof faqSchem
             updatedAt: new Date(),
         })
         .where(eq(faq.id, faqId))
-        .returning({ id: faq.id });
+        .returning();
 
         if(!updatedFaq.id) throw new Error("Couldn't create the faq");
 

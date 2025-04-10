@@ -2,7 +2,7 @@
 
 import { z } from "zod";
 import { checkFieldAvailability } from "./queries";
-import { tableMap, Tables, updateUserSchema } from "@/app/types";
+import { DBInstance, tableMap, Tables, updateUserSchema } from "@/app/types";
 import db from "./index";
 import {
   account,
@@ -28,7 +28,7 @@ export async function createUser({
   data: z.infer<typeof createUserSchema>;
   role: User["role"];
   verified?: boolean;
-  dbInstance?: typeof db;
+  dbInstance?: DBInstance;
 }) {
   try {
     const createPayload: Partial<z.infer<typeof createUserSchema>> = {};
@@ -91,7 +91,7 @@ export async function createUser({
           createdAt: new Date(),
           updatedAt: new Date(),
         })
-        .returning({ id: user.id });
+        .returning();
 
       if (!createdUser || !createdUser[0]?.id) {
         throw new Error("Failed to create user.");
@@ -140,7 +140,7 @@ export async function updateUser({
   data: z.infer<typeof updateUserSchema>;
   userId: User["id"];
   role: User["role"];
-  dbInstance?: typeof db;
+  dbInstance?: DBInstance;
 }) {
   try {
     const updateUserPayload: Partial<z.infer<typeof updateUserSchema>> = {};
@@ -261,7 +261,7 @@ export async function updateUserRole({
 }: {
   userId: User["id"];
   role: User["role"];
-  dbInstance?: typeof db;
+  dbInstance?: DBInstance;
 }) {
   const [updatedUserRole] = await dbInstance
     .update(user)
@@ -269,7 +269,7 @@ export async function updateUserRole({
       role: role,
     })
     .where(eq(user.id, userId))
-    .returning({ id: user.id });
+    .returning();
 
   if (!updatedUserRole.id)
     return {

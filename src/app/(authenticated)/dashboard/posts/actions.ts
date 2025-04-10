@@ -71,7 +71,7 @@ export async function createPost({ title, content, status, category, thumbnail, 
             authorId,
             createdAt: new Date(),
             updatedAt: new Date(),
-        }).returning({ id: post.id })
+        }).returning()
 
         if(!createdPost.id) throw new Error("Couldn't create the post");
 
@@ -114,7 +114,7 @@ export async function updatePost({ title, content, status, category, thumbnail, 
             updatedAt: new Date(),
         })
         .where(eq(post.slug, slug))
-        .returning({ id: post.id });
+        .returning();
 
         if(!updatedPost.id) throw new Error("Couldn't create the post");
 

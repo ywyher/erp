@@ -31,7 +31,7 @@ async function main() {
         dateOfBirth: '1971-07-14',
         createdAt: new Date(),
         updatedAt: new Date(),
-      }).returning({ id: user.id })
+      }).returning()
 
     await db
       .insert(admin)
@@ -41,7 +41,7 @@ async function main() {
         createdAt: new Date(),
         updatedAt: new Date(),
       })
-      .returning({ id: admin.id });
+      .returning();
     
     console.log("Admin user created successfully");
   } else {

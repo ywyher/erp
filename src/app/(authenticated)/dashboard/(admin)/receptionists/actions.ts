@@ -63,9 +63,7 @@ export async function createReceptionist({
           department: userData.department,
           userId: createdUser.userId,
         })
-        .returning({
-          userId: receptionist.userId,
-        });
+        .returning();
 
       const scheduleRecords = transformSchedulesToRecords(
         schedulesData,

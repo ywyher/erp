@@ -48,7 +48,7 @@ export async function createService({ data }: { data: z.infer<typeof serviceSche
             creatorId,
             createdAt: new Date(),
             updatedAt: new Date(),
-        }).returning({ id: service.id })
+        }).returning()
 
         if(!createdService.id) throw new Error("Couldn't create the service");
 
@@ -73,7 +73,7 @@ export async function updateService({ data, serviceId }: { data: z.infer<typeof 
             updatedAt: new Date(),
         })
         .where(eq(service.id, serviceId))
-        .returning({ id: service.id });
+        .returning();
 
         if(!updatedService.id) throw new Error("Couldn't create the service");
 

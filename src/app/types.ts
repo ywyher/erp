@@ -1,4 +1,3 @@
-import { specialties } from "@/app/(authenticated)/dashboard/constants";
 import { genders } from "@/lib/constants";
 import {
   account,
@@ -16,23 +15,14 @@ import {
 import { service } from "@/lib/db/schema/service";
 import { z } from "zod";
 
+import * as schema from '@/lib/db/schema/index'
+import { type NeonHttpDatabase } from "drizzle-orm/neon-http";
+import { type PgTransaction } from "drizzle-orm/pg-core"; // core transaction type
+import { PostgresJsDatabase } from "drizzle-orm/postgres-js";
+
+export type DBInstance = PostgresJsDatabase<typeof schema> | NeonHttpDatabase<typeof schema> | PgTransaction<any, typeof schema, any>;
+
 export type Roles = "admin" | "user" | "doctor" | "receptionist";
-
-export type Doctor = {
-  id: string;
-  specialty: (typeof specialties)[number];
-  userId: string;
-};
-
-export type Schedule = {
-  id: string;
-  day: string;
-  startTime: Date;
-  endTime: Date;
-  userId: string;
-  createdAt: Date;
-  updatedAt: Date;
-};
 
 export const emailRegex = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/;
 export const phoneNumberRegex = /^(0\d{2}[\s-]?\d{7}|\d{11})$/;

@@ -98,8 +98,8 @@ export async function createAppointment({
         createdAt: new Date(),
         updatedAt: new Date(),
       })
-      .returning({ id: appointment.id });
-
+      .returning();
+      
     if (!createdAppointment.id) throw new Error("Failed to create appointment");
 
     if (createdAppointment) {
@@ -132,8 +132,8 @@ export async function updateAppointmentStatus({
       status: status,
     })
     .where(eq(appointment.id, appointmentId))
-    .returning({ id: appointment.id });
-
+    .returning();
+    
   if (!updatedAppointment.id)
     return {
       error: "Failed to update appointment status!",

@@ -287,7 +287,7 @@ export async function seed() {
         createdAt: new Date(),
         updatedAt: new Date(),
       })
-      .returning({ id: schema.admin.id });
+      .returning();
 
     // Create a receptionist user
     const receptionistUser = await db

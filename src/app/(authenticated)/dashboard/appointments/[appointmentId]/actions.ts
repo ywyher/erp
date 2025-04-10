@@ -52,7 +52,7 @@ export async function createConsultation({
       createdAt: new Date(),
       updatedAt: new Date(),
     })
-    .returning({ id: consultation.id });
+    .returning();
 
   if (!creation.id)
     return {
@@ -98,7 +98,7 @@ export async function createPrescription({
       createdAt: new Date(),
       updatedAt: new Date(),
     })
-    .returning({ id: prescription.id });
+    .returning();
 
   if (!createdPrescription.id)
     return {
@@ -136,7 +136,7 @@ export async function updateConsultation({
       updatedAt: new Date(),
     })
     .where(eq(consultation.id, consultationId))
-    .returning({ id: consultation.id });
+    .returning();
 
   if (!update.id)
     return {
@@ -166,7 +166,7 @@ export async function updatePrescription({
       updatedAt: new Date(),
     })
     .where(eq(prescription.id, prescriptionId))
-    .returning({ id: prescription.id });
+    .returning();
 
   if (!updatedPrescription.id)
     return {

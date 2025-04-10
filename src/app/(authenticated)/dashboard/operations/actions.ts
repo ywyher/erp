@@ -22,6 +22,7 @@ import { GetObjectCommand } from "@aws-sdk/client-s3";
 import { s3 } from "@/lib/utils";
 import { format } from "date-fns";
 import { operationDataSchema } from "@/app/(authenticated)/dashboard/operations/types";
+import { DBInstance } from "@/app/types";
 
 export const getOperations = async (userId: User["id"], role: User["role"]) => {
   let operations;
@@ -113,7 +114,7 @@ export async function createOperation({
       createdAt: new Date(),
       updatedAt: new Date(),
     })
-    .returning({ id: operation.id });
+    .returning();
 
   if (!createdOperation.id)
     return {
@@ -137,7 +138,7 @@ export async function updateOperationStatus({
 }: {
   operationId: Operation["id"];
   status: Operation["status"];
-  dbInstance?: typeof db;
+  dbInstance?: DBInstance;
 }) {
   const [updatedOperation] = await dbInstance
     .update(operation)
@@ -145,7 +146,7 @@ export async function updateOperationStatus({
       status: status,
     })
     .where(eq(operation.id, operationId))
-    .returning({ id: operation.id });
+    .returning();
 
   if (!updatedOperation.id)
     return {
@@ -163,7 +164,7 @@ export async function updateOperationEndTime({
   dbInstance = db,
 }: {
   date: Date;
-  dbInstance?: typeof db;
+  dbInstance?: DBInstance;
 }) {
   const [updatedOperation] = await dbInstance
     .update(operation)

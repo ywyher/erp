@@ -30,7 +30,7 @@ export async function createSetting({
       createdAt: new Date(),
       updatedAt: new Date(),
     })
-    .returning({ id: settings.id });
+    .returning();
 
   if (!createdSetting.id)
     return {
@@ -67,7 +67,7 @@ export async function updateSetting({
     .update(settings)
     .set(updateData)
     .where(eq(settings.key, settingKey))
-    .returning({ id: settings.id });
+    .returning();
 
   console.log(updatedSetting);
 

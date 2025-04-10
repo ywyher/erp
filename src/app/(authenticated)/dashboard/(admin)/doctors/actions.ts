@@ -64,9 +64,7 @@ export async function createDoctor({
           specialty: userData.specialty,
           userId: createdUser.userId,
         })
-        .returning({
-          userId: doctor.userId,
-        });
+        .returning();
 
       if (!createdDoctor.length)
         throw new Error("Failed to create doctor record.");

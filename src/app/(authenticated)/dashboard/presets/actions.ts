@@ -129,7 +129,7 @@ export async function CreatePreset({ data, doctorId, documentName }: {
         documentName,
         createdAt: new Date(),
         updatedAt: new Date()
-    }).returning({ id: preset.id })
+    }).returning()
 
     if(createdPreset.id) {
         revalidatePath('/dashboard/presets')
@@ -153,7 +153,7 @@ export async function UpdatePreset({ data, presetId }: {
         title: data.title,
         data: data.data,
         updatedAt: new Date()
-    }).where(eq(preset.id, presetId)).returning({ id: preset.id })
+    }).where(eq(preset.id, presetId)).returning()
 
     if(updatedPreset.id) {
         revalidatePath('/dashboard/presets')

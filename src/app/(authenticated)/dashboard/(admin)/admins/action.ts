@@ -28,9 +28,7 @@ export async function createAdmin(data: z.infer<typeof createUserSchema>) {
             id: adminId,
             userId: createdUser.userId,
           })
-          .returning({
-            userId: admin.userId,
-          });
+          .returning();
   
         if (!createdAdmin.length)
           throw new Error("Failed to create admin record.");

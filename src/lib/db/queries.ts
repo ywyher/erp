@@ -1,6 +1,6 @@
 "use server";
 
-import { Roles, tableMap } from "@/app/types";
+import { DBInstance, Roles, tableMap } from "@/app/types";
 import pluralize from "pluralize"; // Install with: npm install pluralize
 import db from "@/lib/db/index";
 import {
@@ -50,10 +50,10 @@ export async function checkFieldAvailability({
 }: {
   field: "email" | "username" | "phoneNumber" | "nationalId";
   value: string;
-  dbInstance?: typeof db;
+  dbInstance?: DBInstance;
 }) {
-  const data = await dbInstance.query.user.findFirst({
-    where: (user, { eq }) => eq(user[field], value),
+  const data = await (dbInstance.query.user.findFirst as typeof db.query.user.findFirst)({
+      where: (user, { eq }) => eq(user[field], value),
   });
 
   return {
@@ -288,7 +288,7 @@ export async function getWorkerUserId(
 export const getOperationDocument = async ({
   dbInstance = db,
 }: {
-  dbInstance?: typeof db;
+  dbInstance?: DBInstance;
 }) => {
   try {
     const [operationDocument] = await dbInstance

@@ -3,14 +3,16 @@ config({ path: ".env" });
 
 import postgres from "postgres";
 import { drizzle as drizzlePostgres, PostgresJsDatabase } from "drizzle-orm/postgres-js";
-import { neon } from "@neondatabase/serverless";
+import { neon, NeonQueryFunction } from "@neondatabase/serverless";
 import { drizzle as drizzleNeon, NeonHttpDatabase } from "drizzle-orm/neon-http";
 
 import * as schema from "./schema";
 
 type DatabaseClient = 
   | PostgresJsDatabase<typeof schema>
-  | NeonHttpDatabase<typeof schema>;
+  | NeonHttpDatabase<typeof schema> & {
+    $client: NeonQueryFunction<false, false>;
+  }
 
 const environment = process.env.ENV || "DEVELOPMENT";
 
