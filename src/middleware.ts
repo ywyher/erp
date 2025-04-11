@@ -1,4 +1,5 @@
-import { getSession } from '@/lib/auth-client'
+import { auth } from '@/lib/auth'
+import { headers } from 'next/headers'
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 
@@ -8,13 +9,9 @@ export const config = {
 
 export async function middleware(request: NextRequest) {
   try {
-    const { data } = await getSession({
-      fetchOptions: {
-        headers: request.headers,
-      },
+    const data = await auth.api.getSession({
+      headers: await headers()
     })
-    
-    console.log(data)
 
     if (!data?.user) {
       return NextResponse.redirect(new URL('/', request.url))

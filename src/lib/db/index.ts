@@ -1,6 +1,3 @@
-import { config } from "dotenv";
-config({ path: ".env" });
-
 import postgres from "postgres";
 import { drizzle as drizzlePostgres, PostgresJsDatabase } from "drizzle-orm/postgres-js";
 import { neon, NeonQueryFunction } from "@neondatabase/serverless";
@@ -22,6 +19,7 @@ PostgresJsDatabase<typeof schema>
 | PgTransaction<any, typeof schema, any>;
 
 const environment = process.env.ENV || "DEVELOPMENT";
+const DATABASE_URL = process.env.DATABASE_URL;
 
 function createDbClient(): DatabaseClient {
   if (!process.env.DATABASE_URL) {
