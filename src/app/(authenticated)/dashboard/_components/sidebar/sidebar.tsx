@@ -28,9 +28,9 @@ export default function Sidebar({ userRole }: { userRole: User["role"] }) {
         `}
       >
         {!isMobile && state == "collapsed" ? (
-          <Logo size={70} type="icon" />
+          <Logo type="icon" />
         ) : (
-          <Logo size={100} />
+          <Logo />
         )}
         <div
           className={`

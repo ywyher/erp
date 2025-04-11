@@ -3,12 +3,11 @@ import Link from "next/link";
 import { FC } from "react";
 
 interface LogoProps {
-  size?: number;
   type?: "full" | "icon";
   className?: string;
 }
 
-const Logo: FC<LogoProps> = ({ size = 110, type = "full", className = "" }) => {
+const Logo: FC<LogoProps> = ({ type = "full", className = "" }) => {
   return (
     <Link 
       href="/"

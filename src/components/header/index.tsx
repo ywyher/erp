@@ -49,8 +49,7 @@ export default function Header({ className = "" }: { className?: string }) {
           className
         )}
       >
-        <Logo />
-
+        <Logo type={!isMobile ? 'full' : 'icon'} />
         <div className="flex-1 flex justify-center">
           <Links user={user || null} isMobile={isMobile} />
         </div>
