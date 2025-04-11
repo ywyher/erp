@@ -15,6 +15,7 @@ import { getUserRegistrationType } from "@/lib/db/queries";
 import { toast } from "sonner";
 import { updateUser } from "@/lib/db/mutations";
 import { genders } from "@/lib/constants";
+import { User } from "@/lib/db/schema";
 
 export default function SettingsForm() {
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -90,7 +91,7 @@ export default function SettingsForm() {
     const result = await updateUser({
       data: normalizedData,
       userId: user.id,
-      role: user.role
+      role: user.role as User['role']
     });
 
     if (result && result.error) {
