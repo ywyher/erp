@@ -16,10 +16,10 @@ import { service } from "@/lib/db/schema/service";
 import { z } from "zod";
 
 export const emailRegex = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/;
+export const usernameRegex = /^[a-zA-Z][a-zA-Z0-9._]{2,19}$/;
 export const phoneNumberRegex = /^(0\d{2}[\s-]?\d{7}|\d{11})$/;
 export const nationalIdRegex =
   /^([1-9]{1})([0-9]{2})([0-9]{2})([0-9]{2})([0-9]{2})[0-9]{3}([0-9]{1})[0-9]{1}$/;
-export const usernameRegex = /^[a-zA-Z][a-zA-Z0-9._]{2,19}$/;
 
 // Password Schema (without superRefine)
 export const basePasswordSchema = z.object({
