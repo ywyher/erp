@@ -8,7 +8,7 @@ import DashboardLayout from "@/app/(authenticated)/dashboard/_components/dashboa
 import { useQuery } from "@tanstack/react-query";
 import { User } from "@/lib/db/schema";
 
-export default async function Dashboard() {
+export default function Dashboard() {
   const { data: user, isLoading } = useQuery({
     queryKey: ['session', 'dashboard'],
     queryFn: async () => {
