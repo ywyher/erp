@@ -1,7 +1,4 @@
-import { getSession } from "@/lib/auth-client";
 import { Metadata } from "next";
-import { headers } from "next/headers";
-import { redirect } from "next/navigation";
 
 export const metadata: Metadata = {
   title: "Post Management | Dashboard | Perfect Health",
@@ -21,23 +18,10 @@ export const metadata: Metadata = {
   },
 }
 
-export default async function Layout({
+export default async function PostsLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const reqHeaders = await headers();
-
-  const { data } = await getSession({
-    fetchOptions: {
-      headers: reqHeaders,
-    },
-  });
-
-  // if (data?.user.role !== "admin" && data?.user.role !== "doctor") {
-  if (data?.user.role !== "admin") {
-    return redirect("/");
-  }
-
   return children;
 }
