@@ -84,7 +84,7 @@ export default function SettingsForm() {
 
   const onSubmit = async (data: z.infer<typeof updateUserSchema>) => {
     if (!user || !user.id) return;
-    // setIsLoading(true);
+    setIsLoading(true);
     
     const normalizedData = normalizeData(data, "object");
     
