@@ -33,6 +33,7 @@ export default function Header({ className = "" }: { className?: string }) {
       className={clsx(
         "flex items-center justify-center",
         "px-6 pt-4",
+        "z-10",
       )}
     >
       <div 

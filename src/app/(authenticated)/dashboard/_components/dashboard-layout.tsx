@@ -42,7 +42,7 @@ export default function DashboardLayout({
     <Card
       // max-w-[1200px]
       className={`
-        relative shadow-lg rounded-xl w-full mx-auto my-4 me-4 flex flex-col
+        relative shadow-lg rounded-xl w-full mx-auto sm:m-2 md:my-4 md:me-4 flex flex-col
         border-border/40 bg-card/95 backdrop-blur-sm
         transition-all duration-200 ease-in-out
         overflow-x-scroll

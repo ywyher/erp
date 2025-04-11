@@ -15,9 +15,9 @@ async function main() {
     body: {
       email: "admin@perfect-health.net",
       password: "Pmssa16771@",
-      name: "admin",
-      dateOfBirth: new Date().toISOString().split('T')[0],
-      displayUsername: 'admin',
+      name: "waleedhaikal",
+      dateOfBirth: new Date(1971, 6, 14).toISOString().split('T')[0],
+      displayUsername: 'waleedhaikal',
       gender: 'male',
       nationalId: '30801201100191',
       phoneNumber: '01024824716',

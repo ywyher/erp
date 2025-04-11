@@ -90,7 +90,6 @@ export default function SettingsForm() {
     const result = await updateUser({
       data: normalizedData,
       userId: user.id,
-      role: "user",
     });
 
     if (result && result.error) {
