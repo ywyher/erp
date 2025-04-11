@@ -1,6 +1,3 @@
-import { headers } from "next/headers";
-import { getSession } from "@/lib/auth-client";
-import { redirect } from "next/navigation";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -26,18 +23,5 @@ export default async function SettingsLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const reqHeaders = await headers();
-
-  const { data } = await getSession({
-    fetchOptions: {
-      headers: reqHeaders,
-    },
-  });
-
-  if(!data?.user.id) {
-    redirect('/')
-    return;
-  }
-
   return children
 }

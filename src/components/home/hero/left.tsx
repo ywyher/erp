@@ -12,11 +12,11 @@ export default function Left() {
                     </div>
                     <br />
                 </div>
-                    <Button asChild className="flex items-center gap-2 text-2xl text-white rounded-lg hover:dark:text-background p-7 w-fit">
-                        <Link href="/booking">
-                            Book an appointment
-                        </Link>
-                    </Button>
+                <Button asChild className="flex items-center gap-2 text-2xl text-white rounded-lg hover:dark:text-background p-7 w-fit">
+                    <Link href="/booking">
+                        Book an appointment
+                    </Link>
+                </Button>
             </div>
         </div>
     )
