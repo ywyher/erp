@@ -1,5 +1,5 @@
 import CreateAppointment from "@/app/(authenticated)/dashboard/appointments/create/_components/create-appointment";
-import { getSession } from "@/lib/auth-client";
+import { auth } from "@/lib/auth";
 import db from "@/lib/db/index";
 import { doctor, Schedule, schedule, User } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
@@ -28,10 +28,8 @@ const getUserSchedules = async (userId: User["id"]) => {
 };
 
 export default async function CreateAppointmentPage() {
-  const { data } = await getSession({
-    fetchOptions: {
-      headers: await headers(),
-    },
+  const data = await auth.api.getSession({
+    headers: await headers(),
   });
 
   if (!data || data.user.role == "user") return redirect("/dashboard");

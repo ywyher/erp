@@ -1,7 +1,7 @@
 "use server"
 
 import { presetSchema } from "@/app/(authenticated)/dashboard/presets/types";
-import { getSession } from "@/lib/auth-client";
+import { auth } from "@/lib/auth";
 import db from "@/lib/db/index";
 import { Doctor, doctor, OperationData, Preset, preset, User } from "@/lib/db/schema";
 import { generateId } from "@/lib/funcs";
@@ -11,10 +11,8 @@ import { headers } from "next/headers";
 import { z } from "zod";
 
 export async function getUser() {
-    const { data } = await getSession({
-        fetchOptions: {
-            headers: await headers()
-        }
+    const data = await auth.api.getSession({
+        headers: await headers()
     })
 
     if(!data) return;
@@ -63,10 +61,8 @@ export async function getDoctors() {
 
 // to display them in the table
 export async function getPresets() {
-    const { data } = await getSession({
-            fetchOptions: {
-            headers: await headers()
-        }
+    const data = await auth.api.getSession({
+        headers: await headers()
     })
 
     if(!data?.user) throw new Error("Unauthenticated")

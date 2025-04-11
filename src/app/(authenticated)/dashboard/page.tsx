@@ -9,7 +9,7 @@ import { useQuery } from "@tanstack/react-query";
 import { User } from "@/lib/db/schema";
 
 export default function Dashboard() {
-  const { data: user, isLoading } = useQuery({
+  const { data: user } = useQuery({
     queryKey: ['session', 'dashboard'],
     queryFn: async () => {
       const { data } = await getSession()
@@ -17,15 +17,19 @@ export default function Dashboard() {
     }
   })
 
-  if(!user || isLoading) return;
-
   return (
     <DashboardLayout
-      title={`${user.role.charAt(0).toUpperCase() + user.role.slice(1)} Dashboard`}
+      title={`
+        ${user && user.role.charAt(0).toUpperCase() + user.role.slice(1)}
+        Dashboard`}
     >
-      {user.role == "admin" && <AdminPage />}
-      {user.role == "receptionist" && <ReceptionistPage userId={user.id} />}
-      {user.role == "doctor" && <DoctorPage userId={user.id} />}
+      {user && (
+        <>
+          {user.role == "admin" && <AdminPage />}
+          {user.role == "receptionist" && <ReceptionistPage userId={user.id} />}
+          {user.role == "doctor" && <DoctorPage userId={user.id} />}
+        </>
+      )}
     </DashboardLayout>
   );
 }

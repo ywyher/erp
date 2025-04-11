@@ -4,17 +4,15 @@ import { getAppointments } from "@/app/(authenticated)/dashboard/appointments/ac
 import { appointmentTableColumns } from "@/app/(authenticated)/dashboard/appointments/columns";
 import { Button } from "@/components/ui/button";
 import { DataTable } from "@/components/ui/data-table";
-import { getSession } from "@/lib/auth-client";
+import { auth } from "@/lib/auth";
 import { User } from "@/lib/db/schema";
 import { CalendarCheck } from "lucide-react";
 import { headers } from "next/headers";
 import Link from "next/link";
 
 export default async function Appointments() {
-  const { data } = await getSession({
-    fetchOptions: {
-      headers: await headers(),
-    },
+  const data = await auth.api.getSession({
+    headers: await headers(),
   });
   
   if (!data) throw new Error("Unauthorized");

@@ -6,15 +6,13 @@ import { Button } from "@/components/ui/button";
 import { DataTable } from "@/components/ui/data-table";
 import { Newspaper } from "lucide-react";
 import Link from "next/link";
-import { getSession } from "@/lib/auth-client";
 import { headers } from "next/headers";
 import { User } from "@/lib/db/schema";
+import { auth } from "@/lib/auth";
 
 export default async function Services() {
-    const { data } = await getSession({
-      fetchOptions: {
-        headers: await headers()
-      }
+    const data = await auth.api.getSession({
+      headers: await headers()
     })
 
     if(!data?.user.id) return <>Loading...</>

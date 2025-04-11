@@ -6,9 +6,9 @@ import {
 } from "@aws-sdk/client-s3";
 import { headers } from "next/headers";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
-import { getSession } from "@/lib/auth-client";
 import crypto from "crypto";
 import { s3 } from "@/lib/utils";
+import { auth } from "@/lib/auth";
 
 const generateFileName = (bytes = 32) =>
   crypto.randomBytes(bytes).toString("hex");
@@ -33,10 +33,8 @@ export async function getPreSignedUrl({
 }) {
   const requestHeaders = await headers();
 
-  const { data } = await getSession({
-    fetchOptions: {
-      headers: requestHeaders,
-    },
+  const data = await auth.api.getSession({
+    headers: requestHeaders,
   });
 
   if (!data || !data.user) {
@@ -73,10 +71,8 @@ export async function getPreSignedUrl({
 export async function deleteFile(fileName: string) {
   const requestHeaders = await headers();
 
-  const { data } = await getSession({
-    fetchOptions: {
-      headers: requestHeaders,
-    },
+  const data = await auth.api.getSession({
+    headers: requestHeaders,
   });
 
   if (!data || !data.user) {

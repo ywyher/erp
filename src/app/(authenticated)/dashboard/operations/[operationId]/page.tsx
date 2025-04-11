@@ -1,7 +1,7 @@
 import DashboardLayout from "@/app/(authenticated)/dashboard/_components/dashboard-layout";
 import OperationTabs from "@/app/(authenticated)/dashboard/operations/[operationId]/_components/operation-tabs";
 import { getDoctorData, getPatientData } from "@/app/(authenticated)/dashboard/operations/[operationId]/actions";
-import { getSession } from "@/lib/auth-client";
+import { auth } from "@/lib/auth";
 import { getOperationDocument } from "@/lib/db/queries";
 import { Consultation, MedicalFile, Operation as TOperation, OperationData, User } from "@/lib/db/schema";
 import { headers } from "next/headers";
@@ -16,10 +16,8 @@ export default async function Operation({
 }) {
   const { operationId } = await params;
 
-  const { data } = await getSession({
-    fetchOptions: {
-      headers: await headers(),
-    },
+  const data = await auth.api.getSession({
+    headers: await headers(),
   });
 
   if (!data || !data.user) {

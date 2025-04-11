@@ -1,9 +1,9 @@
 import { headers } from "next/headers";
-import { getSession } from "@/lib/auth-client";
 import { redirect } from "next/navigation";
 import { Operation } from "@/lib/db/schema";
 import { getOperationStatus } from "@/app/(authenticated)/dashboard/operations/actions";
 import { Metadata } from "next";
+import { auth } from "@/lib/auth";
 
 type Params = Promise<{ operationId: Operation['id'] }>
 
@@ -42,30 +42,25 @@ export default async function OperationDetailsLayout({
 
   const reqHeaders = await headers();
 
-  // Validate session
-  const session = await getSession({
-    fetchOptions: {
-      headers: reqHeaders,
-    },
+  const data = await auth.api.getSession({
+    headers: reqHeaders,
   });
 
-  if (!session?.data) {
+  if (!data) {
     console.error("Could not get session data");
-    redirect("/"); // Redirect to login if session is invalid
+    redirect("/");
     return;
   }
 
-  // Validate operation status
   const status = await getOperationStatus(operationId);
 
   if (!status) {
     console.error("Could not get operation status");
-    redirect("/dashboard/operations"); // Redirect if operation status is invalid
+    redirect("/dashboard/operations");
     return;
   }
 
-  // Check if the operation is completed or if the user is a doctor
-  if (status !== "completed" && session.data.user.role !== "doctor") {
+  if (status !== "completed" && data.user.role !== "doctor") {
     redirect("/dashboard/operations");
     return;
   }

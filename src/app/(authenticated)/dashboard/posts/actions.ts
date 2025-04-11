@@ -1,6 +1,5 @@
 "use server";
 
-import { getSession } from "@/lib/auth-client"
 import db from "@/lib/db/index"
 import { Post, post, User, user } from "@/lib/db/schema"
 import { generateId } from "@/lib/funcs"
@@ -11,6 +10,7 @@ import slugify from 'slugify'
 import { deleteFile } from "@/lib/s3";
 import { revalidatePath } from "next/cache";
 import { PostContentItem } from "@/app/(authenticated)/dashboard/posts/types";
+import { auth } from "@/lib/auth";
 
 export const getPosts = async ({ id, role }: { id: User['id'], role: User['role'] }) => {
     let posts;
@@ -42,10 +42,8 @@ export async function createPost({ title, content, status, category, thumbnail, 
      tags: Post['tags']
     }) {
     try {
-        const { data } = await getSession({
-            fetchOptions: {
-                headers: await headers(),
-            },
+        const data = await auth.api.getSession({
+            headers: await headers(),
         });
     
         if(!data || !data.user) throw new Error("Couldn't Retrieve User Data...");

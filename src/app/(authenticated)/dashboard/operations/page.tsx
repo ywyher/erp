@@ -5,17 +5,15 @@ import { operationTableColumns } from "@/app/(authenticated)/dashboard/operation
 import ToastWrapper from "@/components/toast-wrapper";
 import { Button } from "@/components/ui/button";
 import { DataTable } from "@/components/ui/data-table";
-import { getSession } from "@/lib/auth-client";
+import { auth } from "@/lib/auth";
 import { User } from "@/lib/db/schema";
 import { Cross } from "lucide-react";
 import { headers } from "next/headers";
 import Link from "next/link";
 
 export default async function Operations() {
-  const { data } = await getSession({
-    fetchOptions: {
-      headers: await headers(),
-    },
+  const data = await auth.api.getSession({
+    headers: await headers(),
   });
 
   if (!data) throw new Error("Unauthorized");

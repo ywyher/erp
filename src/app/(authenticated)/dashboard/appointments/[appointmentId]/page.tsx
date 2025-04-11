@@ -1,6 +1,6 @@
 import DashboardLayout from "@/app/(authenticated)/dashboard/_components/dashboard-layout";
 import AppointmentTabs from "@/app/(authenticated)/dashboard/appointments/[appointmentId]/_components/appointment-tabs";
-import { getSession } from "@/lib/auth-client";
+import { auth } from "@/lib/auth";
 import db from "@/lib/db/index";
 import {
   Appointment as TAppointment,
@@ -90,10 +90,8 @@ export default async function Appointment({
     prescriptions?: Prescription[];
   };
 
-  const { data } = await getSession({
-    fetchOptions: {
-      headers: await headers(),
-    },
+  const data = await auth.api.getSession({
+    headers: await headers(),
   });
 
   if (!data || !data.user) {

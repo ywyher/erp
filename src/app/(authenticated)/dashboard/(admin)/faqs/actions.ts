@@ -1,7 +1,7 @@
 'use server'
 
 import { faqSchema } from "@/app/(authenticated)/dashboard/(admin)/faqs/types"
-import { getSession } from "@/lib/auth-client"
+import { auth } from "@/lib/auth"
 import db from "@/lib/db/index"
 import { admin, Faq, faq } from "@/lib/db/schema"
 import { generateId } from "@/lib/funcs"
@@ -22,17 +22,17 @@ export const getFaqData = async (faqId: Faq['id']) => {
 
 export async function createFaq({ data }: { data: z.infer<typeof faqSchema> }) {
     try {
-        const userData = await getSession({
-            fetchOptions: {
-                headers: await headers(),
-            },
+        const userData = await auth.api.getSession({
+            headers: await headers(),
         });
+
+        const user = userData?.user
     
-        if(!userData.data || !userData.data.user) throw new Error("Couldn't Retrieve User Data...");
+        if(!user) throw new Error("Couldn't Retrieve User Data...");
         
         // Get the admin record for this user
         const adminRecord = await db.query.admin.findFirst({
-            where: eq(admin.userId, userData.data.user.id)
+            where: eq(admin.userId, user.id)
         });
         
         if (!adminRecord) throw new Error("You don't have permission to create faqs");

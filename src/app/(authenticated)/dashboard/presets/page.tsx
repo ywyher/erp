@@ -6,14 +6,12 @@ import { Layers } from "lucide-react";
 import Link from "next/link";
 import { presetTableColumns } from "@/app/(authenticated)/dashboard/presets/columns";
 import { getPresets } from "@/app/(authenticated)/dashboard/presets/actions";
-import { getSession } from "@/lib/auth-client";
 import { headers } from "next/headers";
+import { auth } from "@/lib/auth";
 
 export default async function Presets() {
-    const { data } = await getSession({
-            fetchOptions: {
-            headers: await headers()
-        }
+    const data = await auth.api.getSession({
+        headers: await headers()
     })
 
     if(!data?.user) throw new Error("Unauthenticated")

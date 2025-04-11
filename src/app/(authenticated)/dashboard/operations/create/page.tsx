@@ -1,7 +1,7 @@
 import CreateOperation from "@/app/(authenticated)/dashboard/operations/create/_components/create-operation";
-import { getSession, User } from "@/lib/auth-client";
+import { auth } from "@/lib/auth";
 import db from "@/lib/db/index";
-import { doctor } from "@/lib/db/schema";
+import { doctor, User } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
@@ -17,10 +17,8 @@ const getDocotorId = async (userId: User["id"]) => {
 };
 
 export default async function CreateOperationPage() {
-  const { data } = await getSession({
-    fetchOptions: {
-      headers: await headers(),
-    },
+  const data = await auth.api.getSession({
+    headers: await headers(),
   });
 
   if (

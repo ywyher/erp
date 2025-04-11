@@ -1,9 +1,9 @@
 import { headers } from "next/headers";
-import { getSession } from "@/lib/auth-client";
 import { redirect } from "next/navigation";
 import { getAppointmentStatus } from "@/app/(authenticated)/dashboard/appointments/[appointmentId]/actions";
 import type { Metadata } from "next";
 import { Appointment } from "@/lib/db/schema";
+import { auth } from "@/lib/auth";
 
 type Params = Promise<{ appointmentId: Appointment['id'] }>
 
@@ -38,13 +38,11 @@ export default async function AppointmentDetailsLayout({ children, params }: Lay
   const { appointmentId } = await params;
   const reqHeaders = await headers();
 
-  const session = await getSession({
-    fetchOptions: {
-      headers: reqHeaders,
-    },
+  const data = await auth.api.getSession({
+    headers: reqHeaders,
   });
 
-  if (!session?.data) {
+  if (!data) {
     console.error("Could not get session data");
     redirect("/");
     return;
@@ -58,7 +56,7 @@ export default async function AppointmentDetailsLayout({ children, params }: Lay
     return;
   }
 
-  if (status !== "completed" && session.data.user.role !== "doctor") {
+  if (status !== "completed" && data.user.role !== "doctor") {
     redirect("/dashboard/appointment");
     return;
   }

@@ -2,8 +2,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
-import { getSession } from "@/lib/auth-client";
 import crypto from "crypto";
+import { auth } from "@/lib/auth";
 
 const s3 = new S3Client({
   region: "auto",
@@ -52,13 +52,11 @@ const fileTypeConfigs = {
 const acceptedTypes = Object.keys(fileTypeConfigs);
 
 export async function POST(req: NextRequest) {
-  const { data: session } = await getSession({
-    fetchOptions: {
-      headers: req.headers,
-    },
+  const data = await auth.api.getSession({
+    headers: req.headers,
   });
 
-  if (!session || !session.user) {
+  if (!data || !data.user) {
     return NextResponse.json({ message: "Not authenticated" }, { status: 401 });
   }
 
@@ -88,7 +86,7 @@ export async function POST(req: NextRequest) {
     ContentLength: size,
     ChecksumSHA256: checksum,
     Metadata: {
-      userId: session.user.id,
+      userId: data.user.id,
     },
   });
 
