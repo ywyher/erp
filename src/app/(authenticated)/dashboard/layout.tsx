@@ -1,9 +1,7 @@
-import { cookies, headers } from "next/headers";
+import { cookies } from "next/headers";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import Sidebar from "@/app/(authenticated)/dashboard/_components/sidebar/sidebar";
-import { User } from "@/lib/db/schema";
 import { Metadata } from "next";
-import { auth } from "@/lib/auth";
 
 export const metadata: Metadata = {
   title: "Dashboard | Perfect Health",
@@ -30,15 +28,10 @@ export default async function Layout({
 }) {
   const cookieStore = await cookies();
   const defaultOpen = cookieStore.get("sidebar:state")?.value === "true";
-  const reqHeaders = await headers();
-
-  const data = await auth.api.getSession({
-    headers: reqHeaders,
-  });
 
   return (
     <SidebarProvider defaultOpen={defaultOpen}>
-      <Sidebar userRole={data?.user.role as User["role"]} />
+      <Sidebar />
       {children}
     </SidebarProvider>
   );

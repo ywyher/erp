@@ -46,7 +46,7 @@ export default function SidebarFooter() {
       return;
     }
 
-    queryClient.invalidateQueries({ queryKey: ['session'] })
+    queryClient.invalidateQueries({ queryKey: ['session', 'sidebar-footer'] })
     router.push('/')
   }
 

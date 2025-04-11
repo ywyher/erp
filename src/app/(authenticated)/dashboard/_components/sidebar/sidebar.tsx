@@ -15,9 +15,19 @@ import { User } from "@/lib/db/schema";
 import Logo from "@/components/logo";
 import { useSidebar } from "@/components/ui/sidebar";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { useQuery } from "@tanstack/react-query";
+import { getSession } from "@/lib/auth-client";
 
-export default function Sidebar({ userRole }: { userRole: User["role"] }) {
+export default function Sidebar() {
   const { state, isMobile } = useSidebar();
+
+  const { data: user, isLoading } = useQuery({
+    queryKey: ['session', 'sidebar'],
+    queryFn: async () => {
+      const { data } = await getSession()
+      return data?.user as User
+    }
+  })
 
   return (
     <CSidebar collapsible="icon" variant="inset">
@@ -44,10 +54,14 @@ export default function Sidebar({ userRole }: { userRole: User["role"] }) {
       </SidebarHeader>
       <SidebarSeparator />
       <SidebarContent>
-        {userRole == "admin" && <AdminDashboard />}
-        {userRole == "doctor" && <DoctorDashboard />}
-        {userRole == "receptionist" && <ReceptionistDashboard />}
-        {userRole == "user" && <UserDashboard />}
+        {(user && !isLoading) && (
+          <>
+            {user.role == "admin" && <AdminDashboard />}
+            {user.role == "doctor" && <DoctorDashboard />}
+            {user.role == "receptionist" && <ReceptionistDashboard />}
+            {user.role == "user" && <UserDashboard />}
+          </>
+        )}
       </SidebarContent>
       <SidebarFooter />
     </CSidebar>
