@@ -22,13 +22,13 @@ const environment = process.env.ENV || "DEVELOPMENT";
 const DATABASE_URL = process.env.DATABASE_URL;
 
 function createDbClient(): DatabaseClient {
-  if (!process.env.DATABASE_URL) {
+  if (!DATABASE_URL) {
     throw new Error("DATABASE_URL environment variable is not set");
   }
 
   if (environment === "DEVELOPMENT") {
     // Local development setup
-    const client = postgres(process.env.DATABASE_URL, { max: 1 });
+    const client = postgres(DATABASE_URL, { max: 1 });
     const db = drizzlePostgres(client, {
       schema,
       logger: true, // Log SQL queries during development
@@ -37,7 +37,7 @@ function createDbClient(): DatabaseClient {
     return db;
   } else {
     // Production setup
-    const sql = neon(process.env.DATABASE_URL);
+    const sql = neon(DATABASE_URL);
     const db = drizzleNeon({ client: sql, schema });
     console.log("Connected to Neon database");
     return db;

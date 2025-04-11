@@ -1,20 +1,17 @@
-import { auth } from '@/lib/auth'
-import { headers } from 'next/headers'
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
+import { getSessionCookie } from "better-auth/cookies";
 
 export const config = {
-  matcher: ['/settings']
+  matcher: ['/settings'],
 }
 
 export async function middleware(request: NextRequest) {
   try {
-    const data = await auth.api.getSession({
-      headers: await headers()
-    })
+    const sessionCookie = getSessionCookie(request);
 
-    if (!data?.user) {
-      return NextResponse.redirect(new URL('/', request.url))
+    if (!sessionCookie) {
+      return NextResponse.redirect(new URL("/", request.url));
     }
     
     return NextResponse.next()
