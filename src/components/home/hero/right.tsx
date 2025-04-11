@@ -6,11 +6,10 @@ export default function Right() {
  return (
     <div className="grid place-items-center w-[500px] h-[500px]">
         <div className="relative w-full h-full 
-            border-[2rem] border-gray-200 dark:border-gray-700
-            rounded-full 
-            shadow-2xl 
+            md:border-[2rem] border-gray-300 dark:border-gray-800
+            rounded-full shadow-2xl 
             flex items-center justify-center
-            bg-gradient-to-br from-indigo-50 to-white
+            md:bg-gradient-to-br from-indigo-50 to-white
             dark:from-indigo-900/30 dark:to-black/30
         ">
             <div className="
@@ -27,18 +26,28 @@ export default function Right() {
                 ease-in-out
             ">
                 <FloatingCard 
-                    title="Well qualified doctors" 
-                    description='Treat with care'
+                    title="Well-qualified doctors" 
+                    description="Experienced professionals ready to care for you"
                     Icon={Users}
-                    className="-top-16 -left-24 rotate-[-5deg]"
+                    className="top-10 -left-6 md:-left-20 rotate-[-4deg]"
                 />
+
                 <FloatingCard
                     title="Book an appointment" 
-                    description='At your fingertips'
+                    description="Seamlessly schedule your visits"
                     Icon={Clock}
                     className="
-                        top-44 left-48 md:left-64 z-10 
-                        w-[280px] rotate-[5deg]
+                        top-48 md:top-40 left-32 md:left-60 z-10 
+                        w-[280px] rotate-[4deg]
+                    "
+                />
+                <FloatingCard
+                    title="Digital healthcare platform" 
+                    description="Your complete care hub"
+                    Icon={Clock}
+                    className="
+                        bottom-0 md:bottom-0 -left-6 md:-left-16 z-10 
+                        rotate-[2deg] w-fit
                     "
                 />
                 <div className="

@@ -1,22 +1,30 @@
+import { auth } from '@/lib/auth'
+import { headers } from 'next/headers'
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
-import { getSessionCookie } from "better-auth/cookies";
-
-export const config = {
-  matcher: ['/settings'],
-}
 
 export async function middleware(request: NextRequest) {
   try {
-    const sessionCookie = getSessionCookie(request);
+    const data = await auth.api.getSession({
+      headers: await headers()
+    })
 
-    if (!sessionCookie) {
-      return NextResponse.redirect(new URL("/", request.url));
+    const user = data?.user
+
+    if (!user && request.nextUrl.pathname.startsWith('/settings')) {
+      return NextResponse.rewrite(new URL('/', request.url))
     }
-    
-    return NextResponse.next()
+   
+    if ((!user || user.role == 'user') && request.nextUrl.pathname.startsWith('/dashboard')) {
+      return NextResponse.rewrite(new URL('/', request.url))
+    }
   } catch (error) {
     console.error('Auth middleware error:', error)
     return NextResponse.redirect(new URL('/', request.url))
   }
+}
+
+export const config = {
+  runtime: 'nodejs',
+  matcher: ['/settings', '/dashboard/:path*'],
 }

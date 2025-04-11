@@ -2,22 +2,16 @@
 
 import { auth } from "@/lib/auth";
 import db from "@/lib/db";
-import { admin } from "@/lib/db/schema";
+import { admin, user } from "@/lib/db/schema";
 import { generateId } from "@/lib/funcs";
+import { eq } from "drizzle-orm";
 
 async function main() {
   console.log("🌱 Starting database seeding...");
 
-  const exists = await db.query.user.findFirst({
-    where: (user, { eq }) => eq(user.email, 'admin@perfect-health.net')
-  })
+  await db.delete(user).where(eq(user.email, 'admin@perfect-health.net'))
 
-  if(exists?.id) {
-    console.log("🌱 User already exists...");
-    return;
-  }
-
-  const { user } = await auth.api.signUpEmail({
+  const data = await auth.api.signUpEmail({
     body: {
       email: "admin@perfect-health.net",
       password: "Pmssa16771@",
@@ -29,7 +23,8 @@ async function main() {
       phoneNumber: '01024824716',
       role: "admin",
       username: 'admin',
-      provider: 'email'
+      provider: 'email',
+      emailVerified: true,
     }
   })
 
@@ -37,7 +32,7 @@ async function main() {
     .insert(admin)
     .values({
       id: generateId(),
-      userId: user.id,
+      userId: data.user.id,
       createdAt: new Date(),
       updatedAt: new Date(),
   })

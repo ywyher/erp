@@ -23,13 +23,13 @@ import {
 } from "@/components/ui/sheet";
 import Pfp from "@/components/pfp";
 import { Separator } from "@/components/ui/separator";
-import { StyledLink } from "@/components/header/styled-link";
 import { User } from "@/lib/db/schema";
-import Links from "@/components/header/links";
+import { getLinks } from "@/components/header/links";
 import { signOut } from "@/lib/auth-client";
 import { Button } from "@/components/ui/button";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
+import Link from "next/link";
 
 export function Menu({ user, isMobile }: { user: User; isMobile: boolean }) {
   const router = useRouter();
@@ -48,6 +48,8 @@ export function Menu({ user, isMobile }: { user: User; isMobile: boolean }) {
   }
   if (!user) return;
 
+  const links = getLinks(user)
+
   if (isMobile)
     return (
       <Sheet>
@@ -64,18 +66,33 @@ export function Menu({ user, isMobile }: { user: User; isMobile: boolean }) {
             </SheetHeader>
             <Separator />
           </div>
-          <div className="flex flex-col gap-4">
-            <div className="flex flex-col gap-5">
-              <Links isMobile={isMobile} user={user} />
+          <div className="flex flex-col gap-4 h-full">
+            <div className="flex flex-col gap-1 w-full">
+              {links.map((link, idx) => (
+                <Link
+                  key={idx}
+                  href={link.href}
+                  className="flex items-center gap-3 px-3 py-2 rounded-md text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+                >
+                  <link.icon className="w-5 h-5 text-slate-600 dark:text-slate-400" />
+                  <span className="font-medium">{link.label}</span>
+                </Link>
+              ))}
             </div>
             <Separator />
-            <StyledLink href="/settings" icon={Settings} isMobile={isMobile}>
-              Settings
-            </StyledLink>
-            <Button onClick={() => handleLogout()}>
-              <LogOut />
-              Logout
-            </Button>
+            <Link
+              href="/settings"
+              className="flex items-center gap-3 px-3 py-2 rounded-md text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+            >
+              <Settings className="w-5 h-5 text-slate-600 dark:text-slate-400" />
+              <span className="font-medium">Settings</span>
+            </Link>
+            <div className="flex items-end h-full">
+              <Button className="w-full" onClick={() => handleLogout()}>
+                <LogOut />
+                Logout
+              </Button>
+            </div>
           </div>
         </SheetContent>
       </Sheet>

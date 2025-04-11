@@ -123,7 +123,7 @@
     "mammoth": "^1.9.0",
     "mongodb": "^6.15.0",
     "nanoid": "^5.1.5",
-    "next": "15.2.4",
+    "next": "15.3.1-canary.4",
     "next-themes": "^0.4.6",
     "nuqs": "^2.4.1",
     "oslo": "^1.2.1",
