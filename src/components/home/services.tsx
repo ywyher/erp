@@ -16,6 +16,7 @@ import { getServices } from "@/app/(authenticated)/dashboard/(admin)/services/ac
 import ServiceCard from "@/components/service-card";
 import { IconName } from "@/components/icons-selector";
 import ServiceCardSkeleton from "@/components/service-card-skeleton";
+import Section from "@/components/section";
 
 export default function Services() {
     const [scrollProgress, setScrollProgress] = useState(0)
@@ -59,68 +60,70 @@ export default function Services() {
     if (services && services.length === 0) return null;
     
     return (
-        <CardLayout
-          title="Our Services"
-          className="relative flex flex-col justify-center h-fit w-full"
-          variant="home"
-        >
-          <div className="absolute inset-0 -z-10 pointer-events-none">
-            <div className="
-              absolute left-1/2 top-1/2
-              -translate-x-1/2 -translate-y-1/2
-              md:h-[400px] md:w-[60%] w-[100%] h-[700px]
-              rounded-full bg-primary opacity-30 blur-[80px]
-            "></div>
-          </div>
-          <Carousel
-            setApi={setApi}
-            opts={{
-              align: "start",
-              loop: true,
-            }}
-            className="w-full overflow-visible"
+        <Section>
+          <CardLayout
+            title="Our Services"
+            className="relative flex flex-col justify-center h-fit w-full"
+            variant="home"
           >
-            <div className="flex flex-col gap-3">
-              <CarouselContent className="py-4 px-2">
-                {isServicesLoading
-                  ? loadingArray.map((_, idx) => (
-                      <CarouselItem key={idx} className="md:basis-1/2 lg:basis-1/3">
-                        <ServiceCardSkeleton />
-                      </CarouselItem>
-                    ))
-                  : services?.map((service) => (
-                      <CarouselItem
-                        key={service.id}
-                        className="flex items-center justify-center md:basis-1/2 lg:basis-1/3"
-                      >
-                        <ServiceCard
-                            icon={service.icon as IconName}
-                            title={service.title}
-                        />
-                      </CarouselItem>
-                    ))
-                }
-              </CarouselContent>
-              <div className="flex flex-row items-center justify-between gap-4 mt-4">
-                <div className="
-                  flex-grow h-3 overflow-hidden
-                  border-2 border-background rounded
-                ">
-                  <div
-                    className="left-0 h-full transition-transfor duration-300 ease-out rounded bg-gradient-to-r to-primary from-secondary"
-                    style={{
-                      transform: `translateX(${scrollProgress - 100}%)`,
-                      willChange: "transform"
-                    }}
-                  />
-                </div>
-                <div className="flex justify-center gap-4">
-                  <CarouselPrevious variant="outline" className="static w-8 h-8 transform-none" />
-                  <CarouselNext variant="outline" className="static w-8 h-8 transform-none" />
+            <div className="absolute inset-0 -z-10 pointer-events-none">
+              <div className="
+                absolute left-1/2 top-1/2
+                -translate-x-1/2 -translate-y-1/2
+                md:h-[400px] md:w-[60%] w-[100%] h-[700px]
+                rounded-full bg-primary opacity-30 blur-[80px]
+              "></div>
+            </div>
+            <Carousel
+              setApi={setApi}
+              opts={{
+                align: "start",
+                loop: true,
+              }}
+              className="w-full overflow-visible"
+            >
+              <div className="flex flex-col gap-3">
+                <CarouselContent className="py-4 px-2">
+                  {isServicesLoading
+                    ? loadingArray.map((_, idx) => (
+                        <CarouselItem key={idx} className="md:basis-1/2 lg:basis-1/3">
+                          <ServiceCardSkeleton />
+                        </CarouselItem>
+                      ))
+                    : services?.map((service) => (
+                        <CarouselItem
+                          key={service.id}
+                          className="flex items-center justify-center md:basis-1/2 lg:basis-1/3"
+                        >
+                          <ServiceCard
+                              icon={service.icon as IconName}
+                              title={service.title}
+                          />
+                        </CarouselItem>
+                      ))
+                  }
+                </CarouselContent>
+                <div className="flex flex-row items-center justify-between gap-4 mt-4">
+                  <div className="
+                    flex-grow h-3 overflow-hidden
+                    border-2 border-background rounded
+                  ">
+                    <div
+                      className="left-0 h-full transition-transfor duration-300 ease-out rounded bg-gradient-to-r to-primary from-secondary"
+                      style={{
+                        transform: `translateX(${scrollProgress - 100}%)`,
+                        willChange: "transform"
+                      }}
+                    />
+                  </div>
+                  <div className="flex justify-center gap-4">
+                    <CarouselPrevious variant="outline" className="static w-8 h-8 transform-none" />
+                    <CarouselNext variant="outline" className="static w-8 h-8 transform-none" />
+                  </div>
                 </div>
               </div>
-            </div>
-          </Carousel>
-        </CardLayout>
+            </Carousel>
+          </CardLayout>
+        </Section>
       )
 }

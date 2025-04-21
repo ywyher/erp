@@ -15,6 +15,7 @@ import PostCard from "@/components/post-card";
 import { useQuery } from "@tanstack/react-query";
 import { getPosts } from "@/components/home/actions";
 import PostCardSkeleton from "@/components/post-card-skeleton";
+import Section from "@/components/section";
 
 export default function Posts() {
     const [scrollProgress, setScrollProgress] = useState(0)
@@ -58,73 +59,75 @@ export default function Posts() {
     if (posts && posts.length === 0) return null;
     
     return (
-        <CardLayout
-          title="Latest Posts"
-          className="relative flex flex-col justify-center h-fit w-full"
-          variant="home"
-        >
-          <div className="absolute inset-0 -z-10 pointer-events-none">
-            <div className="
-              absolute top-[25%] left-0
-              -translate-x-1/3 -translate-y-1/3
-              h-[300px] w-[300px]
-              rounded-full bg-primary opacity-50 blur-[80px]
-            "></div>
-          </div>
-          <div className="absolute inset-0 -z-10 pointer-events-none">
-            <div className="
-              absolute bottom-0 right-0
-              translate-x-1/4 translate-y-1/4
-              h-[300px] w-[200px]
-              rounded-full bg-secondary opacity-50 blur-[80px]
-            "></div>
-          </div>
-          <Carousel
-            setApi={setApi}
-            opts={{
-              align: "start",
-              loop: true,
-            }}
-            className="w-full overflow-visible"
+        <Section>
+          <CardLayout
+            title="Latest Posts"
+            className="relative flex flex-col justify-center h-fit w-full"
+            variant="home"
           >
-            <div className="flex flex-col gap-3">
-              <CarouselContent className="py-4 px-2">
-                {isPostsLoading
-                  ? loadingArray.map((_, idx) => (
-                      <CarouselItem key={idx} className="md:basis-1/2 lg:basis-1/3">
-                        <PostCardSkeleton />
-                      </CarouselItem>
-                    ))
-                  : posts?.map((post) => (
-                      <CarouselItem
-                        key={post.id}
-                        className="flex items-center justify-center md:basis-1/2 lg:basis-1/3"
-                      >
-                        <PostCard post={post} />
-                      </CarouselItem>
-                    ))
-                }
-              </CarouselContent>
-              <div className="flex flex-row items-center justify-between gap-4 mt-4">
-                <div className="
-                  flex-grow h-3 overflow-hidden
-                  border-2 border-background rounded
-                ">
-                  <div
-                    className="left-0 h-full transition-transfor duration-300 ease-out rounded bg-gradient-to-r to-primary from-secondary"
-                    style={{
-                      transform: `translateX(${scrollProgress - 100}%)`,
-                      willChange: "transform"
-                    }}
-                  />
-                </div>
-                <div className="flex justify-center gap-4">
-                  <CarouselPrevious variant="outline" className="static w-8 h-8 transform-none" />
-                  <CarouselNext variant="outline" className="static w-8 h-8 transform-none" />
+            <div className="absolute inset-0 -z-10 pointer-events-none">
+              <div className="
+                absolute top-[25%] left-0
+                -translate-x-1/3 -translate-y-1/3
+                h-[300px] w-[300px]
+                rounded-full bg-primary opacity-50 blur-[80px]
+              "></div>
+            </div>
+            <div className="absolute inset-0 -z-10 pointer-events-none">
+              <div className="
+                absolute bottom-0 right-0
+                translate-x-1/4 translate-y-1/4
+                h-[300px] w-[200px]
+                rounded-full bg-secondary opacity-50 blur-[80px]
+              "></div>
+            </div>
+            <Carousel
+              setApi={setApi}
+              opts={{
+                align: "start",
+                loop: true,
+              }}
+              className="w-full overflow-visible"
+            >
+              <div className="flex flex-col gap-3">
+                <CarouselContent className="py-4 px-2">
+                  {isPostsLoading
+                    ? loadingArray.map((_, idx) => (
+                        <CarouselItem key={idx} className="md:basis-1/2 lg:basis-1/3">
+                          <PostCardSkeleton />
+                        </CarouselItem>
+                      ))
+                    : posts?.map((post) => (
+                        <CarouselItem
+                          key={post.id}
+                          className="flex items-center justify-center md:basis-1/2 lg:basis-1/3"
+                        >
+                          <PostCard post={post} />
+                        </CarouselItem>
+                      ))
+                  }
+                </CarouselContent>
+                <div className="flex flex-row items-center justify-between gap-4 mt-4">
+                  <div className="
+                    flex-grow h-3 overflow-hidden
+                    border-2 border-background rounded
+                  ">
+                    <div
+                      className="left-0 h-full transition-transfor duration-300 ease-out rounded bg-gradient-to-r to-primary from-secondary"
+                      style={{
+                        transform: `translateX(${scrollProgress - 100}%)`,
+                        willChange: "transform"
+                      }}
+                    />
+                  </div>
+                  <div className="flex justify-center gap-4">
+                    <CarouselPrevious variant="outline" className="static w-8 h-8 transform-none" />
+                    <CarouselNext variant="outline" className="static w-8 h-8 transform-none" />
+                  </div>
                 </div>
               </div>
-            </div>
-          </Carousel>
-        </CardLayout>
+            </Carousel>
+          </CardLayout>
+        </Section>
       )
 }
