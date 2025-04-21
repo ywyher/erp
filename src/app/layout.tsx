@@ -5,7 +5,6 @@ import localFont from "next/font/local";
 import "./globals.css";
 import { ReactQueryProvider } from "@/lib/react-query";
 import { NuqsAdapter } from "nuqs/adapters/next/app";
-import { Analytics } from "@vercel/analytics/react"
 import Seeder from "@/components/seeder";
 import Script from "next/script";
 
@@ -56,7 +55,6 @@ export default async function RootLayout({
           antialiased overflow-x-hidden
         `}
       >
-        <Analytics />
         <ReactQueryProvider>
           <div 
             className="
