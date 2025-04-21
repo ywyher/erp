@@ -88,7 +88,7 @@ export default function Check({
       callbackURL: process.env.NEXT_PUBLIC_APP_URL,
     });
 
-    if (!data.error) {
+    if (!data) {
       setIsLoading(false);
     }
   };

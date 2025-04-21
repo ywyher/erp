@@ -39,6 +39,7 @@ export default function DialogWrapper({
       <Drawer open={open} onOpenChange={setOpen}>
         {trigger && <DrawerTrigger asChild>{trigger}</DrawerTrigger>}
         <DrawerContent className={`
+          h-[90vh]
           pb-3
           px-3
           ${className}
