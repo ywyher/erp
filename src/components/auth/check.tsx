@@ -6,7 +6,6 @@ import { authSchema } from "@/components/auth/types";
 import { zodResolver } from "@hookform/resolvers/zod";
 import LoadingBtn from "@/components/loading-btn";
 import { checkIdentifier, normalizeData } from "@/lib/funcs";
-import { signIn } from "@/lib/auth-client";
 import { Dispatch, useState } from "react";
 import { checkFieldAvailability } from "@/lib/db/queries";
 import { z } from "zod";
@@ -105,14 +104,14 @@ export default function Check({
           <Google /> Log In with Google
         </LoadingBtn>
       </div> */}
-      <div className="relative">
+      {/* <div className="relative">
         <div className="absolute inset-0 flex items-center">
           <span className="w-full border-t border-zinc-700" />
         </div>
         <div className="relative flex justify-center text-xs uppercase">
           <span className="px-2 text-zinc-400">Or</span>
         </div>
-      </div>
+      </div> */}
       <Form {...form}>
         <form onSubmit={form.handleSubmit(handleCheck, handleError)} className="space-y-4">
           <div>

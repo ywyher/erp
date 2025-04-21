@@ -97,6 +97,7 @@
     "@udecode/plate-toggle": "^45.0.6",
     "@udecode/plate-trailing-block": "^44.0.0",
     "@uploadthing/react": "7.1.0",
+    "@vercel/analytics": "^1.5.0",
     "@vercel/postgres": "^0.10.0",
     "alert": "^6.0.2",
     "axios": "^1.8.4",

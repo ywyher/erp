@@ -4,7 +4,7 @@ import Image from "next/image";
 
 export default function Right() {
  return (
-    <div className="grid place-items-center w-[500px] h-[500px]">
+    <div className="grid place-items-center w-full max-w-[500px] h-[500px] relative">
         <div className="relative w-full h-full 
             md:border-[2rem] border-gray-300 dark:border-gray-800
             rounded-full shadow-2xl 

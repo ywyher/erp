@@ -9,7 +9,7 @@ export default function Hero() {
             variant="home"
             contentClassName="
                 grid grid-cols-1 lg:grid-cols-2
-                items-center min-h-[85vh]
+                items-center min-h-[87vh]
                 pt-5 lg:pt-0
                 lg:gap-0 gap-24
             "

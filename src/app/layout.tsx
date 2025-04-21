@@ -5,6 +5,7 @@ import localFont from "next/font/local";
 import "./globals.css";
 import { ReactQueryProvider } from "@/lib/react-query";
 import { NuqsAdapter } from "nuqs/adapters/next/app";
+import { Analytics } from "@vercel/analytics/react"
 import Seeder from "@/components/seeder";
 import Script from "next/script";
 
@@ -52,16 +53,19 @@ export default async function RootLayout({
       <body
         className={`
           ${geistSans.variable} ${geistMono.variable}
-          antialiased
+          antialiased overflow-x-hidden
         `}
       >
+        <Analytics />
         <ReactQueryProvider>
-
-          <main className="
-            absolute top-0 z-[-2] h-screen w-screen
-            bg-background bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,hsla(215,85%,30%,0.3),rgba(255,255,255,0))]
-            dark:bg-neutral-950 dark:bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,hsla(215,70%,40%,0.3),rgba(0,0,0,0))]          
-          ">
+          <div 
+            className="
+              absolute top-0 z-[-2] h-screen w-screen
+              bg-background bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,hsla(215,85%,30%,0.3),rgba(255,255,255,0))]
+              dark:bg-neutral-950 dark:bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,hsla(215,70%,40%,0.3),rgba(0,0,0,0))]          
+            "
+          />
+          <main className="overflow-x-hidden">
             <NuqsAdapter>
               <ThemeProvider
                 attribute="class"
