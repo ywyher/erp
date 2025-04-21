@@ -95,7 +95,7 @@ export default function Check({
 
   return (
     <div className="flex flex-col gap-6">
-      <div>
+      {/* <div>
         <LoadingBtn
           onClick={onGoogleLogin}
           variant="outline"
@@ -105,7 +105,7 @@ export default function Check({
         >
           <Google /> Log In with Google
         </LoadingBtn>
-      </div>
+      </div> */}
       <div className="relative">
         <div className="absolute inset-0 flex items-center">
           <span className="w-full border-t border-zinc-700" />

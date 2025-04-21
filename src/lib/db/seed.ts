@@ -9,7 +9,9 @@ import { eq } from "drizzle-orm";
 async function main() {
   console.log("🌱 Starting database seeding...");
 
-  await db.delete(user).where(eq(user.email, 'admin@perfect-health.net'))
+  const [exists] = await db.select().from(user).where(eq(user.email, 'admin@perfect-health.net'))
+
+  if(exists.id) return;
 
   const data = await auth.api.signUpEmail({
     body: {
