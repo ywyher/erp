@@ -40,7 +40,7 @@ export default function Header({ className = "" }: { className?: string }) {
         className={clsx(
           // "absolute top-4 z-10 bg-background",
           "flex items-center justify-between",
-          "w-full max-w-6xl",
+          "w-full max-w-7xl",
           "border rounded-2xl shadow-sm",
           "px-5 py-2 md:py-0",
           "bg-background",

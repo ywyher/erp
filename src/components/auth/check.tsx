@@ -12,7 +12,6 @@ import { checkFieldAvailability } from "@/lib/db/queries";
 import { z } from "zod";
 import { FormFieldWrapper } from "@/components/form-field-wrapper";
 import { toast } from "sonner";
-import Google from "@/components/svg/google";
 import { AuthIdentifier, AuthPort } from "@/components/auth/auth";
 import { useIsMobile } from "@/hooks/use-mobile";
 
@@ -81,17 +80,17 @@ export default function Check({
     }
   }
 
-  const onGoogleLogin = async () => {
-    setIsLoading(true);
-    const data = await signIn.social({
-      provider: "google",
-      callbackURL: process.env.NEXT_PUBLIC_APP_URL,
-    });
+  // const onGoogleLogin = async () => {
+  //   setIsLoading(true);
+  //   const data = await signIn.social({
+  //     provider: "google",
+  //     callbackURL: process.env.NEXT_PUBLIC_APP_URL,
+  //   });
 
-    if (!data) {
-      setIsLoading(false);
-    }
-  };
+  //   if (!data) {
+  //     setIsLoading(false);
+  //   }
+  // };
 
   return (
     <div className="flex flex-col gap-6">

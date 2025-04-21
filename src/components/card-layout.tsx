@@ -20,7 +20,7 @@ export default function CardLayout({
   return (
 <div className="px-6 w-full">
   <Card className={clsx(
-    "w-full max-w-6xl mx-auto border-none rounded-lg",
+    "w-full max-w-7xl mx-auto border-none rounded-lg",
     "py-3 px-6",
     variant == 'home' && 'bg-transparent shadow-none',
     className,
