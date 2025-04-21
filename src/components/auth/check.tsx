@@ -13,6 +13,8 @@ import { FormFieldWrapper } from "@/components/form-field-wrapper";
 import { toast } from "sonner";
 import { AuthIdentifier, AuthPort } from "@/components/auth/auth";
 import { useIsMobile } from "@/hooks/use-mobile";
+import Google from "@/components/svg/google";
+import { signIn } from "@/lib/auth-client";
 
 
 type CheckProps = {
@@ -79,21 +81,21 @@ export default function Check({
     }
   }
 
-  // const onGoogleLogin = async () => {
-  //   setIsLoading(true);
-  //   const data = await signIn.social({
-  //     provider: "google",
-  //     callbackURL: process.env.NEXT_PUBLIC_APP_URL,
-  //   });
+  const onGoogleLogin = async () => {
+    setIsLoading(true);
+    const data = await signIn.social({
+      provider: "google",
+      callbackURL: process.env.NEXT_PUBLIC_APP_URL,
+    });
 
-  //   if (!data) {
-  //     setIsLoading(false);
-  //   }
-  // };
+    if (!data) {
+      setIsLoading(false);
+    }
+  };
 
   return (
     <div className="flex flex-col gap-6">
-      {/* <div>
+      <div>
         <LoadingBtn
           onClick={onGoogleLogin}
           variant="outline"
@@ -103,15 +105,15 @@ export default function Check({
         >
           <Google /> Log In with Google
         </LoadingBtn>
-      </div> */}
-      {/* <div className="relative">
+      </div>
+      <div className="relative">
         <div className="absolute inset-0 flex items-center">
           <span className="w-full border-t border-zinc-700" />
         </div>
         <div className="relative flex justify-center text-xs uppercase">
           <span className="px-2 text-zinc-400">Or</span>
         </div>
-      </div> */}
+      </div>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(handleCheck, handleError)} className="space-y-4">
           <div>
